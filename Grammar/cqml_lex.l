@@ -8,6 +8,7 @@ IS			(u|U|l|L)*
 %{
 #include <stdio.h>
 #include "y.tab.h"
+#include <string.h>
 
 void count();
 %}
@@ -151,7 +152,7 @@ void count()
 			column += 8 - (column % 8);
 		else
 			column++;
-
+	yylval.data.lexem=strdup(yytext);
 	ECHO;
 }
 
@@ -171,6 +172,7 @@ int check_type()
 /*
 *	it actually will only return IDENTIFIER
 */
+	//yylval.data.lexem=strdup(yytext);
 
-	return(IDENTIFIER);
+	return(CQML_TYPE);
 }

@@ -10,27 +10,47 @@
 
 %token CASE DEFAULT IF ELSE SWITCH WHILE DO FOR GOTO CONTINUE BREAK RETURN
 
-%start element_list
+%start start_point
+
+%union {
+	struct
+	{
+	int* val;
+	char * lexem;
+	} data;
+}
 %%
+
+start_point
+	:	element_list
+	{ makeSource( $<data.val>1); }
+	;
 
 element_list
 	:	element element_list
+	{ $<data.val>$ = createList( $<data.val>1 , 'L', $<data.val>2, 0); }
 	|	element
+	{ $<data.val>$ = createList( $<data.val>1 , 'l', 0, 0);  }
 	;
 	
 element
 	:	CQML_TYPE '{' attribute_or_subelement_list '}'
+	{ $<data.val>$ = createElement( $<data.val>1 , 'R', $<data.val>3, $<data.lexem>1 ); }
 	|	CQML_TYPE '{' '}'
+	{ $<data.val>$ = createElement( $<data.val>1 , 'r', 0, $<data.lexem>1); }
 	;
 
 attribute_or_subelement_list
 	: attribute_or_element ';' attribute_or_subelement_list
+	{ $<data.val>$ = createList( $<data.val>1 , 'L', $<data.val>3, 0); }
 	| attribute_or_element ';'
+	{ $<data.val>$ = createList( $<data.val>1 , 'l', 0, 0);  }
 ;
 
 
 attribute_or_element
 	: element
+	{ $<data.val>$ = $<data.val>1; }
 	| event_handler
 	| attribute
 ;
@@ -446,6 +466,10 @@ function_definition
 
 %%
 #include <stdio.h>
+
+int* createElement(int *a, char b, int *c, char * d);
+int* createList(int *a, char b, int *c, char * d);
+void makeSource(int *a);
 
 extern char yytext[];
 extern int column;
