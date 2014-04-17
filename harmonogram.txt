@@ -1,0 +1,10 @@
+1.5	Drawing Interfaces, Attributy, Reference na gui_elementy (pomoci id)
+15.5	Attributy, kontrola cyklickych zavislosti
+29.5	Pozicování (anchors, spacing ...), import komponent z jinych cqml files
+12.6	Input Callbacks, Input elements (mouse + txt)
+26.6	kontrola existence atributu a callbacku
+10.7	vic gui_elementu - kresleni a parametry (kruznice, zaoblovani rohu etc.)
+24.7	Input Interfaces
+7.8	Layouts
+21.8	Animace parametrù
+4.9	Jazykove mutace
