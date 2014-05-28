@@ -2183,5 +2183,5 @@ int check_type()
 */
 	//yylval.data.lexem=strdup(yytext);
 
-	return(CQML_TYPE);
+	return(IDENTIFIER);
 }
