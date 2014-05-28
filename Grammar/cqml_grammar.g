@@ -2,7 +2,7 @@
 %token PTR_OP INC_OP DEC_OP LEFT_OP RIGHT_OP LE_OP GE_OP EQ_OP NE_OP
 %token AND_OP OR_OP MUL_ASSIGN DIV_ASSIGN MOD_ASSIGN ADD_ASSIGN
 %token SUB_ASSIGN LEFT_ASSIGN RIGHT_ASSIGN AND_ASSIGN
-%token XOR_ASSIGN OR_ASSIGN TYPE_NAME CQML_TYPE
+%token XOR_ASSIGN OR_ASSIGN TYPE_NAME
 
 %token TYPEDEF EXTERN STATIC AUTO REGISTER
 %token CHAR SHORT INT LONG SIGNED UNSIGNED FLOAT DOUBLE CONST VOLATILE VOID
@@ -34,9 +34,9 @@ element_list
 	;
 	
 element
-	:	CQML_TYPE '{' attribute_or_subelement_list '}'
+	:	IDENTIFIER '{' attribute_or_subelement_list '}'
 	{ $<data.val>$ = createElement( $<data.val>1 , 'R', $<data.val>3, $<data.lexem>1 ); }
-	|	CQML_TYPE '{' '}'
+	|	IDENTIFIER '{' '}'
 	{ $<data.val>$ = createElement( $<data.val>1 , 'r', 0, $<data.lexem>1); }
 	;
 
@@ -53,6 +53,7 @@ attribute_or_element
 	{ $<data.val>$ = $<data.val>1; }
 	| event_handler
 	| attribute
+	{ $<data.val>$ = $<data.val>1; }
 ;
 
 event_handler
@@ -61,143 +62,219 @@ event_handler
 
 attribute
 	:	IDENTIFIER ':' expression
+	{ $<data.val>$ = createAttribute( $<data.val>1 , 'l', $<data.val>1, $<data.val>3);  }
 ;
 
 primary_expression
 	: IDENTIFIER
+	{ $<data.val>$ = MakeNode0ID($<data.lexem>1); }
 	| CONSTANT
+	{ $<data.val>$ = MakeNode0($<data.lexem>1); }
 	| STRING_LITERAL
+	{ $<data.val>$ = MakeNode0($<data.lexem>1); }
 	| '(' expression ')'
+	{ $<data.val>$ = MakeNode3(MakeNode0("("), $<data.val>2 ,MakeNode0(")")); }
 	;
 
 postfix_expression
 	: primary_expression
+	{ $<data.val>$ = MakeNode1($<data.val>1); }
 	| postfix_expression '[' expression ']'
+	{ $<data.val>$ = MakeNode4($<data.val>1, MakeNode0("["), $<data.val>3,MakeNode0("]")); }
 	| postfix_expression '(' ')'
+	{ $<data.val>$ = MakeNode3($<data.val>1, MakeNode0("(") ,MakeNode0(")")); }
 	| postfix_expression '(' argument_expression_list ')'
+	{ $<data.val>$ = MakeNode4($<data.val>1, MakeNode0("("), $<data.val>3, MakeNode0(")")); }
 	| postfix_expression '.' IDENTIFIER
+	{ $<data.val>$ = MakeNode3($<data.val>1, MakeNode0("."), MakeNode0ID($<data.lexem>3)); }
 	| postfix_expression PTR_OP IDENTIFIER
+	{ $<data.val>$ = MakeNode3($<data.val>1, MakeNode0($<data.lexem>2), MakeNode0ID($<data.lexem>3)); }
 	| postfix_expression INC_OP
+	{ $<data.val>$ = MakeNode2($<data.val>1, MakeNode0($<data.lexem>2)); }
 	| postfix_expression DEC_OP
+	{ $<data.val>$ = MakeNode2($<data.val>1, MakeNode0($<data.lexem>2)); }
 	;
 
 argument_expression_list
 	: assignment_expression
+	{ $<data.val>$ = MakeNode1($<data.val>1); }
 	| argument_expression_list ',' assignment_expression
+	{ $<data.val>$ = MakeNode3($<data.val>1, MakeNode0(","), $<data.val>3); }
 	;
 
 unary_expression
 	: postfix_expression
+	{ $<data.val>$ = MakeNode1($<data.val>1); }
 	| INC_OP unary_expression
+	{ $<data.val>$ = MakeNode2(MakeNode0($<data.lexem>1), $<data.val>2); }
 	| DEC_OP unary_expression
+	{ $<data.val>$ = MakeNode2(MakeNode0($<data.lexem>1), $<data.val>2); }
 	| unary_operator cast_expression
+	{ $<data.val>$ = MakeNode2($<data.val>1, $<data.val>2); }
 	| SIZEOF unary_expression
+	{ $<data.val>$ = MakeNode2(MakeNode0($<data.lexem>1), $<data.val>2); }
 	| SIZEOF '(' type_name ')'
+	{ $<data.val>$ = MakeNode4(MakeNode0($<data.lexem>1), MakeNode0("("), $<data.val>3, MakeNode0(")")); }
 	;
 
 unary_operator
 	: '&'
+	{ $<data.val>$ = MakeNode0("&"); }
 	| '*'
+	{ $<data.val>$ = MakeNode0("*"); }
 	| '+'
+	{ $<data.val>$ = MakeNode0("+"); }
 	| '-'
+	{ $<data.val>$ = MakeNode0("-"); }
 	| '~'
+	{ $<data.val>$ = MakeNode0("~"); }
 	| '!'
+	{ $<data.val>$ = MakeNode0("!"); }
 	;
 
 cast_expression
 	: unary_expression
+	{ $<data.val>$ = MakeNode1($<data.val>1); }
 	| '(' type_name ')' cast_expression
+	{ $<data.val>$ = MakeNode4(MakeNode0("("), $<data.val>2, MakeNode0(")"), $<data.val>4); }
+	
 	;
 
 multiplicative_expression
 	: cast_expression
+	{ $<data.val>$ = MakeNode1($<data.val>1); }
 	| multiplicative_expression '*' cast_expression
+	{ $<data.val>$ = MakeNode3($<data.val>1, MakeNode0("*"), $<data.val>3); }
 	| multiplicative_expression '/' cast_expression
+	{ $<data.val>$ = MakeNode3($<data.val>1, MakeNode0("/"), $<data.val>3); }
 	| multiplicative_expression '%' cast_expression
+	{ $<data.val>$ = MakeNode3($<data.val>1, MakeNode0("%"), $<data.val>3); }
 	;
 
 additive_expression
 	: multiplicative_expression
+	{ $<data.val>$ = MakeNode1($<data.val>1); }
 	| additive_expression '+' multiplicative_expression
+	{ $<data.val>$ = MakeNode3($<data.val>1, MakeNode0("+"), $<data.val>3); }
 	| additive_expression '-' multiplicative_expression
+	{ $<data.val>$ = MakeNode3($<data.val>1, MakeNode0("-"), $<data.val>3); }
 	;
 
 shift_expression
 	: additive_expression
+	{ $<data.val>$ = MakeNode1($<data.val>1); }
 	| shift_expression LEFT_OP additive_expression
+	{ $<data.val>$ = MakeNode3($<data.val>1, MakeNode0($<data.lexem>2), $<data.val>3); }
 	| shift_expression RIGHT_OP additive_expression
+	{ $<data.val>$ = MakeNode3($<data.val>1, MakeNode0($<data.lexem>2), $<data.val>3); }
 	;
 
 relational_expression
 	: shift_expression
+	{ $<data.val>$ = MakeNode1($<data.val>1); }
 	| relational_expression '<' shift_expression
+	{ $<data.val>$ = MakeNode3($<data.val>1, MakeNode0("<"), $<data.val>3); }
 	| relational_expression '>' shift_expression
+	{ $<data.val>$ = MakeNode3($<data.val>1, MakeNode0(">"), $<data.val>3); }
 	| relational_expression LE_OP shift_expression
+	{ $<data.val>$ = MakeNode3($<data.val>1, MakeNode0($<data.lexem>2), $<data.val>3); }
 	| relational_expression GE_OP shift_expression
+	{ $<data.val>$ = MakeNode3($<data.val>1, MakeNode0($<data.lexem>2), $<data.val>3); }
 	;
 
 equality_expression
 	: relational_expression
+	{ $<data.val>$ = MakeNode1($<data.val>1); }
 	| equality_expression EQ_OP relational_expression
+	{ $<data.val>$ = MakeNode3($<data.val>1, MakeNode0($<data.lexem>2), $<data.val>3); }
 	| equality_expression NE_OP relational_expression
+	{ $<data.val>$ = MakeNode3($<data.val>1, MakeNode0($<data.lexem>2), $<data.val>3); }
 	;
 
 and_expression
 	: equality_expression
+	{ $<data.val>$ = MakeNode1($<data.val>1); }
 	| and_expression '&' equality_expression
+	{ $<data.val>$ = MakeNode3($<data.val>1, MakeNode0("&"), $<data.val>3); }
 	;
 
 exclusive_or_expression
 	: and_expression
+	{ $<data.val>$ = MakeNode1($<data.val>1); }
 	| exclusive_or_expression '^' and_expression
+	{ $<data.val>$ = MakeNode3($<data.val>1, MakeNode0("^"), $<data.val>3); }
 	;
 
 inclusive_or_expression
 	: exclusive_or_expression
+	{ $<data.val>$ = MakeNode1($<data.val>1); }
 	| inclusive_or_expression '|' exclusive_or_expression
+	{ $<data.val>$ = MakeNode3($<data.val>1, MakeNode0("|"), $<data.val>3); }
 	;
 
 logical_and_expression
 	: inclusive_or_expression
+	{ $<data.val>$ = MakeNode1($<data.val>1); }
 	| logical_and_expression AND_OP inclusive_or_expression
+	{ $<data.val>$ = MakeNode3($<data.val>1, MakeNode0($<data.lexem>2), $<data.val>3); }
 	;
 
 logical_or_expression
 	: logical_and_expression
+	{ $<data.val>$ = MakeNode1($<data.val>1); }
 	| logical_or_expression OR_OP logical_and_expression
+	{ $<data.val>$ = MakeNode3($<data.val>1, MakeNode0($<data.lexem>2), $<data.val>3); }
 	;
 
 conditional_expression
 	: logical_or_expression
+	{ $<data.val>$ = MakeNode1($<data.val>1); }
 	| logical_or_expression '?' expression ':' conditional_expression
+	{ $<data.val>$ = MakeNode3($<data.val>1, MakeNode0("?"), MakeNode3($<data.val>3, MakeNode0(":"),$<data.val>5)); }
 	;
 
 assignment_expression
 	: conditional_expression
+	{ $<data.val>$ = MakeNode1($<data.val>1); }
 	| unary_expression assignment_operator assignment_expression
+	{ $<data.val>$ = MakeNode3($<data.val>1, $<data.val>2, $<data.val>3); }
 	;
 
 assignment_operator
 	: '='
+	{ $<data.val>$ = MakeNode0("="); }
 	| MUL_ASSIGN
+	{ $<data.val>$ = MakeNode0($<data.lexem>1); }
 	| DIV_ASSIGN
+	{ $<data.val>$ = MakeNode0($<data.lexem>1); }
 	| MOD_ASSIGN
+	{ $<data.val>$ = MakeNode0($<data.lexem>1); }
 	| ADD_ASSIGN
+	{ $<data.val>$ = MakeNode0($<data.lexem>1); }
 	| SUB_ASSIGN
+	{ $<data.val>$ = MakeNode0($<data.lexem>1); }
 	| LEFT_ASSIGN
+	{ $<data.val>$ = MakeNode0($<data.lexem>1); }
 	| RIGHT_ASSIGN
+	{ $<data.val>$ = MakeNode0($<data.lexem>1); }
 	| AND_ASSIGN
+	{ $<data.val>$ = MakeNode0($<data.lexem>1); }
 	| XOR_ASSIGN
+	{ $<data.val>$ = MakeNode0($<data.lexem>1); }
 	| OR_ASSIGN
+	{ $<data.val>$ = MakeNode0($<data.lexem>1); }
 	;
 
 expression
 	: assignment_expression
+	{ $<data.val>$ = MakeNode1($<data.val>1); }
 	| expression ',' assignment_expression
+	{ $<data.val>$ = MakeNode3($<data.val>1, MakeNode0(","), $<data.val>3); }
 	;
 
 constant_expression
 	: conditional_expression
+	{ $<data.val>$ = MakeNode1($<data.val>1); }
 	;
 
 declaration
@@ -469,7 +546,20 @@ function_definition
 
 int* createElement(int *a, char b, int *c, char * d);
 int* createList(int *a, char b, int *c, char * d);
+int* createAttribute(int *a, char b, char *c, char * d);
 void makeSource(int *a);
+//typedef struct SrcNode SrcNode;
+//SrcNode* MakeNode0(char * text);
+//SrcNode* MakeNode1(SrcNode* child1);
+//SrcNode* MakeNode2(SrcNode* child1,SrcNode* child2);
+//SrcNode* MakeNode3(SrcNode* child1,SrcNode* child2,SrcNode* child3);
+//SrcNode* MakeNode4(SrcNode* child1,SrcNode* child2,SrcNode* child3,SrcNode* child4);
+int* MakeNode0ID(char * text);
+int* MakeNode0(char * text);
+int* MakeNode1(int* child1);
+int* MakeNode2(int* child1,int* child2);
+int* MakeNode3(int* child1,int* child2,int* child3);
+int* MakeNode4(int* child1,int* child2,int* child3,int* child4);
 
 extern char yytext[];
 extern int column;
