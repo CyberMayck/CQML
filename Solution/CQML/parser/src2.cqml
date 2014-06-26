@@ -1,0 +1,32 @@
+Rectangle
+{
+	Rectangle
+	{
+		Rectangle { }; 
+		Rectangle { };
+	};
+	Rectangle
+	{
+		id : meh;
+		Rectangle
+		{
+			hey : parent.x;
+			Rectangle { };
+		}; 
+	}; 
+}
+Rectangle
+{
+	Rectangle
+	{
+		Rectangle { }; 
+	};
+	Rectangle
+	{
+		Rectangle { };
+		Rectangle
+		{
+			Rectangle { };
+		}; 
+	}; 
+}
