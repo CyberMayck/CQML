@@ -66,6 +66,24 @@
 
 
 /* Copy the first part of user declarations.  */
+#include <stdio.h>
+
+int* createElement(int *a, char b, int *c, char * d);
+int* createList(int *a, char b, int *c, char * d);
+int* createAttribute(int *a, char b, char *c, char * d);
+void makeSource(int *a);
+//typedef struct SrcNode SrcNode;
+//SrcNode* MakeNode0(char * text);
+//SrcNode* MakeNode1(SrcNode* child1);
+//SrcNode* MakeNode2(SrcNode* child1,SrcNode* child2);
+//SrcNode* MakeNode3(SrcNode* child1,SrcNode* child2,SrcNode* child3);
+//SrcNode* MakeNode4(SrcNode* child1,SrcNode* child2,SrcNode* child3,SrcNode* child4);
+int* MakeNode0ID(char * text);
+int* MakeNode0(char * text);
+int* MakeNode1(int* child1);
+int* MakeNode2(int* child1,int* child2);
+int* MakeNode3(int* child1,int* child2,int* child3);
+int* MakeNode4(int* child1,int* child2,int* child3,int* child4);
 
 
 /* Line 189 of yacc.c  */

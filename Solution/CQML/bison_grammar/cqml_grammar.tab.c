@@ -66,7 +66,6 @@
 
 
 /* Copy the first part of user declarations.  */
-#include "parser_tree.h"
 
 
 /* Line 189 of yacc.c  */
@@ -1962,7 +1961,7 @@ yyreduce:
 
 /* Line 1455 of yacc.c  */
 #line 26 "cqml_grammar.g"
-    { makeSource( (yyvsp[(1) - (1)].data.val)); ;}
+    {  MakeParseTree((yyvsp[(1) - (1)].data.val)); ;}
     break;
 
   case 3:

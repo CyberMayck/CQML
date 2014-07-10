@@ -3,19 +3,21 @@ Rectangle
 	x : 0;
 	y : 0;
 	width : 100;
-	height : 100;
+	height : width;
 	Rectangle
 	{
+		id : crap;
 		x : 5;
 		y : 5;
-		width : parent.width/2-10;
+		width : nope.x/2-10;
 		height : parent.height-10;
 		Rectangle { }; 
 		Rectangle { };
 	};
 	Rectangle
 	{
-		x : parent.width/2+5;
+		id : nope;
+		x : crap.width/2+5;
 		y : 5;
 		width : parent.width/2-10;
 		height : parent.height-10;

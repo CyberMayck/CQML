@@ -5,6 +5,8 @@
 #define NODE_TYPE_NORMAL		(0)
 #define NODE_TYPE_ID			(1)
 #define NODE_TYPE_DOT			(2)
+#define NODE_TYPE_DOT_PROCESSED	(3)
+#define NODE_TYPE_LEAF			(4)
 
 typedef struct ParserList ParserList;
 typedef struct ParserGUIElement ParserGUIElement;

@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
+#include <string>
+#include <vector>
 #include <unordered_map>
 //#include "lex.yy.c"
 //#include "cqml_grammar.tab.c"
@@ -14,10 +15,22 @@ void PrintNodeToFile(SrcNode* node);
 class GUIElement;
 class GUIElementAttribute;
 
+
+class GraphNode
+{
+public:
+	std::string key;
+	std::vector<int> nextNodes;
+};
+
+std::unordered_map<std::string, int> keyMap;
+std::vector<GraphNode*> graphNodes;
+
 class GUIElement
 {
 public:
 	int id;
+	int parentId;
 	char * name;
 	GUIElement ** children;
 	GUIElementAttribute * attributes;
@@ -30,6 +43,7 @@ class GUIElementAttribute
 public:
 	char * name;
 	SrcNode * expression;
+	int graphInd;
 };
 
 GUIElement * elements;
@@ -56,6 +70,19 @@ int identifiersMax;
 int rootElements[100];
 int rootElementCount;
 
+
+
+
+#include <stack>
+std::stack<int> tStack;
+int tInd=0;
+int compInd=0;
+
+int* gIndex;
+int* gLink;
+int* stackCnts;
+int* compInds;
+void tarjanRecursion(int ind);
 
 
 char * firstIDrec(SrcNode* node)
@@ -99,19 +126,26 @@ void printAttributes()
 	int currentId;
 	currentId=id;
 
-	for(int i=0;i<elementCount;i++)
+	for(int k=compInd-1;k>=0;k--)
 	{
-		for(int j=0;j<elements[i].attributeCount;i++)
+		for(int i=0;i<elementCount;i++)
 		{
-			GUIElementAttribute* att=&elements[i].attributes[j];
-			if(strcmp("id",att->name)==0)
+			for(int j=0;j<elements[i].attributeCount;j++)
 			{
-				continue;
-			}
-			fprintf(file, "_QML_element%d->%s=",i,att->name);
+				GUIElementAttribute* att=&elements[i].attributes[j];
+				if(compInds[att->graphInd]!=k)
+				{
+					continue;
+				}
+				if(strcmp("id",att->name)==0)
+				{
+					continue;
+				}
+				fprintf(file, "_QML_element%d->%s=",i,att->name);
 				
-			PrintNodeToFile(att->expression);
-			fprintf(file, ";\n");
+				PrintNodeToFile(att->expression);
+				fprintf(file, ";\n");
+			}
 		}
 	}
 }
@@ -130,11 +164,113 @@ void recursionInit()
 	for(int i=0;i<elementCount;i++)
 	{
 		fprintf(file, "_QML_element%d = (GUI_Element*)acGUI_%s();\n",i,elements[i].name);
+	}
+	for(int i=0;i<elementCount;i++)
+	{
+	//	fprintf(file, "_QML_element%d = (GUI_Element*)acGUI_%s();\n",i,elements[i].name);
 		for(int j=0;j<elements[i].childrenCount;j++)
 		{
 			fprintf(file, "mGUI_Element_InsertChild((GUI_Element*)_QML_element%d, (GUI_Element*)_QML_element%d);\n",i,elements[i].children[j]->id);
 		}
 	}
+}
+
+bool * visited;
+bool * processed;
+
+bool recursionDetectCycle(GraphNode * node, int ind)
+{
+	if(visited[ind])
+		return true;
+	processed[ind]=true;
+	visited[ind]=true;
+	for(int i=0;i<node->nextNodes.size();i++)
+	{
+		if(recursionDetectCycle(graphNodes[node->nextNodes[i]],node->nextNodes[i]))
+			return true;
+	}
+	visited[ind]=false;
+	return false;
+}
+
+void sortTopologically()
+{
+	gIndex=new int[graphNodes.size()];
+	gLink=new int[graphNodes.size()];
+	stackCnts=new int[graphNodes.size()];
+	compInds=new int[graphNodes.size()];
+	for(int i=0;i<graphNodes.size();i++)
+	{
+		gIndex[i]=-1;
+		stackCnts[i]=0;
+	}
+	for(int i=0;i<graphNodes.size();i++)
+	{
+		if(gIndex[i]==-1)
+		{
+			tarjanRecursion(i);
+		}
+	}
+}
+
+void tarjanRecursion(int ind)
+{
+	gIndex[ind]=tInd;
+	gLink[ind]=tInd;
+	tInd++;
+	tStack.push(ind);
+	stackCnts[ind]++;
+
+	for(int i=0;i<graphNodes[ind]->nextNodes.size();i++)
+	{
+		int ind2=graphNodes[ind]->nextNodes[i];
+		if(gIndex[ind2]==-1)
+		{
+			tarjanRecursion(ind2);
+			if(gLink[ind]>gLink[ind2])
+				gLink[ind]=gLink[ind2];
+		}
+		else if(stackCnts[ind2]>0)
+		{
+			if(gLink[ind]>gIndex[ind2])
+				gLink[ind]=gIndex[ind2];
+		}
+	}
+
+	if(gLink[ind]==gIndex[ind])
+	{
+		while(true)
+		{
+			int ind2=tStack.top();
+			tStack.pop();
+			stackCnts[ind2]--;
+			compInds[ind2]=compInd;
+			
+			if(ind==ind2)
+				break;
+		}
+		compInd++;
+	}
+}
+
+bool detectCycle()
+{
+	visited=new bool[graphNodes.size()];
+	processed=new bool[graphNodes.size()];
+	for(int i=0,j=graphNodes.size();i<j;i++)
+	{
+		visited[i]=false;
+		processed[i]=false;
+	}
+	for(int i=0;i<graphNodes.size();i++)
+	{
+		if(!processed[i])
+		{
+			if(recursionDetectCycle(graphNodes[i],i))
+				return true;
+		}
+	}
+	return false;
 }
 
 void makeSource()
@@ -156,14 +292,20 @@ void makeSource()
 	id=0;
 	fprintf(file,"void _QML_Init()\n{\n");
 	fprintf(file, "root = (GUI_Element*) acGUI_Element();\n");
+	recursionInit();
 	
 	for(int i=0;i<rootElementCount;i++)
 	{
 		fprintf(file, "mGUI_Element_InsertChild((GUI_Element*)root, (GUI_Element*)_QML_element%d);\n",rootElements[i]);
 	}
 
-	recursionInit();
-		
+	bool cycle=detectCycle();
+
+	if(cycle)
+	{
+		printf("Cycle Detected\n");
+	}
+	sortTopologically();
 
 	printAttributes();
 
@@ -215,6 +357,7 @@ GUIElement * recursionProcessTree(ParserGUIElement * element)
 			if(element->list->members[i]->type==TYPE_GUI_ELEMENT)
 			{
 				instance->children[childCnt]=recursionProcessTree((ParserGUIElement *)element->list->members[i]);
+				instance->children[childCnt]->parentId=instance->id;
 				childCnt++;
 			}
 			else if(element->list->members[i]->type==TYPE_ATTRIBUTE)
@@ -230,7 +373,7 @@ GUIElement * recursionProcessTree(ParserGUIElement * element)
 	return instance;
 }
 
-int recursionCount(ParserGUIElement * element)
+void recursionCount(ParserGUIElement * element)
 {
 	elementCount++;
 	if((*element).list!=0)
@@ -242,54 +385,207 @@ int recursionCount(ParserGUIElement * element)
 		}
 	}
 }
+bool processSrcDots(SrcNode * node, int currentElementId, int graphInd);
 
-void processSrcReferences(SrcNode * node, int currentId, bool leftMostFound)
+void processSrcReferences(SrcNode * node, int currentId, bool leftMostFound, bool dotNodePassed, int graphInd)
 {
 	char str[100];
-	if(node->text!=0)
-	{
-		if(node->type==NODE_TYPE_ID)
-		{
-			bool isOtherId=false;//idMap.count(std::string(node->text))!=0;
-			if(leftMostFound)
+			if(node->type==NODE_TYPE_DOT)
 			{
-				if(isOtherId)
+				dotNodePassed=true;
+			}
+			else if(node->type==NODE_TYPE_ID)
+			{
+				bool isOtherId=idMap.count(std::string(node->text))!=0;
+				//if(leftMostFound)
 				{
-					int otherId=0;//idMap[std::string(node->text)];
-					free(node->text);
-					sprintf(str,"(*_QML_element%d)",otherId);
-					node->text=new char[strlen(str)];
-					strcpy(node->text,str);
-				}
-				else
-				{
-					if(strcmp("parent",node->text)==0)
+					if(isOtherId)
 					{
+						int otherId=idMap[std::string(node->text)];
 						free(node->text);
-						sprintf(str,"(*_QML_element%d->parent)",currentId);
-						node->text=new char[strlen(str)];
+						sprintf(str,"(*_QML_element%d)",otherId);
+						node->text=new char[strlen(str)+1];
 						strcpy(node->text,str);
 					}
 					else
 					{
-						sprintf(str,"(*_QML_element%d->%s)",currentId,node->text);
-						free(node->text);
-						node->text=new char[strlen(str)];
-						strcpy(node->text,str);
+						if(strcmp("parent",node->text)==0)
+						{
+							free(node->text);
+							sprintf(str,"(*_QML_element%d->parent)",currentId);
+							node->text=new char[strlen(str)+1];
+							strcpy(node->text,str);
+						}
+						else// if(is valid att?) //complete
+						{
+							sprintf(str,"(*_QML_element%d).%s",currentId,node->text);
+
+							std::string key=std::to_string(static_cast<long long>(currentId))+std::string(".")+std::string(node->text);
+
+							free(node->text);
+							node->text=new char[strlen(str)+1];
+							strcpy(node->text,str);
+
+							if(keyMap.count(key)!=0)
+							{
+								graphNodes[keyMap[key]]->nextNodes.push_back(graphInd);
+							}
+							else
+							{
+								GraphNode* graphNode=new GraphNode();
+								graphNode->key=key;
+								graphNode->nextNodes.push_back(graphInd);
+								keyMap[key]=graphNodes.size();
+								graphNodes.push_back(graphNode);
+								//graphNodespush_back();
+							}
+
+
+
+						}
+						//else //nothing
 					}
 				}
 			}
-			//else
-			//{
-			//}
-			leftMostFound=true;
+	if(!dotNodePassed)
+	{
+		for(int i=0;i<node->childrenCount;i++)
+		{
+			processSrcReferences(node->children[i],currentId,leftMostFound,dotNodePassed, graphInd);
 		}
 	}
-	for(int i=0;i<node->childrenCount;i++)
+	else
 	{
-		processSrcReferences(node->children[i],currentId,leftMostFound);
+		if(processSrcDots(node, currentId, graphInd))
+		{
+			node->type=NODE_TYPE_DOT_PROCESSED;
+		}
 	}
 }
+//class 
+int countDotIds(SrcNode * node)
+{
+	if(node->type==NODE_TYPE_LEAF)
+		return -1;
+	if(node->type==NODE_TYPE_ID)
+		return 1;
+
+	int cnt=0;
+	int val=0;
+	for(int i=0;i<node->childrenCount;i++)
+	{
+		if(node->type==NODE_TYPE_DOT && i==1)
+			continue;
+		
+		val=countDotIds(node->children[i]);
+		if(val<0)
+			return -1;
+		cnt+=val;
+	}
+	return cnt;
+}
+
+int fillIds(SrcNode * node, std::string* identifiers, int ind)
+{
+	if(node->type==NODE_TYPE_ID)
+	{
+		identifiers[ind]=std::string(node->text);
+		ind++;
+	}
+	else
+	{
+		for(int i=0;i<node->childrenCount;i++)
+		{		
+			ind=fillIds(node->children[i],identifiers, ind);
+		}
+	}
+	return ind;
+}
+
+bool processSrcDots(SrcNode * node, int currentElementId, int graphInd)
+{
+	int cnt=countDotIds(node);
+	if(cnt<1)
+		return false;
+
+	std::string* identifiers = new std::string[cnt];
+	fillIds(node,identifiers,0);
+
+	//bool prevParam=false;
+	bool prevElement=false;
+	bool isOtherId=idMap.count(identifiers[0])!=0;
+	int curId=currentElementId;
+	if(isOtherId)
+	{
+		curId=idMap[identifiers[0]];
+	}
+	else
+	{
+		if(identifiers[0]==std::string("parent"))
+		{
+			prevElement=true;
+			curId=elements[curId].parentId;
+		}
+		else //if(is valid param identifiers[0])
+		{
+			prevElement=false;
+		}
+	}
+	std::string attribs("");
+	for(int i=1;i<cnt;i++)
+	{
+		if(prevElement)
+		{
+			if(identifiers[i]==std::string("parent"))
+			{
+				prevElement=true;
+				curId=elements[curId].parentId;
+			}
+			else
+			{
+				attribs+="."+identifiers[i];
+				prevElement=false;
+			}
+		}
+		else
+		{
+			if(identifiers[i]==std::string("parent"))
+			{
+				return false;
+			}
+			attribs+="."+identifiers[i];
+		}
+	}
+	
+	std::string key=std::to_string(static_cast<long long>(curId))+attribs;
+	//std::unordered_map<std::string, int> keyMap;
+	//std::vector<GraphNode*> graphNodes;
+	
+	if(keyMap.count(key)!=0)
+	{
+		graphNodes[keyMap[key]]->nextNodes.push_back(graphInd);
+	}
+	else
+	{
+		GraphNode* graphNode=new GraphNode();
+		graphNode->key=key;
+		graphNode->nextNodes.push_back(graphInd);
+		keyMap[key]=graphNodes.size();
+		graphNodes.push_back(graphNode);
+		//graphNodespush_back();
+	}
+	//attribs;
+	//curId ///vex
+
+	attribs=std::string("(*_QML_element")+std::to_string(static_cast<long long>(curId))+std::string(")")+attribs;
+	//attribs
+	node->text=new char[attribs.length()+1];
+	std::strcpy(node->text,attribs.c_str());
+
+	return true;
+}
+
+
 
 
 void PrintNodeToFile(SrcNode* node)
@@ -299,10 +595,32 @@ void PrintNodeToFile(SrcNode* node)
 	{
 		fprintf(file, "%s",node->text);
 	}
-	for(i=0;i<(*node).childrenCount;i++)
+	if(node->type!=NODE_TYPE_DOT_PROCESSED)
 	{
-		PrintNodeToFile(node->children[i]);
+		for(i=0;i<(*node).childrenCount;i++)
+		{
+			PrintNodeToFile(node->children[i]);
+		}
 	}
+	else
+	{
+		printf("");
+	}
+}
+
+std::string expressionToStr(SrcNode * node)
+{
+	if(node->text!=0)// && (*node).type==NODE_TYPE_ID)
+	{
+		if(node->text)
+			return std::string(node->text);
+	}
+	std::string str("");
+	for(int i=0;i<node->childrenCount;i++)
+	{
+		str+=expressionToStr(node->children[i]);
+	}
+	return str;
 }
 
 void processTree(ParserList* root)
@@ -320,6 +638,7 @@ void processTree(ParserList* root)
 	{
 		rootElements[rootElementCount]=id;
 		recursionProcessTree((ParserGUIElement*)elementTree->members[i]);
+		elements[rootElements[rootElementCount]].parentId=-1;
 		rootElementCount++;
 	}
 
@@ -332,7 +651,7 @@ void processTree(ParserList* root)
 			if(strcmp(att->name,"id")==0)
 			{
 				//char * getString() error
-				//idMap[std::string(att->name)]=i;
+				idMap[expressionToStr(att->expression)]=i;
 			}
 			break; // should check for duplicities !!!
 		}
@@ -348,7 +667,25 @@ void processTree(ParserList* root)
 
 			if(strcmp(att->name,"id")==0)
 				continue;
-			processSrcReferences(att->expression,i,false);
+			std::string key=std::to_string(static_cast<long long>(i))+"."+std::string(att->name);
+			int graphInd;
+			
+			if(keyMap.count(key)!=0)
+			{
+				graphInd=keyMap[key];//->nextNodes.push_back(graphInd);
+			}
+			else
+			{
+				GraphNode* graphNode=new GraphNode();
+				graphNode->key=key;
+				graphInd=graphNodes.size();
+				keyMap[key]=graphInd;
+				graphNodes.push_back(graphNode);
+				//graphNodespush_back();
+			}
+			att->graphInd=graphInd;
+			
+			processSrcReferences(att->expression,i,false,false,graphInd);
 		}
 	}
 }
@@ -403,6 +740,8 @@ int main()
 	processTree(elementTree);
 	makeSource();
 	fclose(srcFile);
+	printf("\n%d\n",compInd);
+	scanf("%d",&a);
 
 	return 0;
 }

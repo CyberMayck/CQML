@@ -68,8 +68,8 @@ GUI_Element cGUI_Element()
 
 	instance.x=0;
 	instance.y=0;
-	instance.width=480; // should be 0
-	instance.height=360; // comm
+	instance.width=0;
+	instance.height=0;
 
 	instance.Draw=mGUI_Element_Draw;
 	return instance;
@@ -124,13 +124,13 @@ void mGUI_Element_Draw(GUI_Element *self)
 
 
 	
-	for(i=0;i<(*self).childrenCount;i++)
+	/*for(i=0;i<(*self).childrenCount;i++)
 	{
 		(*(*self).children[i]).x=5+i*((*self).width-10)/((*self).childrenCount);
-		(*(*self).children[i]).y=5;
+		(*(*self).children[i]).y=10;
 		(*(*self).children[i]).width=((*self).width-10)/((*self).childrenCount);
-		(*(*self).children[i]).height=(*self).height-10;
-	}
+		(*(*self).children[i]).height=(*self).height-20;
+	}*/
 
 
 	for(i=0;i<(*self).childrenCount;i++)
@@ -193,12 +193,21 @@ void mGUI_Element_InsertChild(GUI_Element *self,GUI_Element *child)
 }
 
 
-
 GUI_Element* root;
 GUI_Element* _QML_element1;
 GUI_Element* _QML_element2;
 GUI_Element* _QML_element3;
 GUI_Element* _QML_element4;
+GUI_Element* _QML_element5;
+GUI_Element* _QML_element6;
+GUI_Element* _QML_element7;
+GUI_Element* _QML_element8;
+GUI_Element* _QML_element9;
+GUI_Element* _QML_element10;
+GUI_Element* _QML_element11;
+GUI_Element* _QML_element12;
+GUI_Element* _QML_element13;
+GUI_Element* _QML_element14;
 
 void _QML_Init()
 {
@@ -210,8 +219,31 @@ mGUI_Element_InsertChild((GUI_Element*)_QML_element1, (GUI_Element*)_QML_element
 _QML_element3 = (GUI_Element*)acGUI_Rectangle();
 mGUI_Element_InsertChild((GUI_Element*)_QML_element2, (GUI_Element*)_QML_element3);
 _QML_element4 = (GUI_Element*)acGUI_Rectangle();
-mGUI_Element_InsertChild((GUI_Element*)_QML_element1, (GUI_Element*)_QML_element4);
+mGUI_Element_InsertChild((GUI_Element*)_QML_element2, (GUI_Element*)_QML_element4);
+_QML_element5 = (GUI_Element*)acGUI_Rectangle();
+mGUI_Element_InsertChild((GUI_Element*)_QML_element1, (GUI_Element*)_QML_element5);
+_QML_element6 = (GUI_Element*)acGUI_Rectangle();
+mGUI_Element_InsertChild((GUI_Element*)_QML_element5, (GUI_Element*)_QML_element6);
+_QML_element7 = (GUI_Element*)acGUI_Rectangle();
+mGUI_Element_InsertChild((GUI_Element*)_QML_element6, (GUI_Element*)_QML_element7);
+_QML_element8 = (GUI_Element*)acGUI_Rectangle();
+mGUI_Element_InsertChild((GUI_Element*)root, (GUI_Element*)_QML_element8);
+_QML_element9 = (GUI_Element*)acGUI_Rectangle();
+mGUI_Element_InsertChild((GUI_Element*)_QML_element8, (GUI_Element*)_QML_element9);
+_QML_element10 = (GUI_Element*)acGUI_Rectangle();
+mGUI_Element_InsertChild((GUI_Element*)_QML_element9, (GUI_Element*)_QML_element10);
+_QML_element11 = (GUI_Element*)acGUI_Rectangle();
+mGUI_Element_InsertChild((GUI_Element*)_QML_element8, (GUI_Element*)_QML_element11);
+_QML_element12 = (GUI_Element*)acGUI_Rectangle();
+mGUI_Element_InsertChild((GUI_Element*)_QML_element11, (GUI_Element*)_QML_element12);
+_QML_element13 = (GUI_Element*)acGUI_Rectangle();
+mGUI_Element_InsertChild((GUI_Element*)_QML_element11, (GUI_Element*)_QML_element13);
+_QML_element14 = (GUI_Element*)acGUI_Rectangle();
+mGUI_Element_InsertChild((GUI_Element*)_QML_element13, (GUI_Element*)_QML_element14);
 }
+
+
+
 
 int main()
 {

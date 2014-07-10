@@ -8,7 +8,7 @@ SrcNode* MakeNode0(char * text)
 	(*pointer).childrenCount=0;
 	(*pointer).children=0;
 	(*pointer).text=text;
-	(*pointer).type=NODE_TYPE_NORMAL;
+	(*pointer).type=NODE_TYPE_LEAF;
 	return pointer;
 }
 SrcNode* MakeNode0ID(char * text)

@@ -1962,7 +1962,7 @@ yyreduce:
 
 /* Line 1455 of yacc.c  */
 #line 26 "cqml_grammar.g"
-    { makeSource( (yyvsp[(1) - (1)].data.val)); ;}
+    {  makeParseTree((yyvsp[(1) - (1)].data.val)); ;}
     break;
 
   case 3:

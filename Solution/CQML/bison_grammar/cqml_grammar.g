@@ -23,7 +23,7 @@
 
 start_point
 	:	element_list
-	{ makeSource( $<data.val>1); }
+	{  makeParseTree($<data.val>1); }
 	;
 
 element_list
