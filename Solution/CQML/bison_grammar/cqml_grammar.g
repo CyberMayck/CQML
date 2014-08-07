@@ -4,7 +4,7 @@
 %token SUB_ASSIGN LEFT_ASSIGN RIGHT_ASSIGN AND_ASSIGN
 %token XOR_ASSIGN OR_ASSIGN TYPE_NAME
 
-%token TYPEDEF EXTERN STATIC AUTO REGISTER
+%token TYPEDEF EXTERN STATIC AUTO REGISTER PROPERTY
 %token CHAR SHORT INT LONG SIGNED UNSIGNED FLOAT DOUBLE CONST VOLATILE VOID
 %token STRUCT UNION ENUM ELLIPSIS
 
@@ -52,12 +52,23 @@ attribute_or_element
 	: element
 	{ $<data.val>$ = $<data.val>1; }
 	| event_handler
+	{ $<data.val>$ = $<data.val>1; }
 	| attribute
+	{ $<data.val>$ = $<data.val>1; }
+	| property
 	{ $<data.val>$ = $<data.val>1; }
 ;
 
 event_handler
-	: IDENTIFIER ':' '{' pure_c_code '}'
+	: IDENTIFIER ':' compound_statement
+	{ $<data.val>$ = createHandler( $<data.val>1 , 'l', $<data.lexem>1, $<data.val>3);  }
+;
+
+property
+	: PROPERTY IDENTIFIER attribute
+	{ $<data.val>$ = createPropertyInit( $<data.val>2 , $<data.val>3 , $<data.lexem>2);  }
+	| PROPERTY IDENTIFIER IDENTIFIER
+	{ $<data.val>$ = createProperty( $<data.val>2 , $<data.lexem>2 , $<data.lexem>3);  }
 ;
 
 attribute
@@ -279,49 +290,78 @@ constant_expression
 
 declaration
 	: declaration_specifiers ';'
+	{ $<data.val>$ = MakeNode2($<data.val>1, MakeNode0(";")); }
 	| declaration_specifiers init_declarator_list ';'
+	{ $<data.val>$ = MakeNode3($<data.val>1, $<data.val>2, MakeNode0(";")); }
 	;
 
 declaration_specifiers
 	: storage_class_specifier
+	{ $<data.val>$ = MakeNode1($<data.val>1); }
 	| storage_class_specifier declaration_specifiers
+	{ $<data.val>$ = MakeNode2($<data.val>1, $<data.val>2); }
 	| type_specifier
+	{ $<data.val>$ = MakeNode1($<data.val>1); }
 	| type_specifier declaration_specifiers
+	{ $<data.val>$ = MakeNode2($<data.val>1, $<data.val>2); }
 	| type_qualifier
+	{ $<data.val>$ = MakeNode1($<data.val>1); }
 	| type_qualifier declaration_specifiers
+	{ $<data.val>$ = MakeNode2($<data.val>1, $<data.val>2); }
 	;
 
 init_declarator_list
 	: init_declarator
+	{ $<data.val>$ = MakeNode1($<data.val>1); }
 	| init_declarator_list ',' init_declarator
+	{ $<data.val>$ = MakeNode3($<data.val>1, MakeNode0(","), $<data.val>3); }
 	;
 
 init_declarator
 	: declarator
+	{ $<data.val>$ = MakeNode1($<data.val>1); }
 	| declarator '=' initializer
+	{ $<data.val>$ = MakeNode3($<data.val>1, MakeNode0("="), $<data.val>3); }
 	;
 
 storage_class_specifier
 	: TYPEDEF
+	{ $<data.val>$ = MakeNode0($<data.lexem>1); }
 	| EXTERN
+	{ $<data.val>$ = MakeNode0($<data.lexem>1); }
 	| STATIC
+	{ $<data.val>$ = MakeNode0($<data.lexem>1); }
 	| AUTO
+	{ $<data.val>$ = MakeNode0($<data.lexem>1); }
 	| REGISTER
+	{ $<data.val>$ = MakeNode0($<data.lexem>1); }
 	;
 
 type_specifier
 	: VOID
+	{ $<data.val>$ = MakeNode0($<data.lexem>1); }
 	| CHAR
+	{ $<data.val>$ = MakeNode0($<data.lexem>1); }
 	| SHORT
+	{ $<data.val>$ = MakeNode0($<data.lexem>1); }
 	| INT
+	{ $<data.val>$ = MakeNode0($<data.lexem>1); }
 	| LONG
+	{ $<data.val>$ = MakeNode0($<data.lexem>1); }
 	| FLOAT
+	{ $<data.val>$ = MakeNode0($<data.lexem>1); }
 	| DOUBLE
+	{ $<data.val>$ = MakeNode0($<data.lexem>1); }
 	| SIGNED
+	{ $<data.val>$ = MakeNode0($<data.lexem>1); }
 	| UNSIGNED
+	{ $<data.val>$ = MakeNode0($<data.lexem>1); }
 	| struct_or_union_specifier
+	{ $<data.val>$ = MakeNode1($<data.val>1); }
 	| enum_specifier
+	{ $<data.val>$ = MakeNode1($<data.val>1); }
 	| TYPE_NAME
+	{ $<data.val>$ = MakeNode0($<data.lexem>1); }
 	;
 
 struct_or_union_specifier
@@ -380,56 +420,81 @@ enumerator
 
 type_qualifier
 	: CONST
+	{ $<data.val>$ = MakeNode0($<data.lexem>1); }
 	| VOLATILE
+	{ $<data.val>$ = MakeNode0($<data.lexem>1); }
 	;
 
 declarator
 	: pointer direct_declarator
+	{ $<data.val>$ = MakeNode2($<data.val>1, $<data.val>2); }
 	| direct_declarator
+	{ $<data.val>$ = MakeNode1($<data.val>1); }
 	;
 
 direct_declarator
 	: IDENTIFIER
 	| '(' declarator ')'
+	{ $<data.val>$ = MakeNode3(MakeNode0("("), $<data.val>2, MakeNode0(")")); }
 	| direct_declarator '[' constant_expression ']'
+	{ $<data.val>$ = MakeNode4($<data.val>1, MakeNode0("["), $<data.val>3, MakeNode0("]")); }
 	| direct_declarator '[' ']'
+	{ $<data.val>$ = MakeNode3($<data.val>1, MakeNode0("["), MakeNode0("]")); }
 	| direct_declarator '(' parameter_type_list ')'
+	{ $<data.val>$ = MakeNode4($<data.val>1, MakeNode0("("), $<data.val>3, MakeNode0(")")); }
 	| direct_declarator '(' identifier_list ')'
+	{ $<data.val>$ = MakeNode4($<data.val>1, MakeNode0("("), $<data.val>3, MakeNode0(")")); }
 	| direct_declarator '(' ')'
+	{ $<data.val>$ = MakeNode3($<data.val>1, MakeNode0("("), MakeNode0(")")); }
 	;
 
 pointer
 	: '*'
+	{ $<data.val>$ = MakeNode0("*"); }
 	| '*' type_qualifier_list
+	{ $<data.val>$ = MakeNode2(MakeNode0("*"), $<data.val>2); }
 	| '*' pointer
+	{ $<data.val>$ = MakeNode2(MakeNode0("*"), $<data.val>2); }
 	| '*' type_qualifier_list pointer
+	{ $<data.val>$ = MakeNode3(MakeNode0("*"), $<data.val>2, $<data.val>3); }
 	;
 
 type_qualifier_list
 	: type_qualifier
+	{ $<data.val>$ = MakeNode1($<data.val>1); }
 	| type_qualifier_list type_qualifier
+	{ $<data.val>$ = MakeNode2($<data.val>1, $<data.val>2); }
 	;
 
 
 parameter_type_list
 	: parameter_list
+	{ $<data.val>$ = MakeNode1($<data.val>1); }
 	| parameter_list ',' ELLIPSIS
+	{ $<data.val>$ = MakeNode3($<data.val>1, MakeNode0(","),  MakeNode0($<data.lexem>3)); }
 	;
 
 parameter_list
 	: parameter_declaration
+	{ $<data.val>$ = MakeNode1($<data.val>1); }
 	| parameter_list ',' parameter_declaration
+	{ $<data.val>$ = MakeNode3($<data.val>1, MakeNode0(","),  $<data.val>3); }
 	;
 
 parameter_declaration
 	: declaration_specifiers declarator
+	{ $<data.val>$ = MakeNode2($<data.val>1, $<data.val>2); }
 	| declaration_specifiers abstract_declarator
+	{ $<data.val>$ = MakeNode2($<data.val>1, $<data.val>2); }
 	| declaration_specifiers
+	{ $<data.val>$ = MakeNode1($<data.val>1); }
 	;
 
 identifier_list
 	: IDENTIFIER
+	{ $<data.val>$ = MakeNode0($<data.lexem>1); }
 	| identifier_list ',' IDENTIFIER
+	{ $<data.val>$ = MakeNode3($<data.val>1, MakeNode0(","), $<data.val>3); }
 	;
 
 type_name
@@ -439,106 +504,162 @@ type_name
 
 abstract_declarator
 	: pointer
+	{ $<data.val>$ = MakeNode1($<data.val>1); }
 	| direct_abstract_declarator
+	{ $<data.val>$ = MakeNode1($<data.val>1); }
 	| pointer direct_abstract_declarator
+	{ $<data.val>$ = MakeNode2($<data.val>1, $<data.val>2); }
 	;
 
 direct_abstract_declarator
 	: '(' abstract_declarator ')'
+	{ $<data.val>$ = MakeNode3(MakeNode0("("), $<data.val>2, MakeNode0(")")); }
 	| '[' ']'
+	{ $<data.val>$ = MakeNode2(MakeNode0("["), MakeNode0("]")); }
 	| '[' constant_expression ']'
+	{ $<data.val>$ = MakeNode3(MakeNode0("["), $<data.val>2, MakeNode0("]")); }
 	| direct_abstract_declarator '[' ']'
+	{ $<data.val>$ = MakeNode3($<data.val>1, MakeNode0("["), MakeNode0("]")); }
 	| direct_abstract_declarator '[' constant_expression ']'
+	{ $<data.val>$ = MakeNode4($<data.val>1, MakeNode0("["), $<data.val>3, MakeNode0("]")); }
 	| '(' ')'
+	{ $<data.val>$ = MakeNode2(MakeNode0("("), MakeNode0(")")); }
 	| '(' parameter_type_list ')'
+	{ $<data.val>$ = MakeNode3(MakeNode0("("), $<data.val>2, MakeNode0(")")); }
 	| direct_abstract_declarator '(' ')'
+	{ $<data.val>$ = MakeNode3($<data.val>1, MakeNode0("("), MakeNode0(")")); }
 	| direct_abstract_declarator '(' parameter_type_list ')'
+	{ $<data.val>$ = MakeNode3($<data.val>1, MakeNode0("("), $<data.val>3, MakeNode0(")")); }
 	;
 
 initializer
 	: assignment_expression
+	{ $<data.val>$ = MakeNode1($<data.val>1); }
 	| '{' initializer_list '}'
+	{ $<data.val>$ = MakeNode3(MakeNode0("{"), $<data.val>2, MakeNode0("}")); }
 	| '{' initializer_list ',' '}'
+	{ $<data.val>$ = MakeNode4(MakeNode0("{"), $<data.val>2, MakeNode0(","), MakeNode0("}")); }
 	;
 
 initializer_list
 	: initializer
+	{ $<data.val>$ = MakeNode1($<data.val>1); }
 	| initializer_list ',' initializer
+	{ $<data.val>$ = MakeNode3($<data.val>1, MakeNode0(","), $<data.val>3); }
 	;
 
 statement
 	: labeled_statement
+	{ $<data.val>$ = MakeNode1($<data.val>1); }
 	| compound_statement
+	{ $<data.val>$ = MakeNode1($<data.val>1); }
 	| expression_statement
+	{ $<data.val>$ = MakeNode1($<data.val>1); }
 	| selection_statement
+	{ $<data.val>$ = MakeNode1($<data.val>1); }
 	| iteration_statement
+	{ $<data.val>$ = MakeNode1($<data.val>1); }
 	| jump_statement
+	{ $<data.val>$ = MakeNode1($<data.val>1); }
 	;
 
 labeled_statement
 	: IDENTIFIER ':' statement
+	{ $<data.val>$ = MakeNode3($<data.lexem>1, MakeNode0(":"), $<data.val>3); }
 	| CASE constant_expression ':' statement
+	{ $<data.val>$ = MakeNode4($<data.lexem>1, $<data.val>2, MakeNode0(":"), $<data.val>4); }
 	| DEFAULT ':' statement
+	{ $<data.val>$ = MakeNode3($<data.lexem>1, MakeNode0(":"), $<data.val>3); }
 	;
 
 compound_statement
 	: '{' '}'
+	{ $<data.val>$ = MakeNode2(MakeNode0("{"), MakeNode0("}")); }
 	| '{' statement_list '}'
+	{ $<data.val>$ = MakeNode3(MakeNode0("{"), $<data.val>2, MakeNode0("}")); }
 	| '{' declaration_list '}'
+	{ $<data.val>$ = MakeNode3(MakeNode0("{"), $<data.val>2, MakeNode0("}")); }
 	| '{' declaration_list statement_list '}'
+	{ $<data.val>$ = MakeNode2($<data.val>1, $<data.val>2); }
 	;
 
 declaration_list
 	: declaration
+	{ $<data.val>$ = MakeNode1($<data.val>1); }
 	| declaration_list declaration
+	{ $<data.val>$ = MakeNode2($<data.val>1, $<data.val>2); }
 	;
 
 statement_list
 	: statement
+	{ $<data.val>$ = MakeNode1($<data.val>1); }
 	| statement_list statement
+	{ $<data.val>$ = MakeNode2($<data.val>1, $<data.val>2); }
 	;
 
 expression_statement
 	: ';'
+	{ $<data.val>$ = MakeNode0(";"); }
 	| expression ';'
+	{ $<data.val>$ = MakeNode2($<data.val>1, MakeNode0(";")); }
 	;
 
 selection_statement
 	: IF '(' expression ')' statement
+	{ $<data.val>$ = MakeNode5($<data.lexem>1, MakeNode0("("), $<data.val>3, MakeNode0(")"), $<data.val>5); }
 	| IF '(' expression ')' statement ELSE statement
+	{ $<data.val>$ = MakeNode7($<data.lexem>1, MakeNode0("("), $<data.val>3, MakeNode0(")"), $<data.val>5, $<data.lexem>6, $<data.val>7); }
 	| SWITCH '(' expression ')' statement
+	{ $<data.val>$ = MakeNode5($<data.lexem>1, MakeNode0("("), $<data.val>3, MakeNode0(")"), $<data.val>5); }
 	;
 
 iteration_statement
 	: WHILE '(' expression ')' statement
+	{ $<data.val>$ = MakeNode5($<data.lexem>1, MakeNode0("("), $<data.val>3, MakeNode0(")"), $<data.val>5); }
 	| DO statement WHILE '(' expression ')' ';'
+	{ $<data.val>$ = MakeNode7($<data.lexem>1, $<data.val>2, $<data.lexem>3, MakeNode0("("), $<data.val>5, MakeNode0(")"),  MakeNode0(";")); }
 	| FOR '(' expression_statement expression_statement ')' statement
+	{ $<data.val>$ = MakeNode6($<data.lexem>1, MakeNode0("("), $<data.val>3, $<data.val>4, MakeNode0(")"), $<data.val>6); }
 	| FOR '(' expression_statement expression_statement expression ')' statement
+	{ $<data.val>$ = MakeNode7($<data.lexem>1, MakeNode0("("), $<data.val>3, $<data.val>4, $<data.val>5, MakeNode0(")"), $<data.val>7); }
 	;
 
 jump_statement
 	: GOTO IDENTIFIER ';'
+	{ $<data.val>$ = MakeNode3($<data.lexem>1, $<data.lexem>2, MakeNode0(";")); }
 	| CONTINUE ';'
+	{ $<data.val>$ = MakeNode2($<data.lexem>1, MakeNode0(";")); }
 	| BREAK ';'
+	{ $<data.val>$ = MakeNode2($<data.lexem>1, MakeNode0(";")); }
 	| RETURN ';'
+	{ $<data.val>$ = MakeNode2($<data.lexem>1, MakeNode0(";")); }
 	| RETURN expression ';'
+	{ $<data.val>$ = MakeNode3($<data.lexem>1, $<data.val>2, MakeNode0(";")); }
 	;
 
 pure_c_code
 	: external_declaration
+	{ $<data.val>$ = MakeNode1($<data.val>1); }
 	| pure_c_code external_declaration
+	{ $<data.val>$ = MakeNode2($<data.val>1, $<data.val>2); }
 	;
 
 external_declaration
 	: function_definition
+	{ $<data.val>$ = MakeNode1($<data.val>1); }
 	| declaration
+	{ $<data.val>$ = MakeNode1($<data.val>1); }
 	;
 
 function_definition
 	: declaration_specifiers declarator declaration_list compound_statement
+	{ $<data.val>$ = MakeNode4($<data.val>1, $<data.val>2, $<data.val>3, $<data.val>4); }
 	| declaration_specifiers declarator compound_statement
+	{ $<data.val>$ = MakeNode3($<data.val>1, $<data.val>2, $<data.val>3); }
 	| declarator declaration_list compound_statement
+	{ $<data.val>$ = MakeNode3($<data.val>1, $<data.val>2, $<data.val>3); }
 	| declarator compound_statement
+	{ $<data.val>$ = MakeNode2($<data.val>1, $<data.val>2); }
 	;
 
 %%

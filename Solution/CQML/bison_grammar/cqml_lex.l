@@ -7,7 +7,7 @@ IS			(u|U|l|L)*
 
 %{
 #include <stdio.h>
-#include "cqml_grammar.tab.hpp"
+#include "cqml_grammar.tab.h"
 #include <string.h>
 
 void count();
@@ -35,6 +35,7 @@ void comment();
 "if"			{ count(); return(IF); }
 "int"			{ count(); return(INT); }
 "long"			{ count(); return(LONG); }
+"property"		{ count(); return(PROPERTY); }
 "register"		{ count(); return(REGISTER); }
 "return"		{ count(); return(RETURN); }
 "short"			{ count(); return(SHORT); }

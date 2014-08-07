@@ -2,30 +2,47 @@ Rectangle
 {
 	x : 0;
 	y : 0;
-	width : 100;
+	width : 500;
 	height : width;
 	Rectangle
 	{
 		id : crap;
 		x : 5;
 		y : 5;
-		width : nope.x/2-10;
-		height : parent.height-10;
-		Rectangle { }; 
-		Rectangle { };
+		width : parent.width/2-10;
+		height : nope.parent.height-10;
+		Rectangle 
+		{
+			x : 5;
+			y : 5;
+			width  : parent.width-10;
+			height : parent.height/2-10;
+		}; 
+		Rectangle
+		{
+			x : 5;
+			y : parent.height/2+5;
+			width  : parent.width-10;
+			height : parent.height/2-10;
+			MouseClicked : { crap.x = 0; color.red = 0; };
+		};
 	};
 	Rectangle
 	{
 		id : nope;
-		x : crap.width/2+5;
+		x : crap.width+5;
 		y : 5;
 		width : parent.width/2-10;
 		height : parent.height-10;
 		Rectangle
 		{
+			x : 5;
+			y : 5;
 			width : parent.width/2;
 			height : parent.height/2;
 			Rectangle {
+			x : 5;
+			y : 5;
 			width : parent.width/2;
 			height : parent.height/2;
 			};

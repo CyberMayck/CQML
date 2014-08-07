@@ -1,4 +1,9 @@
 //#define USECAIRO
+#define SET_FLAG(x,flag)	(x|flag)
+#define UNSET_FLAG(x,flag)	(x&(~flag))
+#define FLAG(x,flag)		(x&flag)
+
+
 #define USESDL
 
 #ifdef USECAIRO
@@ -9,23 +14,25 @@
 
 #ifdef USESDL
 #include <SDL/SDL.h>
+#include <SDL/SDL_TTF.h>
 #endif
 
 #include<stdio.h>
 #include<stdlib.h>
 #include<string.h>
 
-typedef struct GUI_Element GUI_Element;
-typedef struct GUI_Rectangle GUI_Rectangle;
-typedef struct Color Color;
-void mGUI_Element_Draw(GUI_Element *self);
-void mGUI_Rectangle_Draw(GUI_Element *self);
+#include "cqml.h"
+#include "gui.h"
+#include "draw_iface.h"
+
 
 
 #ifdef USESDL
 //SDL_Surface*    Surf_Display;
 SDL_Window*  SDLWindow;
 SDL_Renderer* SDLRenderer;
+TTF_Font *fntCourier;
+SDL_Texture *strTex;
 
 void SDLInit()
 {
@@ -33,8 +40,10 @@ void SDLInit()
 	//SDL_CreateWindow("CQML SDL TEST", 5, 5, 800, 600,SDL_WINDOW_OPENGL);
 	SDL_CreateWindowAndRenderer(800, 600,SDL_WINDOW_OPENGL,&SDLWindow,&SDLRenderer);
 
-
+	TTF_Init();
+	fntCourier = TTF_OpenFont( "C64.ttf", 12 );
 	//Surf_Display = SDL_SetVideoMode(640, 480, 32, SDL_HWSURFACE | SDL_DOUBLEBUF);
+	
 }
 #endif
 
@@ -57,123 +66,16 @@ cairo_surface_destroy(surface);
 }
 #endif
 
-struct Color{
-	float r;
-	float g;
-	float b;
-	//float a;
-};
-
-struct GUI_Element {
-	GUI_Element * parent;
-	GUI_Element ** children;
-	int childrenCount;
-
-	int x;
-	int y;
-	int width;
-	int height;
-	//int (*Top)(GUI_Element *self);
-	//int (*Left)(GUI_Element *self);
-	void (*Draw)(GUI_Element *self);
-};
 
 
 
-struct GUI_Rectangle {
-	GUI_Element base;
-	int id;
-	Color color;
-};
 
-GUI_Element cGUI_Element()
+
+void DrawRectangle(int x,int y,int w,int h,float r, float g, float b)
 {
-	GUI_Element instance;
-	instance.children=0;
-	instance.parent=0;
-	instance.childrenCount=0;
-
-	instance.x=0;
-	instance.y=0;
-	instance.width=0;
-	instance.height=0;
-
-	instance.Draw=mGUI_Element_Draw;
-	return instance;
-}
-
-GUI_Element* acGUI_Element()
-{
-	GUI_Element * pointer=(GUI_Element*)malloc(sizeof(GUI_Element));
-	*pointer=cGUI_Element();
-	return pointer;
-}
-
-
-GUI_Rectangle cGUI_Rectangle()
-{
-	GUI_Rectangle instance;
-	instance.base=cGUI_Element();
-	instance.base.Draw=mGUI_Rectangle_Draw;
-
-	return instance;
-}
-
-GUI_Rectangle* acGUI_Rectangle()
-{
-	GUI_Rectangle * pointer;
-	pointer=(GUI_Rectangle*)malloc(sizeof(GUI_Rectangle));
-	*pointer=cGUI_Rectangle();
-	return pointer;
-}
-
-int mGUI_Element_Top(GUI_Element *self)
-{
-	if((*self).parent!=0)
-	{
-		return mGUI_Element_Top((*self).parent)+(*self).y;
-	}
-	return (*self).y;
-}
-int mGUI_Element_Left(GUI_Element *self)
-{
-	if((*self).parent!=0)
-	{
-		return mGUI_Element_Left((*self).parent)+(*self).x;
-	}
-	return (*self).x;
-}
-
-void mGUI_Element_Draw(GUI_Element *self)
-{
-	int i;
-	//printf("coord %d \n",(*self).x);
-
-
-	for(i=0;i<(*self).childrenCount;i++)
-	{
-		//printf("kid %d: ",i);
-		(*(*self).children[i]).Draw((*self).children[i]);
-	}
-	return;
-}
-void mGUI_Rectangle_Draw(GUI_Element *self)
-{
-	int x,y,w,h;
-	
 #ifdef USESDL
 	SDL_Rect sdlRect;
 #endif
-
-	x=mGUI_Element_Left(self);
-	y=mGUI_Element_Top(self);
-	w=(*self).width;
-	h=(*self).height;
-
-
-	//cairo draw
-
-	//printf("%d %d %d %d\n",x, y, w, h);
 #ifdef USECAIRO
 	cairo_set_line_width (cr, 2);
 	cairo_set_source_rgb (cr, 0, 0, 0);
@@ -185,38 +87,156 @@ void mGUI_Rectangle_Draw(GUI_Element *self)
 	sdlRect.y=y;
 	sdlRect.w=w;
 	sdlRect.h=h;
+	
+	SDL_SetRenderDrawColor(SDLRenderer,r,g,b,255);
 	SDL_RenderDrawRect(SDLRenderer, &sdlRect);
 #endif
-
-
-	//draw kids
-	mGUI_Element_Draw(self);
 }
 
-void mGUI_Element_InsertChild(GUI_Element *self,GUI_Element *child)
+
+void DrawRectangleFilled(int x,int y,int w,int h,float r, float g, float b)
 {
-	GUI_Element ** oldChildren;
-	int i;
-	oldChildren=(*self).children;
-	(*self).children=(GUI_Element **) malloc(((*self).childrenCount+1)*sizeof(GUI_Element *));
+#ifdef USESDL
+	SDL_Rect sdlRect;
+#endif
+#ifdef USESDL
+	sdlRect.x=x;
+	sdlRect.y=y;
+	sdlRect.w=w;
+	sdlRect.h=h;
 	
-	for(i=0;i<(*self).childrenCount;i++)
-	{
-		(*self).children[i]=oldChildren[i];
-	}
-
-	(*self).children[(*self).childrenCount]=child;
-	(*child).parent=self;
-
-	if((*self).childrenCount>0)
-	{
-		free(oldChildren);
-	}
-	(*self).childrenCount++;
+	SDL_SetRenderDrawColor(SDLRenderer,r,g,b,255);
+	SDL_RenderFillRect(SDLRenderer, &sdlRect);
+#endif
 }
+
+
+#ifdef USESDL
+void InitSDLDrawer()
+{
+	DrawIFace * drawer=(DrawIFace * )malloc(sizeof(DrawIFace));
+	drawer->DrawRectangle=DrawRectangle;
+	drawer->DrawFilledRectangle=DrawRectangleFilled;
+	SetDrawIFace(drawer);
+}
+#endif
+
+//GUI_Element ** drawQueue;
+//GUI_Element ** updateQueue;
+GUI_Element ** allElements;
+int allElementCount;
+int * drawQueue;
+int * updateQueue;
+
+void Update();
+void Redraw();
+int InputHandling();
+
+#include<time.h>
+
+clock_t prevTime;
+clock_t t;
+float timey;
+int fps;
+#include "parser_output.c"
+
+void GUIMainLoop()
+{
+	int quit;
+
+	t=clock();
+	fps=0;
+	quit=0;
+	while(quit==0)
+	{
+		quit=InputHandling();
+		//printf("quit %d\n",quit);
+		Update();
+
+		Redraw();
+
+		timey=timey*0.95+0.05*(((float)(t-prevTime))/CLOCKS_PER_SEC);
+		fps=1/timey;
+		prevTime=t;
+		t=clock();
+
+	}
+}
+
+int InputHandling()
+{
+	SDL_Event sdlEvent;
+	//SDL_WaitEvent(&sdlEvent);
+	while (SDL_PollEvent(&sdlEvent)) {
+	switch (sdlEvent.type)
+	{
+		case SDL_QUIT:
+			return 1;
+			break;
+		case SDL_KEYDOWN:
+			printf("pressed %c\n",sdlEvent.key.keysym.sym);
+			break;
+		case SDL_MOUSEBUTTONDOWN:
+			printf("mouse click %d %d\n",sdlEvent.button.x,sdlEvent.button.y);
+			root->MousePressed(root,sdlEvent.button.x,sdlEvent.button.y,sdlEvent.button.button);
+			break;
+//			
+		case SDL_MOUSEBUTTONUP:
+			root->MouseReleased(root,sdlEvent.button.x,sdlEvent.button.y,sdlEvent.button.button);
+			break;
+		case SDL_MOUSEMOTION:
+			root->MouseMoved(root,sdlEvent.motion.x,sdlEvent.motion.y,sdlEvent.motion.xrel,sdlEvent.motion.yrel);
+			break;
+		case SDL_MOUSEWHEEL:
+			root->MouseScrolled(root,sdlEvent.wheel.x,sdlEvent.wheel.y,sdlEvent.wheel.x,sdlEvent.wheel.y);
+			break;
+	}
+	}
+	return 0;
+}
+
+void Update()
+{
+	int i;
+	_QML_Update();
+	for(i=0;i<allElementCount;i++)
+	{
+		//allElements[i]->Update(allElements[i]);
+	}
+}
+
 
 // parser output stuff
-#include "parser_output.c"
+
+void Redraw()
+{
+	/*int i;
+	for(i=0;i<allElementCount;i++)
+	{
+		allElements[i]->Draw(allElements[i]);
+	}*/
+
+	SDL_Surface *sText;
+	SDL_Color clrFg = {255,255,255,0};
+	SDL_Rect sdlRect = {700,0,100,100};
+	char fpsStr[100];
+
+		SDL_SetRenderDrawColor(SDLRenderer,0,0,0,255);
+		SDL_RenderClear(SDLRenderer);
+
+		mGUI_Element_Draw((GUI_Element*)root);
+
+
+		sprintf(fpsStr,"%d",fps);
+		sText = TTF_RenderText_Solid( fntCourier, fpsStr, clrFg );
+		strTex=SDL_CreateTextureFromSurface(SDLRenderer, sText);
+		SDL_FreeSurface(sText);
+		SDL_RenderCopy(SDLRenderer, strTex, NULL, &sdlRect);
+
+		SDL_RenderPresent(SDLRenderer);
+
+		
+}
 
 int main()
 {
@@ -231,12 +251,14 @@ int main()
 	if(SDLWindow==NULL || SDLRenderer==NULL)
 		return 0;
 #endif
+	InitQML();
 	_QML_Init();
+	InitSDLDrawer();
 	//mGUI_Element_Draw((GUI_Element*)root);
 
-	
+	GUIMainLoop();
 #ifdef USESDL
-	while(quit==0)
+	while(quit==0 && quit==1)
 	{
 		SDL_WaitEvent(&sdlEvent);
 		switch (sdlEvent.type)
@@ -265,7 +287,6 @@ int main()
     SDL_Quit();
 #endif
 
-	
 #ifdef USECAIRO
 	CairoEnd();
 #endif

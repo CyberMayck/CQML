@@ -61,6 +61,9 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="cqml_grammar.tab.c" />
+    <ClCompile Include="custom_classes.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="lex.yy.c" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="parser_output.c">
@@ -70,6 +73,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cqml_grammar.tab.h" />
+    <ClInclude Include="custom_classes.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
     <ClInclude Include="parser_tree.h" />
   </ItemGroup>
   <ItemGroup>

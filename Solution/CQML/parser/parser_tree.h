@@ -1,6 +1,8 @@
 
 #define TYPE_GUI_ELEMENT		(0)
 #define TYPE_ATTRIBUTE			(1)
+#define TYPE_PROPERTY			(2)
+#define TYPE_HANDLER			(3)
 
 #define NODE_TYPE_NORMAL		(0)
 #define NODE_TYPE_ID			(1)
@@ -11,6 +13,8 @@
 typedef struct ParserList ParserList;
 typedef struct ParserGUIElement ParserGUIElement;
 typedef struct ParserAttribute ParserAttribute;
+typedef struct ParserHandler ParserHandler;
+typedef struct ParserProperty ParserProperty;
 typedef struct ParserListElement ParserListElement;
 typedef struct SrcNode SrcNode;
 
@@ -31,16 +35,25 @@ extern "C"
 	SrcNode* MakeNode3(SrcNode* child1,SrcNode* child2,SrcNode* child3);
 	SrcNode* MakeNode3Dot(SrcNode* child1,SrcNode* child2,SrcNode* child3);
 	SrcNode* MakeNode4(SrcNode* child1,SrcNode* child2,SrcNode* child3,SrcNode* child4);
+	SrcNode* MakeNode5(SrcNode* child1,SrcNode* child2,SrcNode* child3,SrcNode* child4,SrcNode* child5);
+	SrcNode* MakeNode6(SrcNode* child1,SrcNode* child2,SrcNode* child3,SrcNode* child4,SrcNode* child5,SrcNode* child6);
+	SrcNode* MakeNode7(SrcNode* child1,SrcNode* child2,SrcNode* child3,SrcNode* child4,SrcNode* child5,SrcNode* child6,SrcNode* child7);
 
 	int* createAttribute(int* a, char b, char* name, SrcNode * cExpression);
+	int* createHandler(int* a, char b, char* name, SrcNode * code);
 	int* createElement(int *a, char b, int *listPointer, char * text);
+	int* createPropertyInit(int *a, int *attPointer, char * text);
+	int* createProperty(int *a, char * text, char * text2);
 	int* createList(int *elementPointer, char type, int *listPointer, char * d);
 	void makeParseTree(int *l);
 }
 #else
 	int* createElement(int *a, char b, int *c, char * d);
 	int* createList(int *a, char b, int *c, char * d);
+	int* createPropertyInit(int *a, int *attPointer, char * text);
+	int* createProperty(int *a, char * text, char * text2);
 	int* createAttribute(int *a, char b, char *c, char * d);
+	int* createHandler(int *a, char b, char *c, char * d);
 	int* MakeNode0ID(char * text);
 	int* MakeNode0(char * text);
 	int* MakeNode1(int* child1);
@@ -48,6 +61,9 @@ extern "C"
 	int* MakeNode3(int* child1,int* child2,int* child3);
 	int* MakeNode3Dot(int* child1,int* child2,int* child3);
 	int* MakeNode4(int* child1,int* child2,int* child3,int* child4);
+	int* MakeNode5(int* child1,int* child2,int* child3,int* child4,int* child5);
+	int* MakeNode6(int* child1,int* child2,int* child3,int* child4,int* child5,int* child6);
+	int* MakeNode7(int* child1,int* child2,int* child3,int* child4,int* child5,int* child6,int* child7);
 	void makeParseTree(int *l);
 #endif
 
@@ -65,6 +81,17 @@ struct ParserAttribute{
 	ParserListElement base;
 	char * name;
 	SrcNode * expression;
+};
+struct ParserHandler{
+	ParserListElement base;
+	char * name;
+	SrcNode * code;
+};
+struct ParserProperty {
+	ParserListElement base;
+	ParserAttribute* attribute;
+	char * typeName;
+	char * attName;
 };
 struct ParserList {
 	ParserListElement ** members;

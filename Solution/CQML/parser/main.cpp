@@ -14,6 +14,8 @@ void PrintNodeToFile(SrcNode* node);
 
 class GUIElement;
 class GUIElementAttribute;
+class GUIElementProperty;
+class GUIElementHandler;
 
 
 class GraphNode
@@ -32,10 +34,30 @@ public:
 	int id;
 	int parentId;
 	char * name;
+	char * origClassName;
+	bool hasCustomClass;
 	GUIElement ** children;
 	GUIElementAttribute * attributes;
+	GUIElementProperty * properties;
+	GUIElementHandler * handlers;
 	int childrenCount;
 	int attributeCount;
+	int handlerCount;
+	int propertiesCount;
+	GUIElement();
+};
+
+GUIElement::GUIElement()
+{
+	hasCustomClass=false;
+}
+
+class GUIElementProperty
+{
+public:
+	char * typeName;
+	char * name;
+	//int graphInd;
 };
 
 class GUIElementAttribute
@@ -43,6 +65,15 @@ class GUIElementAttribute
 public:
 	char * name;
 	SrcNode * expression;
+	int graphInd;
+};
+
+
+class GUIElementHandler
+{
+public:
+	char * name;
+	SrcNode * code;
 	int graphInd;
 };
 
@@ -60,6 +91,8 @@ YY_BUFFER_STATE yyparse();
 }
 
 FILE *file;
+FILE *file_classes;
+FILE *file_classes2;
 int id;
 
 int * identifiersIds;
@@ -117,12 +150,62 @@ void PrintNode(SrcNode* node)
 	}
 }
 
+void printHandlerAssignment()
+{
+	int i;
+
+	int currentId;
+	currentId=id;
+
+	for(int k=compInd-1;k>=0;k--)
+	{
+		for(int i=0;i<elementCount;i++)
+		{
+			for(int j=0;j<elements[i].handlerCount;j++)
+			{
+				GUIElementHandler* handler=&elements[i].handlers[j];
+				if(compInds[handler->graphInd]!=k)
+				{
+					continue;
+				}
+				fprintf(file, "_QML_element%d->Custom%s=_QML_element%d_%s;\n",i,handler->name,i,handler->name);
+			}
+		}
+	}
+}
+
+void printHandlers()
+{
+	int i;
+
+	int currentId;
+	currentId=id;
+
+	for(int k=compInd-1;k>=0;k--)
+	{
+		for(int i=0;i<elementCount;i++)
+		{
+			for(int j=0;j<elements[i].handlerCount;j++)
+			{
+				GUIElementHandler* handler=&elements[i].handlers[j];
+				if(compInds[handler->graphInd]!=k)
+				{
+					continue;
+				}
+				fprintf(file, "void _QML_element%d_%s(GUI_Element * self, QMLEvent Event)\n{\n",i,handler->name);
+				
+				PrintNodeToFile(handler->code);
+				fprintf(file, "\n}\n");
+			}
+		}
+	}
+}
 
 
 void printAttributes()
 {
 	int i;
-	ParserAttribute* att;
+	//ParserAttribute* att;
 	int currentId;
 	currentId=id;
 
@@ -149,7 +232,54 @@ void printAttributes()
 		}
 	}
 }
+int customClassCount=0;
+void classDeclaration()
+{
 
+	for(int i=0;i<elementCount;i++)
+	{
+		if(!elements[i].hasCustomClass)
+			continue;
+
+		
+		char * customClassName= new char[100];
+		sprintf(customClassName,"%sCustom%d",elements[i].name,customClassCount);
+		customClassCount++;
+		//clear?
+		elements[i].origClassName=elements[i].name;
+		elements[i].name=customClassName;
+		
+		fprintf(file_classes,"typedef struct GUI_%s GUI_%s;\n\n",elements[i].name,elements[i].name);
+	}
+	for(int i=0;i<elementCount;i++)
+	{
+		if(!elements[i].hasCustomClass)
+			continue;
+		
+		fprintf(file_classes,"struct GUI_%s\n{\n",elements[i].name);
+		fprintf(file_classes,"GUI_%s original;",elements[i].origClassName);
+
+		for(int j=0;j<elements[i].propertiesCount;j++)
+		{
+			GUIElementProperty * prop= &elements[i].properties[j];
+			fprintf(file_classes,"%s %s;\n",prop->typeName,prop->name);
+		}
+		fprintf(file_classes,"};\n");
+
+		fprintf(file_classes,"GUI_%s* acGUI_%s();\n",elements[i].name,elements[i].name);
+
+		fprintf(file_classes2,"GUI_%s* acGUI_%s()\n{\n",elements[i].name,elements[i].name);
+		fprintf(file_classes2,"GUI_%s * pointer;\npointer=(GUI_%s*)malloc(sizeof(GUI_%s));\n",elements[i].name,elements[i].name,elements[i].name);
+
+		fprintf(file_classes2,"pointer->original=cGUI_%s();\n",elements[i].origClassName);
+		fprintf(file_classes2,"return pointer;\n");
+
+		//fprintf(file_classes2,"GUI_%s* acGUI_%s()\n{\n",elements[i].name,elements[i].name);
+		fprintf(file_classes2,"}\n");
+	}
+
+
+}
 
 void recursionDeclaration()
 {
@@ -282,37 +412,52 @@ void makeSource()
 	//printf("\n");
 	//return;
 	file = fopen("parser_output.c","w");
+	file_classes= fopen("custom_classes.h","w");
+	file_classes2= fopen("custom_classes.c","w");
 	
+	fprintf(file,"#include \"custom_classes.h\"\n\nvoid _QML_Update();\n");
 	fprintf(file, "GUI_Element* root;\n");
 	id=0;
+
+	classDeclaration();
 
 	recursionDeclaration();
 	fprintf(file, "\n");
 	
-	id=0;
+	bool cycle=detectCycle();
+	sortTopologically();
+	
+	printHandlers();
+
 	fprintf(file,"void _QML_Init()\n{\n");
-	fprintf(file, "root = (GUI_Element*) acGUI_Element();\n");
+	id=0;
 	recursionInit();
+	fprintf(file, "root = (GUI_Element*) acGUI_Element();\n");
 	
 	for(int i=0;i<rootElementCount;i++)
 	{
 		fprintf(file, "mGUI_Element_InsertChild((GUI_Element*)root, (GUI_Element*)_QML_element%d);\n",rootElements[i]);
 	}
 
-	bool cycle=detectCycle();
+	printHandlerAssignment();
+
 
 	if(cycle)
 	{
 		printf("Cycle Detected\n");
 	}
-	sortTopologically();
 
+	fprintf(file,"_QML_Update();\n}\n");
+	fprintf(file,"void _QML_Update()\n{\n");
 	printAttributes();
 
+	//printhand
 
 	fprintf(file,"\n}\n");
 
 	fclose(file);
+	fclose(file_classes);
+	fclose(file_classes2);
 }
 
 
@@ -325,6 +470,8 @@ GUIElement * recursionProcessTree(ParserGUIElement * element)
 
 	int childCnt=0;
 	int attribCnt=0;
+	int handlerCnt=0;
+	int propertyCnt=0;
 	if(element->list!=0)
 	{
 		for(i=0;i<element->list->memberCount;i++)
@@ -337,12 +484,27 @@ GUIElement * recursionProcessTree(ParserGUIElement * element)
 			{
 				attribCnt++;
 			}
+			else if(element->list->members[i]->type==TYPE_HANDLER)
+			{
+				handlerCnt++;
+			}
+			else if(element->list->members[i]->type==TYPE_PROPERTY)
+			{
+				if(((ParserProperty*)element->list->members[i])->attribute!=0)
+					attribCnt++;
+				propertyCnt++;
+			}
 		}
 	}
 	instance->attributeCount=attribCnt;
 	instance->attributes=new GUIElementAttribute[attribCnt];
+	instance->handlerCount=handlerCnt;
+	instance->handlers=new GUIElementHandler[handlerCnt];
 	instance->childrenCount=childCnt;
 	instance->children=new GUIElement*[childCnt];
+	instance->propertiesCount=propertyCnt;
+	instance->hasCustomClass=propertyCnt>0;
+	instance->properties=new GUIElementProperty[propertyCnt];
 	instance->id=id;
 	instance->name=element->name;
 
@@ -350,6 +512,8 @@ GUIElement * recursionProcessTree(ParserGUIElement * element)
 	id++;
 	childCnt=0;
 	attribCnt=0;
+	propertyCnt=0;
+	handlerCnt=0;
 	if(element->list!=0)
 	{
 		for(i=0;i<element->list->memberCount;i++)
@@ -366,6 +530,30 @@ GUIElement * recursionProcessTree(ParserGUIElement * element)
 				instance->attributes[attribCnt].name=((ParserAttribute *)element->list->members[i])->name;
 				instance->attributes[attribCnt].expression=((ParserAttribute *)element->list->members[i])->expression;
 				attribCnt++;
+			}
+			else if(element->list->members[i]->type==TYPE_HANDLER)
+			{
+				instance->handlers[handlerCnt]=GUIElementHandler();
+				instance->handlers[handlerCnt].name=((ParserHandler *)element->list->members[i])->name;
+				instance->handlers[handlerCnt].code=((ParserHandler *)element->list->members[i])->code;
+				handlerCnt++;
+			}
+			else if(element->list->members[i]->type==TYPE_PROPERTY)
+			{
+				ParserProperty * prop=(ParserProperty *)element->list->members[i];
+				instance->properties[propertyCnt]=GUIElementProperty();
+				instance->properties[propertyCnt].name=prop->attName;
+				instance->properties[propertyCnt].typeName=prop->typeName;
+				
+				if(prop->attribute!=0)
+				{
+					instance->attributes[attribCnt]=GUIElementAttribute();
+					instance->attributes[attribCnt].name=prop->attribute->name;
+					instance->attributes[attribCnt].expression=prop->attribute->expression;
+				
+					attribCnt++;
+				}
+				propertyCnt++;
 			}
 		}
 	}
@@ -515,8 +703,10 @@ bool processSrcDots(SrcNode * node, int currentElementId, int graphInd)
 	bool prevElement=false;
 	bool isOtherId=idMap.count(identifiers[0])!=0;
 	int curId=currentElementId;
+	int startInd=1;
 	if(isOtherId)
 	{
+		prevElement=true;
 		curId=idMap[identifiers[0]];
 	}
 	else
@@ -529,10 +719,11 @@ bool processSrcDots(SrcNode * node, int currentElementId, int graphInd)
 		else //if(is valid param identifiers[0])
 		{
 			prevElement=false;
+			startInd=0; //
 		}
 	}
 	std::string attribs("");
-	for(int i=1;i<cnt;i++)
+	for(int i=startInd;i<cnt;i++)
 	{
 		if(prevElement)
 		{
@@ -576,8 +767,11 @@ bool processSrcDots(SrcNode * node, int currentElementId, int graphInd)
 	}
 	//attribs;
 	//curId ///vex
-
-	attribs=std::string("(*_QML_element")+std::to_string(static_cast<long long>(curId))+std::string(")")+attribs;
+	if(startInd==1)
+		attribs=std::string("(*_QML_element")+std::to_string(static_cast<long long>(curId))+std::string(")")+attribs;
+	else
+		attribs=std::string("(*(GUI_")+std::string(elements[curId].name)+std::string("*)_QML_element")+std::to_string(static_cast<long long>(curId))+std::string(")")+attribs;
+		
 	//attribs
 	node->text=new char[attribs.length()+1];
 	std::strcpy(node->text,attribs.c_str());
@@ -687,8 +881,36 @@ void processTree(ParserList* root)
 			
 			processSrcReferences(att->expression,i,false,false,graphInd);
 		}
+
+		for(int j=0;j<elements[i].handlerCount;j++)
+		{
+			GUIElementHandler * handler=&elements[i].handlers[j];
+
+			
+			std::string key=std::to_string(static_cast<long long>(i))+"."+std::string(handler->name);
+			int graphInd;
+			
+			if(keyMap.count(key)!=0)
+			{
+				graphInd=keyMap[key];//->nextNodes.push_back(graphInd);
+			}
+			else
+			{
+				GraphNode* graphNode=new GraphNode();
+				graphNode->key=key;
+				graphInd=graphNodes.size();
+				keyMap[key]=graphInd;
+				graphNodes.push_back(graphNode);
+				//graphNodespush_back();
+			}
+			handler->graphInd=graphInd;
+
+			processSrcReferences(handler->code,i,false,false,graphInd);
+		}
 	}
 }
+
+
 
 
 

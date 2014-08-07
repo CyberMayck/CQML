@@ -24,10 +24,39 @@
     <ClCompile Include="parser_output.c">
       <Filter>Resource Files</Filter>
     </ClCompile>
+    <ClCompile Include="gui.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="input.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="dependance.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cqml.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="custombuild.bat">
       <Filter>Custom Build</Filter>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="custom_classes.h">
+      <Filter>Resource Files</Filter>
+    </ClInclude>
+    <ClInclude Include="gui.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="draw_iface.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="input.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="cqml.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
