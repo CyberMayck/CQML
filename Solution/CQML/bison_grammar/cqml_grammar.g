@@ -7,6 +7,7 @@
 %token TYPEDEF EXTERN STATIC AUTO REGISTER PROPERTY
 %token CHAR SHORT INT LONG SIGNED UNSIGNED FLOAT DOUBLE CONST VOLATILE VOID
 %token STRUCT UNION ENUM ELLIPSIS
+%token IMPORT AS
 
 %token CASE DEFAULT IF ELSE SWITCH WHILE DO FOR GOTO CONTINUE BREAK RETURN
 
@@ -22,15 +23,27 @@
 %%
 
 start_point
-	:	element_list
+	:	element_or_import_list
 	{  makeParseTree($<data.val>1); }
 	;
 
-element_list
-	:	element element_list
-	{ $<data.val>$ = createList( $<data.val>1 , 'L', $<data.val>2, 0); }
+element_or_import_list
+	:	import_list element
+	{ $<data.val>$ = createList( $<data.val>2 , 'L', $<data.val>1, 0); }
 	|	element
 	{ $<data.val>$ = createList( $<data.val>1 , 'l', 0, 0);  }
+	;
+
+import_list
+	:	import import_list
+	{ $<data.val>$ = createList( $<data.val>1 , 'L', $<data.val>2, 0); }
+	|	import
+	{ $<data.val>$ = createList( $<data.val>1 , 'l', 0, 0);  }
+	;
+
+import
+	:	IMPORT STRING_LITERAL AS IDENTIFIER
+	{ $<data.val>$ = createImport( $<data.lexem>2, $<data.lexem>4); }
 	;
 	
 element

@@ -50,6 +50,9 @@ void comment();
 "void"			{ count(); return(VOID); }
 "volatile"		{ count(); return(VOLATILE); }
 "while"			{ count(); return(WHILE); }
+"as"			{ count(); return(AS); }
+"import"		{ count(); return(IMPORT); }
+
 
 {L}({L}|{D})*		{ count(); return(check_type()); }
 

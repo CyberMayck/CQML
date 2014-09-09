@@ -86,18 +86,20 @@
      UNION = 302,
      ENUM = 303,
      ELLIPSIS = 304,
-     CASE = 305,
-     DEFAULT = 306,
-     IF = 307,
-     ELSE = 308,
-     SWITCH = 309,
-     WHILE = 310,
-     DO = 311,
-     FOR = 312,
-     GOTO = 313,
-     CONTINUE = 314,
-     BREAK = 315,
-     RETURN = 316
+     IMPORT = 305,
+     AS = 306,
+     CASE = 307,
+     DEFAULT = 308,
+     IF = 309,
+     ELSE = 310,
+     SWITCH = 311,
+     WHILE = 312,
+     DO = 313,
+     FOR = 314,
+     GOTO = 315,
+     CONTINUE = 316,
+     BREAK = 317,
+     RETURN = 318
    };
 #endif
 
@@ -108,7 +110,7 @@ typedef union YYSTYPE
 {
 
 /* Line 1676 of yacc.c  */
-#line 15 "cqml_grammar.g"
+#line 16 "cqml_grammar.g"
 
 	struct
 	{
@@ -119,7 +121,7 @@ typedef union YYSTYPE
 
 
 /* Line 1676 of yacc.c  */
-#line 123 "cqml_grammar.tab.h"
+#line 125 "cqml_grammar.tab.h"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
