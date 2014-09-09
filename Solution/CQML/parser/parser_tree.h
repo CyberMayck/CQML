@@ -3,6 +3,7 @@
 #define TYPE_ATTRIBUTE			(1)
 #define TYPE_PROPERTY			(2)
 #define TYPE_HANDLER			(3)
+#define TYPE_IMPORT				(4)
 
 #define NODE_TYPE_NORMAL		(0)
 #define NODE_TYPE_ID			(1)
@@ -10,6 +11,7 @@
 #define NODE_TYPE_DOT_PROCESSED	(3)
 #define NODE_TYPE_LEAF			(4)
 
+typedef struct ParserImport ParserImport;
 typedef struct ParserList ParserList;
 typedef struct ParserGUIElement ParserGUIElement;
 typedef struct ParserAttribute ParserAttribute;
@@ -45,6 +47,7 @@ extern "C"
 	int* createPropertyInit(int *a, int *attPointer, char * text);
 	int* createProperty(int *a, char * text, char * text2);
 	int* createList(int *elementPointer, char type, int *listPointer, char * d);
+	int* createImport( char * text, char * text2);
 	void makeParseTree(int *l);
 }
 #else
@@ -53,6 +56,7 @@ extern "C"
 	int* createPropertyInit(int *a, int *attPointer, char * text);
 	int* createProperty(int *a, char * text, char * text2);
 	int* createAttribute(int *a, char b, char *c, char * d);
+	int* createImport( char * text, char * text2);
 	int* createHandler(int *a, char b, char *c, char * d);
 	int* MakeNode0ID(char * text);
 	int* MakeNode0(char * text);
@@ -96,6 +100,11 @@ struct ParserProperty {
 struct ParserList {
 	ParserListElement ** members;
 	int memberCount;
+};
+struct ParserImport {
+	ParserListElement base;
+	char * path;
+	char * name;
 };
 
 struct SrcNode{

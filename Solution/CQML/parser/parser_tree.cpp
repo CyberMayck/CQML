@@ -187,6 +187,17 @@ int* createAttribute(int* a, char b, char* name, SrcNode * cExpression)
 	return (int*)pointer;
 }
 
+
+int* createImport(char* path, char* name)
+{
+	ParserImport * pointer;
+	pointer=(ParserImport*)malloc(sizeof(ParserImport));
+	(*pointer).name=name;
+	(*pointer).path=path;
+	(*pointer).base.type=TYPE_IMPORT;
+	return (int*)pointer;
+}
+
 int* createHandler(int* a, char b, char* name, SrcNode * code)
 {
 	ParserHandler * pointer;

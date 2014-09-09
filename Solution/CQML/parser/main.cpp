@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 #include <unordered_map>
+
 //#include "lex.yy.c"
 //#include "cqml_grammar.tab.c"
 //#include "cqml_grammar.tab.h"
@@ -16,7 +17,16 @@ class GUIElement;
 class GUIElementAttribute;
 class GUIElementProperty;
 class GUIElementHandler;
+class GUIImport;
 
+class GUIImport
+{
+public:
+	bool processed;
+	GUIImport(){processed=false;}
+	std::string name;
+	std::string path;
+};
 
 class GraphNode
 {
@@ -27,6 +37,9 @@ public:
 
 std::unordered_map<std::string, int> keyMap;
 std::vector<GraphNode*> graphNodes;
+
+std::unordered_map<std::string, bool> importsProcessed;
+std::vector<GUIImport> imports;
 
 class GUIElement
 {
@@ -415,7 +428,7 @@ void makeSource()
 	file_classes= fopen("custom_classes.h","w");
 	file_classes2= fopen("custom_classes.c","w");
 	
-	fprintf(file,"#include \"custom_classes.h\"\n\nvoid _QML_Update();\n");
+	fprintf(file,"#include \"custom_classes.h\"\n#include \"qml_includes.h\"\n\nvoid _QML_Update();\n");
 	fprintf(file, "GUI_Element* root;\n");
 	id=0;
 
@@ -461,6 +474,8 @@ void makeSource()
 }
 
 
+int importCnt=0;
+
 
 GUIElement * recursionProcessTree(ParserGUIElement * element)
 {
@@ -472,6 +487,7 @@ GUIElement * recursionProcessTree(ParserGUIElement * element)
 	int attribCnt=0;
 	int handlerCnt=0;
 	int propertyCnt=0;
+
 	if(element->list!=0)
 	{
 		for(i=0;i<element->list->memberCount;i++)
@@ -494,6 +510,7 @@ GUIElement * recursionProcessTree(ParserGUIElement * element)
 					attribCnt++;
 				propertyCnt++;
 			}
+			
 		}
 	}
 	instance->attributeCount=attribCnt;
@@ -507,6 +524,7 @@ GUIElement * recursionProcessTree(ParserGUIElement * element)
 	instance->properties=new GUIElementProperty[propertyCnt];
 	instance->id=id;
 	instance->name=element->name;
+
 
 
 	id++;
@@ -561,6 +579,19 @@ GUIElement * recursionProcessTree(ParserGUIElement * element)
 	return instance;
 }
 
+/*void recursionCount(ParserGUIElement * element)
+{
+	elementCount++;
+	if((*element).list!=0)
+	{
+		for(int i=0;i<(*(*element).list).memberCount;i++)
+		{
+			if((*(*(*element).list).members[i]).type==TYPE_GUI_ELEMENT)
+				recursionCount((ParserGUIElement *)(*(*element).list).members[i]);
+		}
+	}
+}*/
+
 void recursionCount(ParserGUIElement * element)
 {
 	elementCount++;
@@ -573,6 +604,7 @@ void recursionCount(ParserGUIElement * element)
 		}
 	}
 }
+
 bool processSrcDots(SrcNode * node, int currentElementId, int graphInd);
 
 void processSrcReferences(SrcNode * node, int currentId, bool leftMostFound, bool dotNodePassed, int graphInd)
@@ -591,7 +623,8 @@ void processSrcReferences(SrcNode * node, int currentId, bool leftMostFound, boo
 					{
 						int otherId=idMap[std::string(node->text)];
 						free(node->text);
-						sprintf(str,"(*_QML_element%d)",otherId);
+						//sprintf(str,"(*_QML_element%d)",otherId);
+						sprintf(str,"(*self->localGroup->members[%d])",otherId);
 						node->text=new char[strlen(str)+1];
 						strcpy(node->text,str);
 					}
@@ -600,13 +633,15 @@ void processSrcReferences(SrcNode * node, int currentId, bool leftMostFound, boo
 						if(strcmp("parent",node->text)==0)
 						{
 							free(node->text);
-							sprintf(str,"(*_QML_element%d->parent)",currentId);
+							//sprintf(str,"(*_QML_element%d->parent)",currentId);
+							sprintf(str,"(*self->localGroup->members[%d]->parent)",currentId);
 							node->text=new char[strlen(str)+1];
 							strcpy(node->text,str);
 						}
 						else// if(is valid att?) //complete
 						{
-							sprintf(str,"(*_QML_element%d).%s",currentId,node->text);
+							//sprintf(str,"(*_QML_element%d).%s",currentId,node->text);
+							sprintf(str,"(*self->localGroup->members[%d]).%s",currentId,node->text);
 
 							std::string key=std::to_string(static_cast<long long>(currentId))+std::string(".")+std::string(node->text);
 
@@ -817,12 +852,43 @@ std::string expressionToStr(SrcNode * node)
 	return str;
 }
 
-void processTree(ParserList* root)
+void processTreeImports(ParserList* elementTree)
+{
+	for(int i=0;i<elementTree->memberCount;i++)
+	{
+		if(elementTree->members[i]->type==TYPE_IMPORT)
+		{
+			importCnt++;
+			GUIImport import;
+			import.name=std::string(((ParserImport*)elementTree->members[i])->name);
+			import.path=std::string(((ParserImport*)elementTree->members[i])->path);
+			import.path=import.path.substr(1,import.path.length()-2);
+			imports.push_back(import);
+			if(importsProcessed.count(import.path)<1)
+				importsProcessed[import.path]=false;
+			continue;
+			//((ParserImport*)element->list->members[i])->name;
+			//((ParserImport*)element->list->members[i])->path;
+		}
+
+		// just one element
+		/*rootElements[rootElementCount]=id;
+		recursionProcessTree((ParserGUIElement*)elementTree->members[i]);
+		elements[rootElements[rootElementCount]].parentId=-1;
+		rootElementCount++;*/
+	}
+}
+
+void processTree(ParserList* elementTree)
 {
 	//int id=0;
 	elementCount=0;
 	for(int i=0;i<elementTree->memberCount;i++)
 	{
+		if(elementTree->members[i]->type==TYPE_IMPORT)
+		{
+			continue;
+		}
 		recursionCount((ParserGUIElement*)elementTree->members[i]);
 	}
 	elements=new GUIElement[elementCount];
@@ -830,6 +896,21 @@ void processTree(ParserList* root)
 	id=0;
 	for(int i=0;i<elementTree->memberCount;i++)
 	{
+		if(elementTree->members[i]->type==TYPE_IMPORT)
+		{
+			/*importCnt++;
+			GUIImport import;
+			import.name=std::string(((ParserImport*)elementTree->members[i])->name);
+			import.path=std::string(((ParserImport*)elementTree->members[i])->path);
+			imports.push_back(import);
+			if(importsProcessed.count(import.path)<1)
+				importsProcessed[import.path]=false;*/
+			continue;
+			//((ParserImport*)element->list->members[i])->name;
+			//((ParserImport*)element->list->members[i])->path;
+		}
+
+		// just one element
 		rootElements[rootElementCount]=id;
 		recursionProcessTree((ParserGUIElement*)elementTree->members[i]);
 		elements[rootElements[rootElementCount]].parentId=-1;
@@ -939,29 +1020,77 @@ void outputFile()
 	fclose(file);
 }
 
+ParserList * elementTrees[100];
+int elementTreeCnt=0;
+
+
+bool processFile(const char * name)
+{
+	FILE *srcFile;
+	srcFile = fopen(name,"r");
+	
+    yyrestart(srcFile);
+	if(yyparse())
+	{
+		return false;
+	}
+	processTreeImports(elementTree);
+	elementTrees[elementTreeCnt]=elementTree;
+	elementTreeCnt++;
+	//processTree(elementTree);
+	//makeSource();
+	fclose(srcFile);
+	return true;
+}
+
 int main()
 {
 	FILE *srcFile;
 	int a=0;
 	id=0;
-	srcFile = fopen("src4.cqml","r");
+	//srcFile = fopen("src4.cqml","r");
 	
 	identifiersCount=0;
-	identifiersMax=100;
+	identifiersMax=1000;
 	identifiers=(char**)malloc(sizeof(char*)*identifiersMax);
 	identifiersIds=(int*)malloc(sizeof(int)*identifiersMax);
+
+	processFile("src4.cqml");
+
+	int importInd=0;
+	while(importInd<importCnt)
+	{
+		if(importsProcessed[imports.at(importInd).path])
+		{
+			imports.at(importInd).processed=true;
+		}
+		else
+		{
+			processFile(imports.at(importInd).path.c_str());
+			importsProcessed[imports.at(importInd).path]=true;
+		}
+		importInd++;
+	}
+
+	//processTreeImports(elementTree);
+	//elementTrees[elementTreeCnt]=elementTree;
+	//elementTreeCnt
+
+	for(int i=0;i<elementTreeCnt;i++)
+	{
+		processTree(elementTrees[i]);
+	}
 	
 
-    yyrestart(srcFile);
-	//yy_scan_string("Rectangle { Rectangle { Rectangle { }; }; Rectangle { }; }");
+    //yyrestart(srcFile);
 	
-	if(yyparse())
+	//if(yyparse())
 	{
 		a=1;//eror
 	}
-	processTree(elementTree);
-	makeSource();
-	fclose(srcFile);
+	//processTree(elementTree);
+	//makeSource();
+	//fclose(srcFile);
 	printf("\n%d\n",compInd);
 	scanf("%d",&a);
 

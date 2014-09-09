@@ -1,3 +1,4 @@
+import "button.cqml" as button
 Rectangle
 {
 	x : 0;
@@ -17,6 +18,11 @@ Rectangle
 			y : 5;
 			width  : parent.width-10;
 			height : parent.height/2-10;
+			property GUI_Elemnt prop1 : 4;
+			MouseEntered : { color.green = 0; color.blue = 0;};
+			MouseExited : { color.green = 1; color.blue = 1;};
+			MousePressed : { color.red = 0; };
+			MouseReleased : { color.red = 1; };
 		}; 
 		Rectangle
 		{
@@ -24,7 +30,8 @@ Rectangle
 			y : parent.height/2+5;
 			width  : parent.width-10;
 			height : parent.height/2-10;
-			MouseClicked : { crap.x = 0; color.red = 0; };
+			MousePressed : { color.red = 0; };
+			MouseReleased : { color.red = 1; };
 		};
 	};
 	Rectangle
@@ -34,6 +41,8 @@ Rectangle
 		y : 5;
 		width : parent.width/2-10;
 		height : parent.height-10;
+		MousePressed : { color.red = 0; };
+		MouseReleased : { color.red = 1; };
 		Rectangle
 		{
 			x : 5;
@@ -45,6 +54,8 @@ Rectangle
 			y : 5;
 			width : parent.width/2;
 			height : parent.height/2;
+			MousePressed : { color.green = 0; };
+			MouseReleased : { color.green = 1; };
 			};
 		}; 
 	}; 
