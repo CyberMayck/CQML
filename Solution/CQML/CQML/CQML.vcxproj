@@ -87,6 +87,9 @@
     <ClCompile Include="gui.c" />
     <ClCompile Include="input.c" />
     <ClCompile Include="main.c" />
+    <ClCompile Include="output0.c" />
+    <ClCompile Include="output1.c" />
+    <ClCompile Include="output2.c" />
     <ClCompile Include="parser_output.c">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </ClCompile>
@@ -102,6 +105,12 @@
     <ClInclude Include="draw_iface.h" />
     <ClInclude Include="gui.h" />
     <ClInclude Include="input.h" />
+    <ClInclude Include="output0.h" />
+    <ClInclude Include="output0outer.h" />
+    <ClInclude Include="output1.h" />
+    <ClInclude Include="output1outer.h" />
+    <ClInclude Include="output2.h" />
+    <ClInclude Include="qml_includes.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

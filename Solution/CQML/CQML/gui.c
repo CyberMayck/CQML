@@ -13,6 +13,7 @@ GUI_Element cGUI_Element()
 	instance.height=0;
 
 	instance.Draw=mGUI_Element_Draw;
+	instance.Update=mGUI_Element_Update;
 
 	instance.MouseMoved=mGUI_Element_MouseMoved;
 	instance.MousePressed=mGUI_Element_MousePressed;
@@ -78,6 +79,20 @@ int mGUI_Element_Left(GUI_Element *self)
 		return mGUI_Element_Left((*self).parent)+(*self).x;
 	}
 	return (*self).x;
+}
+
+
+void mGUI_Element_Update(GUI_Element *self)
+{
+	int i;
+	//printf("coord %d \n",(*self).x);
+
+
+	for(i=0;i<(*self).childrenCount;i++)
+	{
+		(*(*self).children[i]).Update((*self).children[i]);
+	}
+	return;
 }
 
 void mGUI_Element_Draw(GUI_Element *self)
@@ -323,8 +338,8 @@ void mGUI_Rectangle_Draw(GUI_Element *self)
 	h=(*self).height;
 
 	
-	drawer->DrawRectangle(x,y,w,h,255,255,255);
 	drawer->DrawFilledRectangle(x,y,w,h,me->color.red*255,me->color.green*255,me->color.blue*255);
+	drawer->DrawRectangle(x,y,w,h,0,0,0);
 
 	//cairo draw
 

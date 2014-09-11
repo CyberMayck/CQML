@@ -138,6 +138,12 @@ clock_t prevTime;
 clock_t t;
 float timey;
 int fps;
+
+void PrintMeMyFriend(char * str)
+{
+	printf("Print: %s\n",str);
+}
+
 #include "parser_output.c"
 
 void GUIMainLoop()

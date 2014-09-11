@@ -6,10 +6,12 @@
 #include"draw_iface.h"
 #include"input.h"
 
+typedef struct GUI_Group GUI_Group;
 typedef struct GUI_Element GUI_Element;
 typedef struct GUI_Rectangle GUI_Rectangle;
 typedef struct Color Color;
 void mGUI_Element_Draw(GUI_Element *self);
+void mGUI_Element_Update(GUI_Element *self);
 void mGUI_Rectangle_Draw(GUI_Element *self);
 
 int mGUI_Element_MouseMoved(GUI_Element *self,int x, int y, int relx, int rely);
@@ -22,7 +24,18 @@ int mGUI_Rectangle_MouseReleased(GUI_Element *self,int x, int y, int button);
 int mGUI_Rectangle_MousePressed(GUI_Element *self,int x, int y, int button);
 int mGUI_Rectangle_MouseScrolled(GUI_Element *self,int x, int y, int relx, int rely);
 
+
+#define MakeNewThing(type, parent)	(mGUI_Element_InsertChild((GUI_Element*)&parent,(GUI_Element*)ac##type()))
+
+struct GUI_Group {
+	GUI_Element * root;
+	int memberCount;
+	GUI_Element ** members;
+};
+
 struct GUI_Element {
+	GUI_Element * root;
+	//GUI_Group * localGroup;
 	GUI_Element * parent;
 	GUI_Element ** children;
 	int childrenCount;
