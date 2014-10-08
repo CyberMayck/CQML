@@ -182,6 +182,17 @@ int* createAttribute(int* a, char b, char* name, SrcNode * cExpression)
 	ParserAttribute * pointer;
 	pointer=(ParserAttribute*)malloc(sizeof(ParserAttribute));
 	(*pointer).name=name;
+	(*pointer).name2=0;
+	(*pointer).expression=cExpression;
+	(*pointer).base.type=TYPE_ATTRIBUTE;
+	return (int*)pointer;
+}
+int* createAttribute2(int* a, char b, char* name2, char* name, SrcNode * cExpression)
+{
+	ParserAttribute * pointer;
+	pointer=(ParserAttribute*)malloc(sizeof(ParserAttribute));
+	(*pointer).name=name;
+	(*pointer).name2=name2;
 	(*pointer).expression=cExpression;
 	(*pointer).base.type=TYPE_ATTRIBUTE;
 	return (int*)pointer;

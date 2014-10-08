@@ -82,6 +82,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="attribControl.c" />
     <ClCompile Include="cqml.c" />
     <ClCompile Include="dependance.c" />
     <ClCompile Include="gui.c" />
@@ -89,7 +90,6 @@
     <ClCompile Include="main.c" />
     <ClCompile Include="output0.c" />
     <ClCompile Include="output1.c" />
-    <ClCompile Include="output2.c" />
     <ClCompile Include="parser_output.c">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </ClCompile>
@@ -98,6 +98,8 @@
     <None Include="custombuild.bat" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="attribControl.h" />
+    <ClInclude Include="context.h" />
     <ClInclude Include="cqml.h" />
     <ClInclude Include="custom_classes.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>

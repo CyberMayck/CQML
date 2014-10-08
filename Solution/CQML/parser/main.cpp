@@ -3,12 +3,20 @@
 #include <string>
 #include <vector>
 #include <unordered_map>
+#include <assert.h>
 
 //#include "lex.yy.c"
 //#include "cqml_grammar.tab.c"
 //#include "cqml_grammar.tab.h"
 #include "cqml_grammar.tab.h"
+
 #include "parser_tree.h"
+#include "parameter_handling.h"
+extern vector<ClassContainer*> defaultClasses;
+extern unordered_map<string, int> defaultClassMap;
+extern vector<ClassContainer*> classes[100];
+extern unordered_map<string, int> classMaps[100];
+
 typedef struct yy_buffer_state *YY_BUFFER_STATE;
 
 void PrintNodeToFile(FILE* file, SrcNode* node);
@@ -67,6 +75,8 @@ public:
 	int attributeCount;
 	int handlerCount;
 	int propertiesCount;
+
+	ClassContainer* classContainer;
 	GUIElement();
 };
 
@@ -87,6 +97,7 @@ class GUIElementAttribute
 {
 public:
 	char * name;
+	char * name2;
 	SrcNode * expression;
 	int graphInd;
 };
@@ -255,7 +266,24 @@ void printAttributes()
 				{
 					continue;
 				}
-				fprintf(file_classes2, "self->_QML_element%d->%s=",i,att->name);
+				
+				///here
+				ClassContainer * cont=elements[i].classContainer;
+				PropertyAndType * prop=cont->CheckExistence(std::string(att->name));
+				if(prop!=0)
+				{
+					if(prop->cont)
+					{
+						if(att->name2==0)
+							fprintf(file_classes2, "((GUI_%s*)self->_QML_element%d)->%s=",prop->cont->className.c_str(),i,att->name);
+						else
+							fprintf(file_classes2, "((GUI_%s*)self->_QML_element%d)->%s.%s=",prop->cont->className.c_str(),i,att->name,att->name2);
+					}
+				}
+				else
+				{
+					assert(false);
+				}
 				
 				PrintNodeToFile(file_classes2,att->expression);
 				fprintf(file_classes2, ";\n");
@@ -582,9 +610,11 @@ void makeSource(std::string name, int treeInd)
 
 
 	fprintf(file_classes2,"static void _QML_Update(GUI_Element *s)\n{\nGUI_Root%s * self=(GUI_Root%s *)s;\n",name.c_str(),name.c_str());
+	fprintf(file_classes2,"mGUI_Element_Update((GUI_Element *)self);\n");
 	printAttributes();
-
-	fprintf(file_classes2,"mGUI_Element_Update((GUI_Element *)self);\n}\n");
+	fprintf(file_classes2,"\n}\n");
+	//
+	//fprintf(file_classes2,"mGUI_Element_Update((GUI_Element *)self);\n}\n");
 
 	//printhand
 
@@ -596,7 +626,7 @@ void makeSource(std::string name, int treeInd)
 }
 
 
-
+// recursion function from creating gui structures from parser tree
 GUIElement * recursionProcessTree(ParserGUIElement * element)
 {
 	int i;
@@ -608,6 +638,7 @@ GUIElement * recursionProcessTree(ParserGUIElement * element)
 	int handlerCnt=0;
 	int propertyCnt=0;
 
+	// count stuff first
 	if(element->list!=0)
 	{
 		for(i=0;i<element->list->memberCount;i++)
@@ -633,6 +664,8 @@ GUIElement * recursionProcessTree(ParserGUIElement * element)
 			
 		}
 	}
+
+	//alocate
 	instance->attributeCount=attribCnt;
 	instance->attributes=new GUIElementAttribute[attribCnt];
 	instance->handlerCount=handlerCnt;
@@ -647,6 +680,7 @@ GUIElement * recursionProcessTree(ParserGUIElement * element)
 
 
 
+	// and init in the end
 	id++;
 	childCnt=0;
 	attribCnt=0;
@@ -666,6 +700,7 @@ GUIElement * recursionProcessTree(ParserGUIElement * element)
 			{
 				instance->attributes[attribCnt]=GUIElementAttribute();
 				instance->attributes[attribCnt].name=((ParserAttribute *)element->list->members[i])->name;
+				instance->attributes[attribCnt].name2=((ParserAttribute *)element->list->members[i])->name2;
 				instance->attributes[attribCnt].expression=((ParserAttribute *)element->list->members[i])->expression;
 				attribCnt++;
 			}
@@ -687,6 +722,7 @@ GUIElement * recursionProcessTree(ParserGUIElement * element)
 				{
 					instance->attributes[attribCnt]=GUIElementAttribute();
 					instance->attributes[attribCnt].name=prop->attribute->name;
+					instance->attributes[attribCnt].name2=0;
 					instance->attributes[attribCnt].expression=prop->attribute->expression;
 				
 					attribCnt++;
@@ -699,18 +735,6 @@ GUIElement * recursionProcessTree(ParserGUIElement * element)
 	return instance;
 }
 
-/*void recursionCount(ParserGUIElement * element)
-{
-	elementCount++;
-	if((*element).list!=0)
-	{
-		for(int i=0;i<(*(*element).list).memberCount;i++)
-		{
-			if((*(*(*element).list).members[i]).type==TYPE_GUI_ELEMENT)
-				recursionCount((ParserGUIElement *)(*(*element).list).members[i]);
-		}
-	}
-}*/
 
 void recursionCount(ParserGUIElement * element)
 {
@@ -753,7 +777,7 @@ void processSrcReferences(SrcNode * node, int treeInd, int currentId, bool leftM
 					{
 						int otherId=importToKeyMaps[treeInd][std::string(node->text)];
 						
-						free(node->text); //here
+						free(node->text);
 						sprintf(str,"GUI_Root%s",importPathToName[imports[otherId].path].c_str());
 						//sprintf(str,"(*self->localGroup->members[%d])",otherId);
 						node->text=new char[strlen(str)+1];
@@ -769,37 +793,56 @@ void processSrcReferences(SrcNode * node, int treeInd, int currentId, bool leftM
 							node->text=new char[strlen(str)+1];
 							strcpy(node->text,str);
 						}
-						else if(strcmp("MakeNewThing",node->text)==0) // temporary - because of missing valid att
+						else
+						{
+							ClassContainer * cont=elements[currentId].classContainer;
+							PropertyAndType * prop=cont->CheckExistence(std::string(node->text));
+							if(prop!=0)
+							{
+								//
+								sprintf(str,"((GUI_%s*)((GUI_Rootoutput%d *)((GUI_Element*)self)->root)->_QML_element%d)->%s",prop->cont->className.c_str(),treeInd,currentId,node->text);
+								//sprintf(str,"(*((GUI_Rootoutput%d *)((GUI_Element*)self)->root)->_QML_element%d).%s",treeInd,currentId,node->text);
+							//sprintf(str,"(*self->localGroup->members[%d]).%s",currentId,node->text);
+							
+								std::string key=std::to_string(static_cast<long long>(currentId))+std::string(".")+std::string(node->text);
+
+								free(node->text);
+								node->text=new char[strlen(str)+1];
+								strcpy(node->text,str);
+
+								if(keyMap.count(key)!=0)
+								{
+									graphNodes[keyMap[key]]->nextNodes.push_back(graphInd);
+								}
+								else
+								{
+									GraphNode* graphNode=new GraphNode();
+									graphNode->key=key;
+									graphNode->nextNodes.push_back(graphInd);
+									keyMap[key]=graphNodes.size();
+									graphNodes.push_back(graphNode);
+									//graphNodespush_back();
+								}
+
+
+							}
+							else
+							{
+								// no id nor valid att - might be local - do nothing
+							}
+						}
+						////
+
+						/*else if(strcmp("MakeNewThing",node->text)==0) // temporary - because of missing valid att
 						{
 						}
 						else// if(is valid att?) //complete
 						{
-							sprintf(str,"(*((GUI_Rootoutput%d *)((GUI_Element*)self)->root)->_QML_element%d).%s",treeInd,currentId,node->text);
-							//sprintf(str,"(*self->localGroup->members[%d]).%s",currentId,node->text);
 							
-							std::string key=std::to_string(static_cast<long long>(currentId))+std::string(".")+std::string(node->text);
-
-							free(node->text);
-							node->text=new char[strlen(str)+1];
-							strcpy(node->text,str);
-
-							if(keyMap.count(key)!=0)
-							{
-								graphNodes[keyMap[key]]->nextNodes.push_back(graphInd);
-							}
-							else
-							{
-								GraphNode* graphNode=new GraphNode();
-								graphNode->key=key;
-								graphNode->nextNodes.push_back(graphInd);
-								keyMap[key]=graphNodes.size();
-								graphNodes.push_back(graphNode);
-								//graphNodespush_back();
-							}
 
 
 
-						}
+						}*/
 						//else //nothing
 					}
 				}
@@ -873,10 +916,19 @@ bool processSrcDots(SrcNode * node, int treeInd,int currentElementId, int graphI
 	bool isOtherId=idMaps[treeInd].count(identifiers[0])!=0;
 	int curId=currentElementId;
 	int startInd=1;
+
+	
+	std::string completeStr("");
+
+	std::string prevTypeName;
+	ClassContainer * prevClassCont=0;
+
 	if(isOtherId)
 	{
 		prevElement=true;
 		curId=idMaps[treeInd][identifiers[0]];
+		prevTypeName=elements[curId].classContainer->className;
+		prevClassCont=elements[curId].classContainer;
 	}
 	else
 	{
@@ -884,11 +936,55 @@ bool processSrcDots(SrcNode * node, int treeInd,int currentElementId, int graphI
 		{
 			prevElement=true;
 			curId=elements[curId].parentId;
+			prevTypeName=elements[curId].classContainer->className;
+			prevClassCont=elements[curId].classContainer;
 		}
 		else //if(is valid param identifiers[0])
 		{
+			ClassContainer * cont=elements[currentElementId].classContainer;
+			
+			prevTypeName=elements[curId].classContainer->className;
+			if(cont->CheckExistence(identifiers[0])!=0)
+			{
+				prevClassCont=elements[curId].classContainer;
+			}
 			prevElement=false;
 			startInd=0; //
+
+			//
+			
+			
+
+	//if(startInd==1)
+	//{
+			completeStr=std::string("(((GUI_Rootoutput")+std::to_string(static_cast<long long>(treeInd))+std::string(" *)((GUI_Element*)self)->root)->_QML_element")+std::to_string(static_cast<long long>(curId))+std::string(")");
+	//else
+		//completeStr=std::string("(*(GUI_")+std::string(elements[curId].name)+std::string("*)((GUI_Rootoutput")+std::to_string(static_cast<long long>(treeInd))+std::string(" *)((GUI_Element*)self)->root)->_QML_element")+std::to_string(static_cast<long long>(curId))+std::string(")");
+	
+			//
+
+			/*PropertyAndType * prop=cont->CheckExistence(identifiers[0]);
+			if(prop!=0)
+			{
+				prevElement=false;
+				startInd=0; //
+				prevTypeName=prop->type;
+				if(classMaps[prop->cont->fileId].count(prop->type)>0)
+				{
+					prevClassCont=classes[prop->cont->fileId][classMaps[prop->cont->fileId][prop->type]];
+				}
+				else
+				{
+					if(defaultClassMap.count(prop->type)>0)
+						prevClassCont=defaultClasses[defaultClassMap[prop->type]];
+					else
+						prevClassCont=0;
+				}
+			}
+			else
+			{
+				// no id or anything
+			}*/
 		}
 	}
 	std::string attribs("");
@@ -900,20 +996,83 @@ bool processSrcDots(SrcNode * node, int treeInd,int currentElementId, int graphI
 			{
 				prevElement=true;
 				curId=elements[curId].parentId;
+				prevTypeName=elements[curId].classContainer->className;
+				prevClassCont=elements[curId].classContainer;
 			}
 			else
 			{
-				attribs+="."+identifiers[i];
-				prevElement=false;
+				PropertyAndType * prop=prevClassCont->CheckExistence(identifiers[i]);
+				if(prop!=0)
+				{
+					//
+					completeStr=std::string("(((GUI_Rootoutput")+std::to_string(static_cast<long long>(treeInd))+std::string(" *)((GUI_Element*)self)->root)->_QML_element")+std::to_string(static_cast<long long>(curId))+std::string(")");
+					//
+					prevElement=false;
+					prevTypeName=prop->type;
+					if(prop->cont->fileId!=-1 && classMaps[prop->cont->fileId].count(prop->type)>0)
+					{
+						prevClassCont=classes[prop->cont->fileId][classMaps[prop->cont->fileId][prop->type]];
+					}
+					else
+					{
+						if(defaultClassMap.count(prop->type)>0)
+							prevClassCont=defaultClasses[defaultClassMap[prop->type]];
+						else
+							prevClassCont=0;
+					}
+					completeStr= std::string("((GUI_")+prop->cont->className+std::string("*)")+completeStr+std::string(")->")+identifiers[i];
+					attribs+="."+identifiers[i];
+					// to do> element might be stored in attribute
+					// + proptype might be from different file
+					prevElement=false;
+				}
+				else
+				{
+					assert(false);
+					//unknown att error
+				}
 			}
 		}
 		else
 		{
-			if(identifiers[i]==std::string("parent"))
+			if(prevClassCont!=0)
 			{
-				return false;
+				if(identifiers[i]==std::string("parent"))
+				{
+					// to do> element might be stored in attribute
+					return false;
+				}
+				PropertyAndType * prop=prevClassCont->CheckExistence(identifiers[i]);
+				if(prop!=0)
+				{
+					prevElement=false;
+					prevTypeName=prop->type;
+					if(prop->cont->fileId!=-1 && classMaps[prop->cont->fileId].count(prop->type)>0)
+					{
+						prevClassCont=classes[prop->cont->fileId][classMaps[prop->cont->fileId][prop->type]];
+					}
+					else
+					{
+						if(defaultClassMap.count(prop->type)>0)
+							prevClassCont=defaultClasses[defaultClassMap[prop->type]];
+						else
+							prevClassCont=0;
+					}
+					prevElement=false;
+					attribs+="."+identifiers[i];
+					completeStr= std::string("((GUI_")+prop->cont->className+std::string("*)")+completeStr+std::string(")->")+identifiers[i];
+				}
+				else
+				{
+					assert(false);
+					//unkown att error
+				}
 			}
-			attribs+="."+identifiers[i];
+			else
+			{
+				// nor id nor anything else
+				attribs+="."+identifiers[i];
+			}
 		}
 	}
 	
@@ -942,8 +1101,10 @@ bool processSrcDots(SrcNode * node, int treeInd,int currentElementId, int graphI
 		attribs=std::string("(*(GUI_")+std::string(elements[curId].name)+std::string("*)((GUI_Rootoutput")+std::to_string(static_cast<long long>(treeInd))+std::string(" *)((GUI_Element*)self)->root)->_QML_element")+std::to_string(static_cast<long long>(curId))+std::string(")")+attribs;
 		
 	//attribs
-	node->text=new char[attribs.length()+1];
-	std::strcpy(node->text,attribs.c_str());
+	//node->text=new char[attribs.length()+1];
+	//std::strcpy(node->text,attribs.c_str());
+	node->text=new char[completeStr.length()+1];
+	std::strcpy(node->text,completeStr.c_str());
 
 	return true;
 }
@@ -1030,9 +1191,11 @@ void processTreeImports(ParserList* elementTree, int importGInd)
 	}
 }
 
+
+// process parse tree and create gui structures
 void processTree(ParserList* elementTree, int treeInd)
 {
-	//int id=0;
+	// count elements
 	elementCount=0;
 	for(int i=0;i<elementTree->memberCount;i++)
 	{
@@ -1044,21 +1207,13 @@ void processTree(ParserList* elementTree, int treeInd)
 	}
 	elements=new GUIElement[elementCount];
 	
+	// process the tree itself (create guielement structures)
 	id=0;
 	for(int i=0;i<elementTree->memberCount;i++)
 	{
 		if(elementTree->members[i]->type==TYPE_IMPORT)
 		{
-			/*importCnt++;
-			GUIImport import;
-			import.name=std::string(((ParserImport*)elementTree->members[i])->name);
-			import.path=std::string(((ParserImport*)elementTree->members[i])->path);
-			imports.push_back(import);
-			if(importsProcessed.count(import.path)<1)
-				importsProcessed[import.path]=false;*/
 			continue;
-			//((ParserImport*)element->list->members[i])->name;
-			//((ParserImport*)element->list->members[i])->path;
 		}
 
 		// just one element
@@ -1076,24 +1231,119 @@ void processTree(ParserList* elementTree, int treeInd)
 			GUIElementAttribute * att=&elements[i].attributes[j];
 			if(strcmp(att->name,"id")==0)
 			{
-				//char * getString() error
-				idMaps[treeInd][expressionToStr(att->expression)]=i;
+				std::string idName=expressionToStr(att->expression);
+				
+				// should check for duplicities !!!
+				if(idMaps[treeInd].count(idName)>0)
+				{
+					assert(false);
+					perror("same id multiple times");
+					exit(-1);
+				}
+				idMaps[treeInd][idName]=i;
+				break;
 			}
-			break; // should check for duplicities !!!
 		}
 	}
 
-	// process expressions
+	int customClassCount=0;
+	// create existence checkers
+	for(int i=0;i<elementCount;i++)
+	{
+		bool imported=false;
+		int importInd;
+		int importFileInd;
+		if(importToKeyMaps[elementTreeCnt].count(elements[i].name)>0)
+		{
+			imported=true;
+			importInd=importToKeyMaps[elementTreeCnt][elements[i].name];
+			importFileInd=imports[importInd].treeInd;
+		}
+
+		
+
+		if(imported)
+		{
+			if(elements[i].propertiesCount>0)
+			{
+				//[0]
+				std::string className=std::string(elements[i].name)+std::string("Custom")+std::to_string(static_cast<long long>(customClassCount));
+				customClassCount++;
+				ClassContainer * cont=new ClassContainer(className,treeInd);
+				cont->SetAncestor(elementGroups[importFileInd][0].classContainer);
+				
+				elements[i].classContainer=cont;
+			}
+			else
+			{
+				elements[i].classContainer=elementGroups[importFileInd][0].classContainer;
+			}
+		}
+		else
+		{
+			if(elements[i].propertiesCount>0)
+			{
+				std::string className=std::string(elements[i].name)+std::string("Custom")+std::to_string(static_cast<long long>(customClassCount));
+				customClassCount++;
+				ClassContainer * cont=new ClassContainer(className, treeInd);
+				cont->SetAncestor(defaultClasses[defaultClassMap[elements[i].name]]);
+				
+				elements[i].classContainer=cont;
+			}
+			else
+			{
+				elements[i].classContainer=defaultClasses[defaultClassMap[elements[i].name]];
+			}
+		}
+
+		for(int j=0;j<elements[i].propertiesCount;j++)
+		{
+			PropertyAndType temp;
+			temp.name=elements[i].properties[j].name;
+			temp.type=elements[i].properties[j].typeName;
+
+			elements[i].classContainer->AddProp(temp);
+		}
+	}
+
+	// process expressions in elements
 	for(int i=0;i<elementCount;i++)
 	{
 		for(int j=0;j<elements[i].attributeCount;j++)
 		{
 			GUIElementAttribute * att=&elements[i].attributes[j];
-			// should check for duplicities !!!
-
+			
+			
 			if(strcmp(att->name,"id")==0)
 				continue;
+
+			// should check for duplicities !!!
+			PropertyAndType* t=  elements[i].classContainer->CheckExistence(std::string(att->name));
+			///here
+			if(t==0)
+			{
+					assert(false);
+				perror("nonexistent atribute");
+				exit(-1);
+			}
+
+			// check for existence after '.'
+			if(att->name2!=0)
+			{
+				// todo? maybe check non-default too?
+				t=defaultClasses[defaultClassMap[t->type]]->CheckExistence(std::string(att->name2));
+				if(t==0)
+				{
+						assert(false);
+					perror("nonexistent atribute");
+					exit(-1);
+				}
+			}
+
+
 			std::string key=std::to_string(static_cast<long long>(i))+"."+std::string(att->name);
+			if(att->name2!=0)
+				key=key+"."+std::string(att->name2);
 			int graphInd;
 			
 			if(keyMap.count(key)!=0)
@@ -1215,6 +1465,9 @@ bool processFile(const char * name)
 
 int main()
 {
+	processBasicTypes();
+
+	//return 0;
 	FILE *srcFile;
 	int a=0;
 	id=0;
@@ -1225,6 +1478,7 @@ int main()
 	identifiers=(char**)malloc(sizeof(char*)*identifiersMax);
 	identifiersIds=(int*)malloc(sizeof(int)*identifiersMax);
 
+	// parse tree creation and import files detection
 	processFile("src4.cqml");
 
 	int importInd=0;
@@ -1241,11 +1495,14 @@ int main()
 		}
 		importInd++;
 	}
+	// import dependencies cycle detection
 	detectCycle(importGraph);
+	// topological sort of import files
 	sortTopologically(importGraph);
 
 	int * importCompInds=compInds;
 
+	// processing parser trees (in topological order of the files)
 	for(int k=0,kM=compInd-1;k<=kM;k++)
 	{
 		for(int i=0;i<elementTreeCnt;i++)
@@ -1258,21 +1515,15 @@ int main()
 			}
 		}
 	}
-	//importMap[import.path]
 
-	//processTreeImports(elementTree);
-	//elementTrees[elementTreeCnt]=elementTree;
-	//elementTreeCnt
 
+	// source generation
 	for(int i=0;i<elementTreeCnt;i++)
 	{
 		elements=elementGroups[i];
 		elementCount=elementGroupSizes[i];
 
 		makeSource(std::string("output")+std::to_string(static_cast<long long>(i)),i);
-//		processTree(elementTrees[i]);
-	//	elementGroups[i]=elements;
-		//elementGroupSizes[i]=elementCount;
 	}
 
 	makeMainSource();
@@ -1290,7 +1541,7 @@ int main()
 	//makeSource();
 	//fclose(srcFile);
 	printf("\n%d\n",compInd);
-	scanf("%d",&a);
+	//scanf("%d",&a);
 
 	return 0;
 }

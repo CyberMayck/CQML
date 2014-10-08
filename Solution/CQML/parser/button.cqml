@@ -4,6 +4,5 @@ Rectangle
 	y: 10;
 	width : 50;
 	height : 50;
-	MouseEntered : { color.green = 0; color.blue = 0;};
-	MouseExited : { color.green = 1; color.blue = 1;};
+	color.red : 40;
 }

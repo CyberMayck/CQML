@@ -66,6 +66,7 @@
     </ClCompile>
     <ClCompile Include="lex.yy.c" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="parameter_handling.cpp" />
     <ClCompile Include="parser_output.c">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </ClCompile>
@@ -76,9 +77,11 @@
     <ClInclude Include="custom_classes.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </ClInclude>
+    <ClInclude Include="parameter_handling.h" />
     <ClInclude Include="parser_tree.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="basic_types.cfg" />
     <None Include="src.cqml" />
     <None Include="src2.cqml" />
     <None Include="src3.cqml" />

@@ -1,5 +1,4 @@
 import "button.cqml" as Button
-import "button2.cqml" as Button2
 Rectangle
 {
 	x : 0;
@@ -8,6 +7,10 @@ Rectangle
 	height : width;
 	Button
 	{
+		x : 5;
+		y : 5;
+		width : 40;
+		height : 40;
 	};
 	Rectangle
 	{
@@ -17,18 +20,12 @@ Rectangle
 		width : parent.width/2-10;
 		height : parent.height/2-10;
 		
-		property GUI_Element baf;
 		Rectangle 
 		{
 			x : 5;
 			y : 5;
 			width  : parent.width-10;
 			height : parent.height/2-10;
-			
-			MouseEntered : { color.green = 0; color.blue = 0; MakeNewThing(Button2,crap);};
-			MouseExited : { color.green = 1; color.blue = 1;};
-			MousePressed : { color.red = 0; };
-			MouseReleased : { color.red = 1; };
 		}; 
 		Rectangle
 		{
@@ -36,8 +33,6 @@ Rectangle
 			y : parent.height/2+5;
 			width  : parent.width-10;
 			height : parent.height/2-10;
-			MousePressed : { color.red = 0; };
-			MouseReleased : { color.red = 1; };
 		};
 	};
 	Rectangle
@@ -47,8 +42,6 @@ Rectangle
 		y : 5;
 		width : parent.width/2-10;
 		height : parent.height-10;
-		MousePressed : { color.red = 0; };
-		MouseReleased : { color.red = 1; };
 		Rectangle
 		{
 			x : 5;
@@ -60,8 +53,6 @@ Rectangle
 			y : 5;
 			width : parent.width/2;
 			height : parent.height/2;
-			MousePressed : { color.green = 0; };
-			MouseReleased : { color.green = 1; };
 			};
 		}; 
 	}; 

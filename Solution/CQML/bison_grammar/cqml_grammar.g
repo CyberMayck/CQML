@@ -87,6 +87,8 @@ property
 attribute
 	:	IDENTIFIER ':' expression
 	{ $<data.val>$ = createAttribute( $<data.val>1 , 'l', $<data.lexem>1, $<data.val>3);  }
+	|	IDENTIFIER '.' IDENTIFIER ':' expression
+	{ $<data.val>$ = createAttribute2( $<data.val>1 , 'l', $<data.lexem>3, $<data.lexem>1, $<data.val>5);  }
 ;
 
 primary_expression

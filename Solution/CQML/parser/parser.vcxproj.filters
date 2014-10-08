@@ -36,6 +36,9 @@
     <ClCompile Include="custom_classes.c">
       <Filter>Output</Filter>
     </ClCompile>
+    <ClCompile Include="parameter_handling.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="src.cqml">
@@ -50,6 +53,9 @@
     <None Include="src3.cqml">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="basic_types.cfg">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cqml_grammar.tab.h">
@@ -60,6 +66,9 @@
     </ClInclude>
     <ClInclude Include="custom_classes.h">
       <Filter>Output</Filter>
+    </ClInclude>
+    <ClInclude Include="parameter_handling.h">
+      <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

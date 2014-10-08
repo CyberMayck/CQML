@@ -42,6 +42,7 @@ extern "C"
 	SrcNode* MakeNode7(SrcNode* child1,SrcNode* child2,SrcNode* child3,SrcNode* child4,SrcNode* child5,SrcNode* child6,SrcNode* child7);
 
 	int* createAttribute(int* a, char b, char* name, SrcNode * cExpression);
+	int* createAttribute2(int* a, char b, char* name2, char* name, SrcNode * cExpression);
 	int* createHandler(int* a, char b, char* name, SrcNode * code);
 	int* createElement(int *a, char b, int *listPointer, char * text);
 	int* createPropertyInit(int *a, int *attPointer, char * text);
@@ -56,6 +57,7 @@ extern "C"
 	int* createPropertyInit(int *a, int *attPointer, char * text);
 	int* createProperty(int *a, char * text, char * text2);
 	int* createAttribute(int *a, char b, char *c, char * d);
+	int* createAttribute2(int *a, char b, char *c2, char *c, char * d);
 	int* createImport( char * text, char * text2);
 	int* createHandler(int *a, char b, char *c, char * d);
 	int* MakeNode0ID(char * text);
@@ -84,6 +86,7 @@ struct ParserGUIElement {
 struct ParserAttribute{
 	ParserListElement base;
 	char * name;
+	char * name2;
 	SrcNode * expression;
 };
 struct ParserHandler{
