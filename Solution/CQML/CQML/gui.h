@@ -36,6 +36,7 @@ struct GUI_Group {
 struct GUI_Element {
 	GUI_Element * root;
 	//GUI_Group * localGroup;
+
 	GUI_Element * parent;
 	GUI_Element ** children;
 	int childrenCount;

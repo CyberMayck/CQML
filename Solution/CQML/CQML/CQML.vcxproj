@@ -83,6 +83,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="attribControl.c" />
+    <ClCompile Include="context.c" />
     <ClCompile Include="cqml.c" />
     <ClCompile Include="dependance.c" />
     <ClCompile Include="gui.c" />
@@ -113,6 +114,7 @@
     <ClInclude Include="output1outer.h" />
     <ClInclude Include="output2.h" />
     <ClInclude Include="qml_includes.h" />
+    <ClInclude Include="struct_definition_macros.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

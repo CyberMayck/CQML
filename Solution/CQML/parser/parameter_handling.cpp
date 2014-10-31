@@ -109,8 +109,49 @@ unordered_map<string, int> defaultClassMap;
 vector<ClassContainer*> classes[100];
 unordered_map<string, int> classMaps[100];
 
+void registerStruct(const char* name, const char* parent);
+void parserDeclare(const char* type, const char* name, const char* value);
+
+#define CQML_PARSER
+#include "..\CQML\struct_definition_macros.h"
+
+ClassContainer * curCont;
+
+void registerStruct(const char* name, const char* parent)
+{
+	string s=string(name);
+	ClassContainer * cont= new ClassContainer(s,-1);
+	defaultClassMap[string(s)]=defaultClasses.size();
+	defaultClasses.push_back(cont);
+
+	curCont=cont;
+
+	if(parent!=0)
+	{
+		string sp=string(parent);
+		cont->SetAncestor(defaultClasses[defaultClassMap[sp]]);
+	}
+}
+
+void parserDeclare(const char* type, const char* name, const char* value)
+{
+	string sType=string(type);
+	string sName=string(name);
+
+	ClassContainer * cont= curCont;
+
+	PropertyAndType temp;
+	temp.name=name;
+	temp.type=type;
+
+	cont->AddProp(temp);
+}
+
 int processBasicTypes()
 {
+	DefaultDeclaration();
+	return 1;
+	
 	FILE *file;
 	file = fopen("basic_types.cfg","r");
 	if (file == NULL)

@@ -73,6 +73,7 @@
     <ClCompile Include="parser_tree.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\CQML\struct_definition_macros.h" />
     <ClInclude Include="cqml_grammar.tab.h" />
     <ClInclude Include="custom_classes.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
