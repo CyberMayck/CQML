@@ -7,8 +7,8 @@ Rectangle
 	height : width;
 	Button
 	{
-		x : 5;
-		y : 5;
+		x : 30;
+		y : 30;
 		width : 40;
 		height : 40;
 	};
@@ -19,6 +19,7 @@ Rectangle
 		y : parent.height/2;
 		width : parent.width/2-10;
 		height : parent.height/2-10;
+		color.red : 1;
 		
 		Rectangle 
 		{
@@ -26,6 +27,7 @@ Rectangle
 			y : 5;
 			width  : parent.width-10;
 			height : parent.height/2-10;
+			color.red : crap.color.red;
 		}; 
 		Rectangle
 		{

@@ -39,6 +39,9 @@
     <ClCompile Include="parameter_handling.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="checker.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="src.cqml">
@@ -72,6 +75,9 @@
     </ClInclude>
     <ClInclude Include="..\CQML\struct_definition_macros.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="checker.h">
+      <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

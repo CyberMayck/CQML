@@ -60,6 +60,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="checker.cpp" />
     <ClCompile Include="cqml_grammar.tab.c" />
     <ClCompile Include="custom_classes.c">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
@@ -74,6 +75,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\CQML\struct_definition_macros.h" />
+    <ClInclude Include="checker.h" />
     <ClInclude Include="cqml_grammar.tab.h" />
     <ClInclude Include="custom_classes.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>

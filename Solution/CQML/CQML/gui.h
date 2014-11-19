@@ -1,15 +1,15 @@
-#ifndef QML_GUI_H
-#define QML_GUI_H
+#pragma once
 
 #include<stdio.h>
 #include<stdlib.h>
 #include"draw_iface.h"
 #include"input.h"
+#include "struct_definition_macros.h"
 
 typedef struct GUI_Group GUI_Group;
-typedef struct GUI_Element GUI_Element;
-typedef struct GUI_Rectangle GUI_Rectangle;
-typedef struct Color Color;
+//typedef struct GUI_Element GUI_Element;
+//typedef struct GUI_Rectangle GUI_Rectangle;
+//typedef struct GUI_Color GUI_Color;
 void mGUI_Element_Draw(GUI_Element *self);
 void mGUI_Element_Update(GUI_Element *self);
 void mGUI_Rectangle_Draw(GUI_Element *self);
@@ -33,7 +33,12 @@ struct GUI_Group {
 	GUI_Element ** members;
 };
 
+
+
+//#define NOPE
+#ifdef NOPE
 struct GUI_Element {
+	int classID;
 	GUI_Element * root;
 	//GUI_Group * localGroup;
 
@@ -54,6 +59,7 @@ struct GUI_Element {
 	int (*MouseReleased)(GUI_Element *self,int x, int y, int button);
 	int (*MouseMoved)(GUI_Element *self,int x, int y, int relx, int rely);
 	int (*MouseScrolled)(GUI_Element *self,int x, int y, int relx, int rely);
+
 	//int (*MousePressed)(GUI_Element *self,QMLEvent Event);
 	//int (*MouseReleased)(GUI_Element *self,QMLEvent Event);
 	//int (*MouseMoved)(GUI_Element *self,QMLEvent Event);
@@ -77,7 +83,7 @@ struct GUI_Element {
 };
 
 
-struct Color{
+struct GUI_Color{
 	float red;
 	float green;
 	float blue;
@@ -87,8 +93,20 @@ struct Color{
 struct GUI_Rectangle {
 	GUI_Element base;
 	int id;
-	Color color;
+	GUI_Color color;
 };
+
+typedef struct GUI_Anchor GUI_Anchor;
+
+struct GUI_Anchor {
+	GUI_Element * top;
+	GUI_Element * left;
+	GUI_Element * right;
+	GUI_Element * bottom;
+};
+
+#endif
+
 
 void InitGUI();
 
@@ -105,4 +123,3 @@ int mGUI_Element_Clicked(GUI_Element *self, int x, int y, int button);
 int mGUI_Rectangle_Clicked(GUI_Element *self, int x, int y, int button);
 
 
-#endif

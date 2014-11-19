@@ -41,6 +41,9 @@
     <ClInclude Include="cqml_grammar.tab.h">
       <Filter>Output</Filter>
     </ClInclude>
+    <ClInclude Include="..\CQML\attribControl.h">
+      <Filter>Output</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="cqml_grammar.g">

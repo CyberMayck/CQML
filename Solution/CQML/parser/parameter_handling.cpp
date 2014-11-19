@@ -65,12 +65,13 @@ unsigned long CRC32(const char * str)
 	return crc ^ ~0U;
 }
 
-ClassContainer::ClassContainer(string str, int fileId)
+ClassContainer::ClassContainer(string str, int fileId, int classID)
 {
 	this->ancestor=0;
 	this->className=str;
 	this->classHash=CRC32(str.c_str());
 	this->fileId=fileId;
+	this->classID=classID;
 }
 
 void ClassContainer::AddProp(PropertyAndType prop)
@@ -83,6 +84,11 @@ void ClassContainer::AddProp(PropertyAndType prop)
 void ClassContainer::SetAncestor(ClassContainer * ancestor)
 {
 	this->ancestor=ancestor;
+}
+
+bool PropertyAndType::IsReference()
+{
+	return '*'==type[type.length()-1];
 }
 
 ClassContainer * ClassContainer::GetAncestor()
@@ -109,6 +115,8 @@ unordered_map<string, int> defaultClassMap;
 vector<ClassContainer*> classes[100];
 unordered_map<string, int> classMaps[100];
 
+int totalClassCnt=0;
+
 void registerStruct(const char* name, const char* parent);
 void parserDeclare(const char* type, const char* name, const char* value);
 
@@ -120,8 +128,8 @@ ClassContainer * curCont;
 void registerStruct(const char* name, const char* parent)
 {
 	string s=string(name);
-	ClassContainer * cont= new ClassContainer(s,-1);
-	defaultClassMap[string(s)]=defaultClasses.size();
+	ClassContainer * cont= new ClassContainer(s,-1,totalClassCnt++);
+	defaultClassMap[s]=defaultClasses.size();
 	defaultClasses.push_back(cont);
 
 	curCont=cont;
@@ -145,6 +153,78 @@ void parserDeclare(const char* type, const char* name, const char* value)
 	temp.type=type;
 
 	cont->AddProp(temp);
+}
+
+
+void PrintClassTabs(FILE * file, int classCnt)
+{
+	int size=defaultClasses.size();
+	for(int i=0;i<classCnt;i++)
+	{
+		size+=classes[i].size();
+	}
+	fprintf(file,"InitClassesSize(%d);\n",size);
+
+	int ind=0;
+	int pInd=0;
+	ClassContainer * c;
+	for(int i=0;i<defaultClasses.size();i++)
+	{
+		c= defaultClasses[i]->GetAncestor();
+		if(c==0)
+			pInd=-1;
+		else
+			pInd=c->classID;
+		fprintf(file,"InitAttribCnt(%d,%d,%d);\n",ind,defaultClasses[i]->props.size(),pInd);
+		ind++;
+	}
+	for(int j=0;j<classCnt;j++)
+	{
+		for(int i=0;i<classes[j].size();i++)
+		{
+			c= classes[j][i]->GetAncestor();
+
+			if(c==0)
+				pInd=-1;
+			else
+				pInd=c->classID;
+			fprintf(file,"InitAttribCnt(%d,%d,%d);\n",ind,classes[j][i]->props.size(),pInd);
+			ind++;
+		}
+	}
+	ind=0;
+
+	
+
+	
+	for(int i=0;i<defaultClasses.size();i++)
+	{
+		for(int k=0;k<defaultClasses[i]->props.size();k++)
+		{
+			PropertyAndType& p=defaultClasses[i]->props[k];
+			
+			fprintf(file,"AddAttribute(%d,%d,offsetof(%s,%s),\"%s\",member_size(%s,%s));\n",
+				ind,p.nameHash,p.cont->className.c_str(),p.name.c_str(),p.type.c_str(),p.cont->className.c_str(),p.name.c_str());
+		}
+		ind++;
+	}
+
+	for(int j=0;j<classCnt;j++)
+	{
+		for(int i=0;i<classes[j].size();i++)
+		{
+			for(int k=0;k<classes[j][i]->props.size();k++)
+			{
+				PropertyAndType& p=classes[j][i]->props[k];
+			
+				fprintf(file,"AddAttribute(%d,%d,offsetof(%s,%s),\"%s\",member_size(%s,%s));\n",
+					ind,p.nameHash,p.cont->className.c_str(),p.name.c_str(),p.type.c_str(),p.cont->className.c_str(),p.name.c_str());
+			}
+			ind++;
+		}
+	}
+	
+
 }
 
 int processBasicTypes()
@@ -174,7 +254,7 @@ int processBasicTypes()
 			}
 			string s=string(str);
 			s=s.substr(1,s.length()-2);
-			cont= new ClassContainer(s,-1);
+			cont= new ClassContainer(s,-1, totalClassCnt++);
 			defaultClassMap[string(s)]=defaultClasses.size();
 			defaultClasses.push_back(cont);
 			//open class

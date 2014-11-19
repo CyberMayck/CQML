@@ -1,5 +1,5 @@
-#ifndef QML_INPUT_H
-#define QML_INPUT_H
+#pragma once
+
 
 #define QML_KEY_EVENT			(0)
 #define QML_MOUSE_EVENT			(1)
@@ -72,4 +72,3 @@ void processEvents();
 void QMLInitInput();
 QMLEvent MakeEvent();
 
-#endif

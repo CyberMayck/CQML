@@ -1,5 +1,5 @@
-#ifndef DRAWIFACE_H
-#define DRAWIFACE_H
+#pragma once
+
 
 typedef struct DrawIFace DrawIFace;
 
@@ -14,5 +14,3 @@ struct DrawIFace
 };
 extern DrawIFace * drawer;
 void SetDrawIFace(DrawIFace * dr);
-
-#endif

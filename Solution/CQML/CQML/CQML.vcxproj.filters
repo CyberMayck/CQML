@@ -91,10 +91,10 @@
     <ClInclude Include="context.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="attribControl.h">
+    <ClInclude Include="struct_definition_macros.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="struct_definition_macros.h">
+    <ClInclude Include="attribControl.h">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
