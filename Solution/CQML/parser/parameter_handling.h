@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <vector>
+#include<stdarg.h>
 using namespace std;
 unsigned long CRC32(char * str, unsigned int len);
 
@@ -18,6 +19,16 @@ public:
 	bool IsReference();
 };
 
+class HandlerAndType
+{
+public:
+	string returnType;
+	string name;
+	vector<string> paramTypes;
+	vector<string> paramNames;
+	ClassContainer * cont;
+};
+
 
 class ClassContainer
 {
@@ -29,10 +40,14 @@ public:
 	int fileId;
 	string className;
 	vector<PropertyAndType> props;
+	vector<HandlerAndType> handlers;
 
 	ClassContainer(string str, int fileId, int classID);
 	void SetAncestor(ClassContainer *);
 	void AddProp(PropertyAndType);
 	ClassContainer* GetAncestor();
 	PropertyAndType* CheckExistence(string);
+
+	void AddHandler(HandlerAndType);
+	HandlerAndType* CheckHExistence(string);
 };

@@ -80,14 +80,18 @@ event_handler
 property
 	: PROPERTY IDENTIFIER attribute
 	{ $<data.val>$ = createPropertyInit( $<data.val>2 , $<data.val>3 , $<data.lexem>2);  }
+	| PROPERTY type_specifier attribute
+	{ $<data.val>$ = createPropertyInit( $<data.val>2 , $<data.val>3 , $<data.lexem>2);  }
 	| PROPERTY IDENTIFIER IDENTIFIER
+	{ $<data.val>$ = createProperty( $<data.val>2 , $<data.lexem>2 , $<data.lexem>3);  }
+	| PROPERTY type_specifier IDENTIFIER
 	{ $<data.val>$ = createProperty( $<data.val>2 , $<data.lexem>2 , $<data.lexem>3);  }
 ;
 
 attribute
-	:	IDENTIFIER ':' expression
+	:	IDENTIFIER ':' conditional_expression
 	{ $<data.val>$ = createAttribute( $<data.val>1 , 'l', $<data.lexem>1, $<data.val>3);  }
-	|	IDENTIFIER '.' IDENTIFIER ':' expression
+	|	IDENTIFIER '.' IDENTIFIER ':' conditional_expression
 	{ $<data.val>$ = createAttribute2( $<data.val>1 , 'l', $<data.lexem>3, $<data.lexem>1, $<data.val>5);  }
 ;
 
@@ -261,9 +265,9 @@ conditional_expression
 
 assignment_expression
 	: conditional_expression
-	{ $<data.val>$ = MakeNode1($<data.val>1); }
+	{ $<data.val>$ = MakeNode1A($<data.val>1); }
 	| unary_expression assignment_operator assignment_expression
-	{ $<data.val>$ = MakeNode3($<data.val>1, $<data.val>2, $<data.val>3); }
+	{ $<data.val>$ = MakeNode3A($<data.val>1, $<data.val>2, $<data.val>3); }
 	;
 
 assignment_operator
@@ -565,17 +569,17 @@ initializer_list
 
 statement
 	: labeled_statement
-	{ $<data.val>$ = MakeNode1($<data.val>1); }
+	{ $<data.val>$ = MakeNode1STATM($<data.val>1); }
 	| compound_statement
-	{ $<data.val>$ = MakeNode1($<data.val>1); }
+	{ $<data.val>$ = MakeNode1STATM($<data.val>1); }
 	| expression_statement
-	{ $<data.val>$ = MakeNode1($<data.val>1); }
+	{ $<data.val>$ = MakeNode1STATM($<data.val>1); }
 	| selection_statement
-	{ $<data.val>$ = MakeNode1($<data.val>1); }
+	{ $<data.val>$ = MakeNode1STATM($<data.val>1); }
 	| iteration_statement
-	{ $<data.val>$ = MakeNode1($<data.val>1); }
+	{ $<data.val>$ = MakeNode1STATM($<data.val>1); }
 	| jump_statement
-	{ $<data.val>$ = MakeNode1($<data.val>1); }
+	{ $<data.val>$ = MakeNode1STATM($<data.val>1); }
 	;
 
 labeled_statement
@@ -630,13 +634,13 @@ selection_statement
 
 iteration_statement
 	: WHILE '(' expression ')' statement
-	{ $<data.val>$ = MakeNode5($<data.lexem>1, MakeNode0("("), $<data.val>3, MakeNode0(")"), $<data.val>5); }
+	{ $<data.val>$ = MakeNode5ITER($<data.lexem>1, MakeNode0("("), $<data.val>3, MakeNode0(")"), $<data.val>5); }
 	| DO statement WHILE '(' expression ')' ';'
-	{ $<data.val>$ = MakeNode7($<data.lexem>1, $<data.val>2, $<data.lexem>3, MakeNode0("("), $<data.val>5, MakeNode0(")"),  MakeNode0(";")); }
+	{ $<data.val>$ = MakeNode7ITER($<data.lexem>1, $<data.val>2, $<data.lexem>3, MakeNode0("("), $<data.val>5, MakeNode0(")"),  MakeNode0(";")); }
 	| FOR '(' expression_statement expression_statement ')' statement
-	{ $<data.val>$ = MakeNode6($<data.lexem>1, MakeNode0("("), $<data.val>3, $<data.val>4, MakeNode0(")"), $<data.val>6); }
+	{ $<data.val>$ = MakeNode6ITER($<data.lexem>1, MakeNode0("("), $<data.val>3, $<data.val>4, MakeNode0(")"), $<data.val>6); }
 	| FOR '(' expression_statement expression_statement expression ')' statement
-	{ $<data.val>$ = MakeNode7($<data.lexem>1, MakeNode0("("), $<data.val>3, $<data.val>4, $<data.val>5, MakeNode0(")"), $<data.val>7); }
+	{ $<data.val>$ = MakeNode7ITER($<data.lexem>1, MakeNode0("("), $<data.val>3, $<data.val>4, $<data.val>5, MakeNode0(")"), $<data.val>7); }
 	;
 
 jump_statement

@@ -65,6 +65,7 @@
     <ClCompile Include="custom_classes.c">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="hashing.cpp" />
     <ClCompile Include="lex.yy.c" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="parameter_handling.cpp" />
@@ -72,6 +73,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="parser_tree.cpp" />
+    <ClCompile Include="src_apendix.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\CQML\struct_definition_macros.h" />
@@ -80,8 +82,10 @@
     <ClInclude Include="custom_classes.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </ClInclude>
+    <ClInclude Include="hashing.h" />
     <ClInclude Include="parameter_handling.h" />
     <ClInclude Include="parser_tree.h" />
+    <ClInclude Include="src_apendix.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="basic_types.cfg" />

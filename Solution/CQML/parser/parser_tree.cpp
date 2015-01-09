@@ -33,6 +33,34 @@ SrcNode* MakeNode1(SrcNode* child1)
 }
 
 
+SrcNode* MakeNode1A(SrcNode* child1)
+{
+	SrcNode* pointer=(SrcNode*)malloc(sizeof(SrcNode));
+	
+	(*pointer).childrenCount=1;
+	(*pointer).children=(SrcNode**)malloc(1*sizeof(SrcNode));
+	(*pointer).text=0;
+	(*pointer).type=NODE_TYPE_ASSIGN;
+
+	(*pointer).children[0]=child1;
+	return pointer;
+}
+
+SrcNode* MakeNode1STATM(SrcNode* child1)
+{
+	//return child1;
+	SrcNode* pointer=(SrcNode*)malloc(sizeof(SrcNode));
+	
+	(*pointer).childrenCount=1;
+	(*pointer).children=(SrcNode**)malloc(1*sizeof(SrcNode));
+	(*pointer).text=0;
+	(*pointer).type=NODE_TYPE_STATM;
+
+	(*pointer).children[0]=child1;
+	return pointer;
+}
+
+
 SrcNode* MakeNode2(SrcNode* child1,SrcNode* child2)
 {
 	SrcNode* pointer=(SrcNode*)malloc(sizeof(SrcNode));
@@ -52,6 +80,22 @@ SrcNode* MakeNode3Dot(SrcNode* child1,SrcNode* child2,SrcNode* child3)
 	pointer->type=NODE_TYPE_DOT;
 	return pointer;
 }
+
+SrcNode* MakeNode3A(SrcNode* child1,SrcNode* child2,SrcNode* child3)
+{
+	SrcNode* pointer=(SrcNode*)malloc(sizeof(SrcNode));
+	
+	(*pointer).childrenCount=3;
+	(*pointer).children=(SrcNode**)malloc(3*sizeof(SrcNode));
+	(*pointer).text=0;
+	(*pointer).type=NODE_TYPE_ASSIGN;
+
+	(*pointer).children[0]=child1;
+	(*pointer).children[1]=child2;
+	(*pointer).children[2]=child3;
+	return pointer;
+}
+
 
 SrcNode* MakeNode3(SrcNode* child1,SrcNode* child2,SrcNode* child3)
 {
@@ -84,6 +128,23 @@ SrcNode* MakeNode4(SrcNode* child1,SrcNode* child2,SrcNode* child3,SrcNode* chil
 	return pointer;
 }
 
+SrcNode* MakeNode5ITER(SrcNode* child1,SrcNode* child2,SrcNode* child3,SrcNode* child4,SrcNode* child5)
+{
+	SrcNode* pointer=(SrcNode*)malloc(sizeof(SrcNode));
+	
+	(*pointer).childrenCount=5;
+	(*pointer).children=(SrcNode**)malloc(5*sizeof(SrcNode));
+	(*pointer).text=0;
+	(*pointer).type=NODE_TYPE_ITER;
+
+	(*pointer).children[0]=child1;
+	(*pointer).children[1]=child2;
+	(*pointer).children[2]=child3;
+	(*pointer).children[3]=child4;
+	(*pointer).children[4]=child5;
+	return pointer;
+}
+
 SrcNode* MakeNode5(SrcNode* child1,SrcNode* child2,SrcNode* child3,SrcNode* child4,SrcNode* child5)
 {
 	SrcNode* pointer=(SrcNode*)malloc(sizeof(SrcNode));
@@ -100,6 +161,26 @@ SrcNode* MakeNode5(SrcNode* child1,SrcNode* child2,SrcNode* child3,SrcNode* chil
 	(*pointer).children[4]=child5;
 	return pointer;
 }
+
+
+SrcNode* MakeNode6ITER(SrcNode* child1,SrcNode* child2,SrcNode* child3,SrcNode* child4,SrcNode* child5,SrcNode* child6)
+{
+	SrcNode* pointer=(SrcNode*)malloc(sizeof(SrcNode));
+	
+	(*pointer).childrenCount=6;
+	(*pointer).children=(SrcNode**)malloc(6*sizeof(SrcNode));
+	(*pointer).text=0;
+	(*pointer).type=NODE_TYPE_ITER;
+
+	(*pointer).children[0]=child1;
+	(*pointer).children[1]=child2;
+	(*pointer).children[2]=child3;
+	(*pointer).children[3]=child4;
+	(*pointer).children[4]=child5;
+	(*pointer).children[5]=child6;
+	return pointer;
+}
+
 
 SrcNode* MakeNode6(SrcNode* child1,SrcNode* child2,SrcNode* child3,SrcNode* child4,SrcNode* child5,SrcNode* child6)
 {
@@ -127,6 +208,25 @@ SrcNode* MakeNode7(SrcNode* child1,SrcNode* child2,SrcNode* child3,SrcNode* chil
 	(*pointer).children=(SrcNode**)malloc(7*sizeof(SrcNode));
 	(*pointer).text=0;
 	(*pointer).type=NODE_TYPE_NORMAL;
+
+	(*pointer).children[0]=child1;
+	(*pointer).children[1]=child2;
+	(*pointer).children[2]=child3;
+	(*pointer).children[3]=child4;
+	(*pointer).children[4]=child5;
+	(*pointer).children[5]=child6;
+	(*pointer).children[6]=child7;
+	return pointer;
+}
+
+SrcNode* MakeNode7ITER(SrcNode* child1,SrcNode* child2,SrcNode* child3,SrcNode* child4,SrcNode* child5,SrcNode* child6,SrcNode* child7)
+{
+	SrcNode* pointer=(SrcNode*)malloc(sizeof(SrcNode));
+	
+	(*pointer).childrenCount=7;
+	(*pointer).children=(SrcNode**)malloc(7*sizeof(SrcNode));
+	(*pointer).text=0;
+	(*pointer).type=NODE_TYPE_ITER;
 
 	(*pointer).children[0]=child1;
 	(*pointer).children[1]=child2;

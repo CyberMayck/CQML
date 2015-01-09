@@ -117,6 +117,7 @@ public:
 	char * name;
 	SrcNode * code;
 	int graphInd;
+	bool isProperty;
 	vector<Checker> checkers;
 
 	void CheckerPrint(FILE *);
@@ -1022,7 +1023,8 @@ GUIElement * recursionProcessTree(ParserGUIElement * element)
 					instance->attributes[attribCnt].name=prop->attribute->name;
 					instance->attributes[attribCnt].name2=0;
 					instance->attributes[attribCnt].expression=prop->attribute->expression;
-				
+					instance->attributes[attribCnt].handler=new GUIElementHandler();
+
 					attribCnt++;
 				}
 				propertyCnt++;
@@ -1049,112 +1051,390 @@ void recursionCount(ParserGUIElement * element)
 
 bool processSrcDots(SrcNode * node, int treeInd, int currentElementId, int graphInd, GUIElementHandler* h);
 
+int countDotIds(SrcNode * node);
+int fillIds(SrcNode * node, std::string* identifiers, int ind);
+
+bool processDots(SrcNode * node, int treeInd,int currentElementId, int graphInd, GUIElementHandler* h, int& varId, bool isRight, SrcApendix& ap, int & lastVar)
+{
+	char str[256];
+	// count Identifiers
+	int cnt=countDotIds(node);
+	if(cnt<1)
+		return false;
+
+	// save identifiers
+	std::string* identifiers = new std::string[cnt];
+	fillIds(node,identifiers,0);
+
+	bool isOtherId=idMaps[treeInd].count(identifiers[0])!=0;
+	int curId=currentElementId;
+	
+	std::string prevTypeName;
+	ClassContainer * prevClassCont=0;
+	int prevVarId=varId;
+
+	
+	if(isOtherId)
+	{
+		curId=idMaps[treeInd][identifiers[0]];
+		
+		sprintf(str,"(*((GUI_Rootoutput%d *)context->root)->_QML_element%d)",treeInd,curId);
+		// start from ID
+		for(int i=1;i<cnt;i++)
+		{
+			if(isRight || i<cnt-1)
+			{
+				if(i==1)
+					ap.addGetter(std::string(str),std::string(node->text),varId);
+				else
+					ap.addGetter(prevVarId,std::string(node->text),varId);
+				prevVarId=varId;
+				varId++;
+			}
+			else
+			{
+				if(i==1)
+					ap.addSetter(std::string(str),std::string(node->text),lastVar);
+				else
+					ap.addSetter(prevVarId,std::string(node->text),lastVar);
+			}
+		}
+	}
+	else
+	{
+		PropertyAndType * prop=elements[curId].classContainer->CheckExistence(identifiers[0]);
+		sprintf(str,"(*((GUI_Rootoutput%d *)context->root)->_QML_element%d)",treeInd,curId);
+		if(prop!=0)
+		{
+			//start from this
+			// if this
+			for(int i=0;i<cnt;i++)
+			{
+				if(isRight || i<cnt-1)
+				{
+					if(i==1)
+						ap.addGetter(std::string(str),std::string(node->text),varId);
+					else
+						ap.addGetter(prevVarId,std::string(node->text),varId);
+					prevVarId=varId;
+					varId++;
+				}
+				else
+				{
+					if(i==1)
+						ap.addSetter(std::string(str),std::string(node->text),lastVar);
+					else
+						ap.addSetter(prevVarId,std::string(node->text),lastVar);
+				}
+			}
+		}
+		else
+		{
+			return true;
+			// leave it alone
+		}
+	}
+	if(isRight)
+	{
+		free(node->text);
+		sprintf(str,"var%d",(varId-1));
+
+		node->text=new char[strlen(str)+1];
+		strcpy(node->text,str);
+	}
+
+
+	return true;
+}
+
+void processRefs(SrcNode * node, int treeInd, int currentElementId, int graphInd, GUIElementHandler* h, int& varId, bool isRight, SrcApendix& ap, int & lastVar)
+{
+	char str[256];
+	if(node->type==NODE_TYPE_ID)
+	{
+		bool isOtherId=idMaps[treeInd].count(std::string(node->text))!=0;
+		int curId=currentElementId;
+
+		if(isOtherId)
+		{
+			curId=idMaps[treeInd][std::string(node->text)];
+			
+			free(node->text);
+			sprintf(str,"(*((GUI_Rootoutput%d *)context->root)->_QML_element%d)",treeInd,curId);
+			//sprintf(str,"(*self->localGroup->members[%d])",otherId);
+			node->text=new char[strlen(str)+1];
+			strcpy(node->text,str);
+		}
+		else
+		{
+			curId=currentElementId;
+			ClassContainer * cont=elements[currentElementId].classContainer;
+			PropertyAndType * prop=cont->CheckExistence(std::string(node->text));
+			
+			sprintf(str,"(*((GUI_Rootoutput%d *)context->root)->_QML_element%d)",treeInd,curId);
+			if(prop!=0)
+			{
+				// ap
+				if(isRight)
+				{
+					ap.addGetter(std::string(str),std::string(node->text),varId);
+					varId++;
+				// add getter
+				}
+				else
+				{
+					ap.addSetter(std::string(str),std::string(node->text),lastVar);
+				// add setter
+				}
+				
+				if(isRight)
+				{
+					free(node->text);
+					sprintf(str,"var%d",(varId-1));
+
+					node->text=new char[strlen(str)+1];
+					strcpy(node->text,str);
+				}
+			}
+			else
+			{
+				// leave it alone might be local
+			}
+		}
+	}
+	else
+	{
+		if(node->type==NODE_TYPE_DOT)
+		{
+			if(processDots(node, treeInd,currentElementId, graphInd,h,varId, isRight,ap,lastVar))
+			{
+				node->type=NODE_TYPE_DOT_PROCESSED;
+			}
+		}
+		else
+		{
+			for(int i=0;i<node->childrenCount;i++)
+			{
+				processRefs(node->children[i],treeInd,currentElementId, graphInd,h,varId,isRight,ap, lastVar);
+			}
+		}
+	}
+}
+
+void printSubnodesToStr(SrcNode * node, string & str)
+{
+	if((*node).text!=0)
+	{
+		str=str+string(node->text);
+	}
+	if(node->type!=NODE_TYPE_DOT_PROCESSED)
+	{
+		for(int i=0;i<node->childrenCount;i++)
+		{
+			printSubnodesToStr(node->children[i],str);
+		}
+	}
+}
+
+void processApendi(SrcNode * node, int treeInd, int currentElementId, int graphInd, GUIElementHandler* h, int & varId)
+{
+	SrcApendix * ap=node->apendix;
+	for(int l=0;l<ap->sentences.size();l++)
+	{
+		SrcNode* node= ap->sentences[l].nodes[ap->sentences[l].nodes.size()-1];
+			int lastVar=0;
+
+		processRefs(node,treeInd,currentElementId,graphInd,h,varId,true,*ap,lastVar);
+
+		string expStr="";
+		printSubnodesToStr(node,expStr);
+		ap->addExpr(varId,expStr);
+		varId++;
+		lastVar=varId;
+
+		for(int i=ap->sentences[l].nodes.size()-2;i>=0;i--)
+		{
+			processRefs(node,treeInd,currentElementId,graphInd,h,varId,false,*ap,lastVar);
+
+
+		}
+		
+		//ap->sentences[l].nodes.size()
+	}
+}
+
+void processSrcAssign(SrcNode * node, int treeInd, int currentElementId, SrcNode * lastStatementNode, int graphInd, GUIElementHandler* h)
+{
+	AssignSentence * sent=&lastStatementNode->apendix->sentences[lastStatementNode->apendix->sentences.size()-1];
+	if(node->childrenCount==3)
+	{
+		// left side of current right side of previous
+		sent->nodes.push_back(node->children[0]);
+		AssignmentOperator op;
+		op.str=string(node->children[1]->text);
+		sent->ops.push_back(op);
+
+		// go right
+		processSrcAssign(node->children[2],treeInd, currentElementId,lastStatementNode,graphInd,h);
+
+		// getters to apendix - replace dots and ids by the vars
+	}
+	else
+	{
+		sent->nodes.push_back(node->children[0]);
+		//just left side - right side of previous
+		// getters to apendix - replace dots and ids by the vars
+	}
+}
+
+void processSrc(SrcNode * node, int treeInd, int currentElementId, SrcNode * lastStatementNode, int graphInd, GUIElementHandler* h, int & varId)
+{
+	if(node->type==NODE_TYPE_STATM)
+	{
+		lastStatementNode=node;
+		node->apendix=0;
+	}
+	bool processKids=false;
+	if(node->type==NODE_TYPE_DOT)
+	{
+		if(lastStatementNode->apendix==0)
+			lastStatementNode->apendix= new SrcApendix();
+		lastStatementNode->apendix->sentences.push_back(AssignSentence());
+		AssignSentence * sent=&lastStatementNode->apendix->sentences[lastStatementNode->apendix->sentences.size()-1];
+		sent->nodes.push_back(node);
+		// append getter to statement
+		// and
+		// write here
+	}
+	else if(node->type==NODE_TYPE_ID)
+	{
+		if(lastStatementNode->apendix==0)
+			lastStatementNode->apendix= new SrcApendix();
+		lastStatementNode->apendix->sentences.push_back(AssignSentence());
+		AssignSentence * sent=&lastStatementNode->apendix->sentences[lastStatementNode->apendix->sentences.size()-1];
+		sent->nodes.push_back(node);
+		// append getter to statement
+		// and
+		// write here
+	}
+	else if(node->type==NODE_TYPE_ASSIGN)
+	{
+		if(lastStatementNode->apendix==0)
+			lastStatementNode->apendix= new SrcApendix();
+		lastStatementNode->apendix->sentences.push_back(AssignSentence());
+		processSrcAssign(node,treeInd,currentElementId, lastStatementNode, graphInd,h);
+	}
+	else processKids=true;
+
+	if(processKids)
+	{
+		for(int i=0;i<node->childrenCount;i++)
+		{
+			processSrc(node->children[i],treeInd,currentElementId, lastStatementNode, graphInd,h,varId);
+		}
+	}
+	if(lastStatementNode==node)
+	{
+		processApendi(node,treeInd,currentElementId, graphInd,h,varId);
+	}
+}
+
 void processSrcReferences(SrcNode * node, int treeInd, int currentId, bool leftMostFound, bool dotNodePassed, int graphInd, GUIElementHandler* h)
 {
 	char str[100];
-			if(node->type==NODE_TYPE_DOT)
+	if(node->type==NODE_TYPE_DOT)
+	{
+		dotNodePassed=true;
+	}
+	else if(node->type==NODE_TYPE_ID)
+	{
+		bool isOtherId=idMaps[treeInd].count(std::string(node->text))!=0;
+		bool isImportName=importToKeyMaps[treeInd].count(std::string(node->text))!=0;
+		//if(leftMostFound)
+		{
+			if(isOtherId)
 			{
-				dotNodePassed=true;
+				int otherId=idMaps[treeInd][std::string(node->text)];
+				free(node->text);
+				sprintf(str,"(*((GUI_Rootoutput%d *)context->root)->_QML_element%d)",treeInd,otherId);
+				//sprintf(str,"(*self->localGroup->members[%d])",otherId);
+				node->text=new char[strlen(str)+1];
+				strcpy(node->text,str);
 			}
-			else if(node->type==NODE_TYPE_ID)
+			else if(isImportName)
 			{
-				bool isOtherId=idMaps[treeInd].count(std::string(node->text))!=0;
-				bool isImportName=importToKeyMaps[treeInd].count(std::string(node->text))!=0;
-				//if(leftMostFound)
+				int otherId=importToKeyMaps[treeInd][std::string(node->text)];
+				
+				free(node->text);
+				sprintf(str,"GUI_Root%s",importPathToName[imports[otherId].path].c_str());
+				//sprintf(str,"(*self->localGroup->members[%d])",otherId);
+				node->text=new char[strlen(str)+1];
+				strcpy(node->text,str);
+			}
+			else
+			{
+				if(strcmp("parent",node->text)==0)
 				{
-					if(isOtherId)
+					free(node->text);
+					sprintf(str,"(*((GUI_Rootoutput%d *)context->root)->_QML_element%d->parent)",treeInd,currentId);
+					//sprintf(str,"(*self->localGroup->members[%d]->parent)",currentId);
+					node->text=new char[strlen(str)+1];
+					strcpy(node->text,str);
+				}
+				else
+				{
+					ClassContainer * cont=elements[currentId].classContainer;
+					PropertyAndType * prop=cont->CheckExistence(std::string(node->text));
+					if(prop!=0)
 					{
-						int otherId=idMaps[treeInd][std::string(node->text)];
-						free(node->text);
-						sprintf(str,"(*((GUI_Rootoutput%d *)context->root)->_QML_element%d)",treeInd,otherId);
-						//sprintf(str,"(*self->localGroup->members[%d])",otherId);
-						node->text=new char[strlen(str)+1];
-						strcpy(node->text,str);
-					}
-					else if(isImportName)
-					{
-						int otherId=importToKeyMaps[treeInd][std::string(node->text)];
+						//
+						sprintf(str,"((%s*)((GUI_Rootoutput%d *)context->root)->_QML_element%d)->%s",prop->cont->className.c_str(),treeInd,currentId,node->text);
+							string checkStr=string("((GUI_Rootoutput")
+							+std::to_string(static_cast<long long>(treeInd))
+							+string(" *)context->root)->_QML_element")
+							+std::to_string(static_cast<long long>(currentId));
+						Checker checker;//(checkStr,string(node->text));
+						checker.SetStartName(checkStr);
+						checker.PushCheck(prop);//string(node->text));
+						h->checkers.push_back(checker);
 						
+						std::string key=std::to_string(static_cast<long long>(currentId))+std::string(".")+std::string(node->text);
+
 						free(node->text);
-						sprintf(str,"GUI_Root%s",importPathToName[imports[otherId].path].c_str());
-						//sprintf(str,"(*self->localGroup->members[%d])",otherId);
 						node->text=new char[strlen(str)+1];
 						strcpy(node->text,str);
-					}
-					else
-					{
-						if(strcmp("parent",node->text)==0)
+
+						if(keyMap.count(key)!=0)
 						{
-							free(node->text);
-							sprintf(str,"(*((GUI_Rootoutput%d *)context->root)->_QML_element%d->parent)",treeInd,currentId);
-							//sprintf(str,"(*self->localGroup->members[%d]->parent)",currentId);
-							node->text=new char[strlen(str)+1];
-							strcpy(node->text,str);
+							graphNodes[keyMap[key]]->nextNodes.push_back(graphInd);
 						}
 						else
 						{
-							ClassContainer * cont=elements[currentId].classContainer;
-							PropertyAndType * prop=cont->CheckExistence(std::string(node->text));
-							if(prop!=0)
-							{
-								//
-								sprintf(str,"((%s*)((GUI_Rootoutput%d *)context->root)->_QML_element%d)->%s",prop->cont->className.c_str(),treeInd,currentId,node->text);
-
-								string checkStr=string("((GUI_Rootoutput")
-									+std::to_string(static_cast<long long>(treeInd))
-									+string(" *)context->root)->_QML_element")
-									+std::to_string(static_cast<long long>(currentId));
-								Checker checker;//(checkStr,string(node->text));
-								checker.SetStartName(checkStr);
-								checker.PushCheck(prop);//string(node->text));
-								h->checkers.push_back(checker);
-
-								//sprintf(str,"(*((GUI_Rootoutput%d *)((GUI_Element*)self)->root)->_QML_element%d).%s",treeInd,currentId,node->text);
-							//sprintf(str,"(*self->localGroup->members[%d]).%s",currentId,node->text);
-							
-								std::string key=std::to_string(static_cast<long long>(currentId))+std::string(".")+std::string(node->text);
-
-								free(node->text);
-								node->text=new char[strlen(str)+1];
-								strcpy(node->text,str);
-
-								if(keyMap.count(key)!=0)
-								{
-									graphNodes[keyMap[key]]->nextNodes.push_back(graphInd);
-								}
-								else
-								{
-									GraphNode* graphNode=new GraphNode();
-									graphNode->key=key;
-									graphNode->nextNodes.push_back(graphInd);
-									keyMap[key]=graphNodes.size();
-									graphNodes.push_back(graphNode);
-									//graphNodespush_back();
-								}
-
-
-							}
-							else
-							{
-								// no id nor valid att - might be local - do nothing
-							}
+							GraphNode* graphNode=new GraphNode();
+							graphNode->key=key;
+							graphNode->nextNodes.push_back(graphInd);
+							keyMap[key]=graphNodes.size();
+							graphNodes.push_back(graphNode);
+							//graphNodespush_back();
 						}
-						////
 
-						/*else if(strcmp("MakeNewThing",node->text)==0) // temporary - because of missing valid att
-						{
-						}
-						else// if(is valid att?) //complete
-						{
-							
-
-
-
-						}*/
-						//else //nothing
+					}
+					else
+					{
+						// no id nor valid att - might be local - do nothing
 					}
 				}
+				////
+				/*else if(strcmp("MakeNewThing",node->text)==0) // temporary - because of missing valid att
+				{
+				}
+				else// if(is valid att?) //complete
+				{
+				}*/
+				//else //nothing
 			}
+		}
+	}
 	if(!dotNodePassed)
 	{
 		for(int i=0;i<node->childrenCount;i++)
@@ -1170,6 +1450,7 @@ void processSrcReferences(SrcNode * node, int treeInd, int currentId, bool leftM
 		}
 	}
 }
+
 //class 
 int countDotIds(SrcNode * node)
 {
@@ -1251,6 +1532,7 @@ bool processSrcDots(SrcNode * node, int treeInd,int currentElementId, int graphI
 		curId=idMaps[treeInd][identifiers[0]];
 		startInd=1;
 	}
+	GUIElement el=elements[curId];
 	prevTypeName=elements[curId].classContainer->className;
 	prevClassCont=elements[curId].classContainer;
 
@@ -1261,8 +1543,10 @@ bool processSrcDots(SrcNode * node, int treeInd,int currentElementId, int graphI
 	string completeName;
 
 	bool previousIsReference=true;
+	bool passedReference=false;
 	for(int i=startInd;i<cnt;i++)
 	{
+		string nam = identifiers[i];
 		PropertyAndType * prop=prevClassCont->CheckExistence(identifiers[i]);
 		if(prop!=0)
 		{
@@ -1308,7 +1592,8 @@ bool processSrcDots(SrcNode * node, int treeInd,int currentElementId, int graphI
 
 			
 			previousIsReference=prop->IsReference();
-
+			if(previousIsReference)
+				passedReference=true;
 
 
 			// is type a class defined in same file
@@ -1325,8 +1610,15 @@ bool processSrcDots(SrcNode * node, int treeInd,int currentElementId, int graphI
 				}
 				else
 				{
-					// is basic type
-					prevClassCont=0;
+					//if(prop->cont)
+					{
+
+					}
+					//else
+					{
+						// is basic type
+						prevClassCont=0;
+					}
 				}
 			}
 		}
@@ -1729,7 +2021,16 @@ void processTree(ParserList* elementTree, int treeInd)
 		{
 			PropertyAndType temp;
 			temp.name=elements[i].properties[j].name;
-			temp.type=elements[i].properties[j].typeName;
+			// todo check default type
+			if(strcmp(elements[i].properties[j].typeName,"int")!=0)
+			{
+				temp.type=(string("GUI_")+string(elements[i].properties[j].typeName));
+			}
+			else
+			{
+				temp.type=elements[i].properties[j].typeName;
+				temp.name=temp.name+"*";
+			}
 
 			elements[i].classContainer->AddProp(temp);
 		}
@@ -1797,6 +2098,23 @@ void processTree(ParserList* elementTree, int treeInd)
 		{
 			GUIElementHandler * handler=&elements[i].handlers[j];
 
+			PropertyAndType* t= elements[i].classContainer->CheckExistence(std::string(handler->name));
+			HandlerAndType* h= elements[i].classContainer->CheckHExistence(std::string(handler->name));
+			///here
+			if(t==0 && h==0)
+			{
+					assert(false);
+				perror("nonexistent atribute");
+				exit(-1);
+			}
+
+			if(t!=0 && h!=0)
+			{
+					assert(false);
+				perror("handler and property has same name");
+				exit(-1);
+			}
+
 			
 			std::string key=std::to_string(static_cast<long long>(i))+"."+std::string(handler->name);
 			int graphInd;
@@ -1815,6 +2133,17 @@ void processTree(ParserList* elementTree, int treeInd)
 				//graphNodespush_back();
 			}
 			handler->graphInd=graphInd;
+			
+			if(t!=0)
+			{
+				// just property handler
+				handler->isProperty=true;
+			}
+			else
+			{
+				handler->isProperty=false;
+				// actual handler
+			}
 
 			processSrcReferences(handler->code,treeInd,i,false,false,graphInd,handler);
 		}

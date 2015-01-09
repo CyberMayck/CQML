@@ -9,7 +9,12 @@
 #define NODE_TYPE_ID			(1)
 #define NODE_TYPE_DOT			(2)
 #define NODE_TYPE_DOT_PROCESSED	(3)
-#define NODE_TYPE_LEAF			(4)
+#define NODE_TYPE_ASSIGN		(4)
+#define NODE_TYPE_ASSIGN_PROCESSED	(5)
+#define NODE_TYPE_EXPRESSION	(6)
+#define NODE_TYPE_ITER			(7)
+#define NODE_TYPE_STATM			(8)
+#define NODE_TYPE_LEAF			(9)
 
 typedef struct ParserImport ParserImport;
 typedef struct ParserList ParserList;
@@ -28,16 +33,23 @@ extern ParserList* elementTree;
 extern int id;
 
 #ifdef __cplusplus
+#include "src_apendix.h"
 extern "C"
 {
 	SrcNode* MakeNode0(char * text);
 	SrcNode* MakeNode0ID(char * text);
 	SrcNode* MakeNode1(SrcNode* child1);
+	SrcNode* MakeNode1STATM(SrcNode* child1);
 	SrcNode* MakeNode2(SrcNode* child1,SrcNode* child2);
 	SrcNode* MakeNode3(SrcNode* child1,SrcNode* child2,SrcNode* child3);
+	SrcNode* MakeNode3A(SrcNode* child1,SrcNode* child2,SrcNode* child3);
 	SrcNode* MakeNode3Dot(SrcNode* child1,SrcNode* child2,SrcNode* child3);
 	SrcNode* MakeNode4(SrcNode* child1,SrcNode* child2,SrcNode* child3,SrcNode* child4);
 	SrcNode* MakeNode5(SrcNode* child1,SrcNode* child2,SrcNode* child3,SrcNode* child4,SrcNode* child5);
+	SrcNode* MakeNode5ITER(SrcNode* child1,SrcNode* child2,SrcNode* child3,SrcNode* child4,SrcNode* child5);
+	SrcNode* MakeNode6ITER(SrcNode* child1,SrcNode* child2,SrcNode* child3,SrcNode* child4,SrcNode* child5,SrcNode* child6);
+	SrcNode* MakeNode7ITER(SrcNode* child1,SrcNode* child2,SrcNode* child3,SrcNode* child4,SrcNode* child5,SrcNode* child6,SrcNode* child7);
+
 	SrcNode* MakeNode6(SrcNode* child1,SrcNode* child2,SrcNode* child3,SrcNode* child4,SrcNode* child5,SrcNode* child6);
 	SrcNode* MakeNode7(SrcNode* child1,SrcNode* child2,SrcNode* child3,SrcNode* child4,SrcNode* child5,SrcNode* child6,SrcNode* child7);
 
@@ -63,11 +75,19 @@ extern "C"
 	int* MakeNode0ID(char * text);
 	int* MakeNode0(char * text);
 	int* MakeNode1(int* child1);
+	int* MakeNode1STATM(int* child1);
 	int* MakeNode2(int* child1,int* child2);
 	int* MakeNode3(int* child1,int* child2,int* child3);
+	int* MakeNode3A(int* child1,int* child2,int* child3);
 	int* MakeNode3Dot(int* child1,int* child2,int* child3);
 	int* MakeNode4(int* child1,int* child2,int* child3,int* child4);
 	int* MakeNode5(int* child1,int* child2,int* child3,int* child4,int* child5);
+
+	int* MakeNode5ITER(int* child1,int* child2,int* child3,int* child4,int* child5);
+	int* MakeNode6ITER(int* child1,int* child2,int* child3,int* child4,int* child5,int* child6);
+	int* MakeNode7ITER(int* child1,int* child2,int* child3,int* child4,int* child5,int* child6,int* child7);
+	
+
 	int* MakeNode6(int* child1,int* child2,int* child3,int* child4,int* child5,int* child6);
 	int* MakeNode7(int* child1,int* child2,int* child3,int* child4,int* child5,int* child6,int* child7);
 	void makeParseTree(int *l);
@@ -115,4 +135,10 @@ struct SrcNode{
 	int childrenCount;
 	char* text;
 	int type;
+	
+#ifdef __cplusplus
+	SrcApendix *apendix;
+#else
+	int* apendix;
+#endif
 };

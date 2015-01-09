@@ -1,4 +1,5 @@
 #include "parameter_handling.h"
+
 #include <string>
 #include <stdio.h>
 #include <stdlib.h>
@@ -81,6 +82,11 @@ void ClassContainer::AddProp(PropertyAndType prop)
 	this->props.push_back(prop);
 }
 
+void ClassContainer::AddHandler(HandlerAndType handler)
+{
+	this->handlers.push_back(handler);
+}
+
 void ClassContainer::SetAncestor(ClassContainer * ancestor)
 {
 	this->ancestor=ancestor;
@@ -109,6 +115,20 @@ PropertyAndType* ClassContainer::CheckExistence(string s)
 	return 0;
 }
 
+HandlerAndType* ClassContainer::CheckHExistence(string s)
+{
+	for(int i=0;i<handlers.size();i++)
+	{
+		if(handlers[i].name==s)
+		{
+			return &handlers[i];
+		}
+	}
+	if(ancestor!=0)
+		return ancestor->CheckHExistence(s);
+	return 0;
+}
+
 vector<ClassContainer*> defaultClasses;
 unordered_map<string, int> defaultClassMap;
 
@@ -119,7 +139,7 @@ int totalClassCnt=0;
 
 void registerStruct(const char* name, const char* parent);
 void parserDeclare(const char* type, const char* name, const char* value);
-
+void parserDeclareFunc(const char* , const char* , const char*, int n_arg , ...);
 #define CQML_PARSER
 #include "..\CQML\struct_definition_macros.h"
 
@@ -139,6 +159,59 @@ void registerStruct(const char* name, const char* parent)
 		string sp=string(parent);
 		cont->SetAncestor(defaultClasses[defaultClassMap[sp]]);
 	}
+}
+
+void parserDeclareFunc(const char* type, const char* name, const char* value, int n_args, ...)
+{
+	//M(int, MousePressed, 0, GUI_Element*, int, int, int) 
+	string sType=string(type);
+	string sName=string(name);
+
+	ClassContainer * cont= curCont;
+	HandlerAndType temp;
+	temp.name=name;
+	temp.returnType=type;
+
+	va_list ap;
+    va_start(ap, n_args);
+
+    for(int i = 0; i < n_args; i++)
+	{
+		const char* s = va_arg(ap, const char*);
+		string str=string(s);
+		int spaceInd=-1;
+		bool nonSpaceFound=false;
+		for(int j=str.length()-1;j>=0;j--)
+		{
+			if(str[j]==' ' && nonSpaceFound)
+			{
+				spaceInd=j;
+				break;
+			}
+			else
+			{
+				nonSpaceFound=true;
+			}
+		}
+		if(spaceInd!=-1)
+		{
+			string s1 = str.substr(0,spaceInd);
+			string s2 = str.substr(spaceInd+1,str.length()-spaceInd-1);
+		//	string s2 = string.substr
+			temp.paramTypes.push_back(s1);
+			temp.paramNames.push_back(s2);
+		}
+		else
+		{
+			temp.paramTypes.push_back(str);
+			temp.paramNames.push_back(string(""));
+		}
+
+    }
+    va_end(ap);
+
+	cont->AddHandler(temp);
+
 }
 
 void parserDeclare(const char* type, const char* name, const char* value)

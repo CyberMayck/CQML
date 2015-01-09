@@ -4,6 +4,48 @@
 static int classCnt;
 static AttributeCheck * classes;
 
+
+int f1(const char* s, int * T, int n)
+{
+	int sum=0;
+	for(int i=0,len=strlen(s);i<len;i++)
+	{
+		sum+=T[i]*(unsigned char)s[i];
+	}
+	sum=sum%n;
+	return sum;
+}
+
+int hash(const char* s, int n,int m, int* T1, int* T2, int* g)
+{
+	int u=f1(s,T1,n);
+	int v=f1(s,T2,n);
+	int a=g[u];
+	int b=g[v];
+	int retVal=(g[u]+g[v])%m;
+	return retVal;
+}
+
+typedef union value_type
+{
+	//include alltypes.h
+} value_type;
+
+int setter(const char* attName,value_type val)
+{
+	// check existence
+
+
+}
+
+int setTypeByID()
+{
+}
+
+int getter(const char* attName,value_type val)
+{
+}
+
 int checkAttributeInd(int classInd, int attHash)
 {
 	int i;
