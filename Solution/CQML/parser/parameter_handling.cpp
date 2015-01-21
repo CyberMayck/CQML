@@ -139,7 +139,7 @@ int totalClassCnt=0;
 
 void registerStruct(const char* name, const char* parent);
 void parserDeclare(const char* type, const char* name, const char* value);
-void parserDeclareFunc(const char* , const char* , const char*, int n_arg , ...);
+void parserDeclareFunc(const char* , const char* , const char*, const char * s);
 #define CQML_PARSER
 #include "..\CQML\struct_definition_macros.h"
 
@@ -161,24 +161,40 @@ void registerStruct(const char* name, const char* parent)
 	}
 }
 
-void parserDeclareFunc(const char* type, const char* name, const char* value, int n_args, ...)
+void parserDeclareFunc(const char* type, const char* name, const char* value, const char* args)
 {
 	//M(int, MousePressed, 0, GUI_Element*, int, int, int) 
 	string sType=string(type);
 	string sName=string(name);
+
+	string sArgs=string(args);
 
 	ClassContainer * cont= curCont;
 	HandlerAndType temp;
 	temp.name=name;
 	temp.returnType=type;
 
-	va_list ap;
-    va_start(ap, n_args);
+	vector<string> arguments;
+
+	int prevInd=0;
+	int n_args=0;
+	for(int i=0,j=sArgs.length();i<j;i++)
+	{
+		if(sArgs[i]==',')
+		{
+			arguments.push_back(sArgs.substr(prevInd,i-prevInd));
+			prevInd=i+1;
+		}
+	}
+	arguments.push_back(sArgs.substr(prevInd,sArgs.length()-prevInd));
+
+	//va_list ap;
+    //va_start(ap, n_args);
 
     for(int i = 0; i < n_args; i++)
 	{
-		const char* s = va_arg(ap, const char*);
-		string str=string(s);
+		//const char* s = va_arg(ap, const char*);
+		string str=arguments[i];//string(s);
 		int spaceInd=-1;
 		bool nonSpaceFound=false;
 		for(int j=str.length()-1;j>=0;j--)
@@ -208,7 +224,7 @@ void parserDeclareFunc(const char* type, const char* name, const char* value, in
 		}
 
     }
-    va_end(ap);
+    //va_end(ap);
 
 	cont->AddHandler(temp);
 

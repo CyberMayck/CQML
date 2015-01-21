@@ -17,7 +17,7 @@
     #define PROP_FACTORY_FROM_STRING4(t, n, d, c) if(strcmp(name, #n) == 0) { string_to_##t(value, &self->n); return 1; }
     #define PROP_FACTORY_DUMP_VAR4(t, n, d, c) t##_to_string(self->n, buffer, buffer_size); printf("%s = %s [%s]\n", #n, buffer, c);
 
-	#define PROP_FACTORY_DECL_FUNC3P(t, n, d, ar, ...) t (*n)(__VA_ARGS__); QML_Context n##_context;
+	#define PROP_FACTORY_DECL_FUNC3P(t, n, d, ...) t (*n)(__VA_ARGS__); QML_Context n##_context;
      
     /* helper functions */
    /* int string_to_int(const char * str, int * outInt) {
@@ -55,19 +55,19 @@
 	F(int, y, 0, "y coordinate in pixels") \
 	F(int, width, 0, "width in pixels") \
 	F(int, height, 0, "height in pixels")\
-	M(int, Draw, 0, 1, GUI_Element* bah) \
-	M(int, Update, 0, 1, GUI_Element*) \
-	M(int, MousePressed, 0, 4, GUI_Element*, int, int, int) \
-	M(int, MouseReleased, 0, 4, GUI_Element*, int, int, int) \
-	M(int, MouseMoved, 0, 5, GUI_Element*, int, int, int, int) \
-	M(int, MouseScrolled, 0, 5, GUI_Element*, int, int, int, int) \
-	M(void, CustomMouseClicked, 0, 2, GUI_Element*, QMLEvent) \
-	M(void, CustomMousePressed, 0, 2, GUI_Element*, QMLEvent) \
-	M(void, CustomMouseReleased, 0, 2, GUI_Element*, QMLEvent) \
-	M(void, CustomMouseMoved, 0, 2, GUI_Element*, QMLEvent) \
-	M(void, CustomMouseEntered, 0, 2, GUI_Element*, QMLEvent) \
-	M(void, CustomMouseExited, 0, 2, GUI_Element*, QMLEvent) \
-	M(void, CustomMouseScrolled, 0, 2, GUI_Element*, QMLEvent)
+	M(int, Draw, 0, GUI_Element* bah) \
+	M(int, Update, 0, GUI_Element*) \
+	M(int, MousePressed, 0, GUI_Element*, int, int, int) \
+	M(int, MouseReleased, 0, GUI_Element*, int, int, int) \
+	M(int, MouseMoved, 0, GUI_Element*, int, int, int, int) \
+	M(int, MouseScrolled, 0, GUI_Element*, int, int, int, int) \
+	M(void, CustomMouseClicked, 0, GUI_Element*, QMLEvent) \
+	M(void, CustomMousePressed, 0, GUI_Element*, QMLEvent) \
+	M(void, CustomMouseReleased, 0, GUI_Element*, QMLEvent) \
+	M(void, CustomMouseMoved, 0, GUI_Element*, QMLEvent) \
+	M(void, CustomMouseEntered, 0, GUI_Element*, QMLEvent) \
+	M(void, CustomMouseExited, 0, GUI_Element*, QMLEvent) \
+	M(void, CustomMouseScrolled, 0, GUI_Element*, QMLEvent)
 
 
 	// what about callbacks?
@@ -108,7 +108,7 @@
 	typedef struct NAME NAME;
      
 
-#define PROP_FACTORY_PARSER_DECL_FUNC3P(t, n, d, ar,...) parserDeclareFunc(#t, #n, #d, ar, #__VA_ARGS__);
+#define PROP_FACTORY_PARSER_DECL_FUNC3P(t, n, d, ...) parserDeclareFunc(#t, #n, #d, #__VA_ARGS__);
 
 #define PROP_FACTORY_PARSER_DECL4(t, n, d, c) parserDeclare(#t,#n,#d);
    

@@ -39,6 +39,7 @@ extern "C"
 	SrcNode* MakeNode0(char * text);
 	SrcNode* MakeNode0ID(char * text);
 	SrcNode* MakeNode1(SrcNode* child1);
+	SrcNode* MakeNode1A(SrcNode* child1);
 	SrcNode* MakeNode1STATM(SrcNode* child1);
 	SrcNode* MakeNode2(SrcNode* child1,SrcNode* child2);
 	SrcNode* MakeNode3(SrcNode* child1,SrcNode* child2,SrcNode* child3);
@@ -75,6 +76,7 @@ extern "C"
 	int* MakeNode0ID(char * text);
 	int* MakeNode0(char * text);
 	int* MakeNode1(int* child1);
+	int* MakeNode1A(int* child1);
 	int* MakeNode1STATM(int* child1);
 	int* MakeNode2(int* child1,int* child2);
 	int* MakeNode3(int* child1,int* child2,int* child3);

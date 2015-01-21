@@ -48,6 +48,12 @@
     <ClCompile Include="src_apendix.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src_processor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="elements.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="src.cqml">
@@ -89,6 +95,15 @@
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="src_apendix.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src_processor.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="elements.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="utils.h">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>

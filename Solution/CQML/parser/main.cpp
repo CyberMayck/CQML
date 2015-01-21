@@ -14,6 +14,8 @@
 
 #include "parser_tree.h"
 #include "parameter_handling.h"
+#include "src_processor.h"
+#include "elements.h"
 extern vector<ClassContainer*> defaultClasses;
 extern unordered_map<string, int> defaultClassMap;
 extern vector<ClassContainer*> classes[100];
@@ -24,28 +26,6 @@ typedef struct yy_buffer_state *YY_BUFFER_STATE;
 
 void PrintNodeToFile(FILE* file, SrcNode* node);
 
-class GUIElement;
-class GUIElementAttribute;
-class GUIElementProperty;
-class GUIElementHandler;
-class GUIImport;
-
-class GUIImport
-{
-public:
-	bool processed;
-	GUIImport(){processed=false;}
-	std::string name;
-	std::string path;
-	int treeInd;
-};
-
-class GraphNode
-{
-public:
-	std::string key;
-	std::vector<int> nextNodes;
-};
 
 std::unordered_map<std::string, int> keyMap;
 std::vector<GraphNode*> graphNodes;
@@ -66,70 +46,6 @@ std::unordered_map<std::string, int> importToKeyMaps[100];
 // import to name of the class in output
 std::unordered_map<std::string, std::string> importPathToName;
 
-class GUIElement
-{
-public:
-	int id;
-	int parentId;
-	char * name;
-	char * origClassName;
-	bool hasCustomClass;
-	GUIElement ** children;
-	GUIElementAttribute * attributes;
-	GUIElementProperty * properties;
-	GUIElementHandler * handlers;
-	int childrenCount;
-	int attributeCount;
-	int handlerCount;
-	int propertiesCount;
-
-	ClassContainer* classContainer;
-	GUIElement();
-};
-
-GUIElement::GUIElement()
-{
-	hasCustomClass=false;
-}
-
-class GUIElementProperty
-{
-public:
-	char * typeName;
-	char * name;
-	//int graphInd;
-};
-
-class GUIElementAttribute
-{
-public:
-	char * name;
-	char * name2;
-	SrcNode * expression;
-	GUIElementHandler * handler;
-	int graphInd;
-};
-
-
-class GUIElementHandler
-{
-public:
-	char * name;
-	SrcNode * code;
-	int graphInd;
-	bool isProperty;
-	vector<Checker> checkers;
-
-	void CheckerPrint(FILE *);
-};
-
-void GUIElementHandler::CheckerPrint(FILE * f)
-{
-	for(int i=0;i<checkers.size();i++)
-	{
-		checkers[i].Print(f);
-	}
-}
 
 GUIElement * elements;
 int elementCount;
@@ -179,6 +95,14 @@ ParserList * elementTrees[100];
 int elementTreeGInds[100];
 int elementTreeCnt=0;
 
+
+void GUIElementHandler::CheckerPrint(FILE * f)
+{
+	//for(int i=0;i<checkers.size();i++)
+	{
+	//	checkers[i].Print(f);
+	}
+}
 
 char * firstIDrec(SrcNode* node)
 {
@@ -925,7 +849,7 @@ void makeSource(std::string name, int treeInd)
 
 
 // recursion function from creating gui structures from parser tree
-GUIElement * recursionProcessTree(ParserGUIElement * element)
+GUIElement * recursionConstructGUIStructures(ParserGUIElement * element)
 {
 	int i;
 	elements[id]=GUIElement();
@@ -990,7 +914,7 @@ GUIElement * recursionProcessTree(ParserGUIElement * element)
 		{
 			if(element->list->members[i]->type==TYPE_GUI_ELEMENT)
 			{
-				instance->children[childCnt]=recursionProcessTree((ParserGUIElement *)element->list->members[i]);
+				instance->children[childCnt]=recursionConstructGUIStructures((ParserGUIElement *)element->list->members[i]);
 				instance->children[childCnt]->parentId=instance->id;
 				childCnt++;
 			}
@@ -1000,6 +924,7 @@ GUIElement * recursionProcessTree(ParserGUIElement * element)
 				instance->attributes[attribCnt].name=((ParserAttribute *)element->list->members[i])->name;
 				instance->attributes[attribCnt].name2=((ParserAttribute *)element->list->members[i])->name2;
 				instance->attributes[attribCnt].expression=((ParserAttribute *)element->list->members[i])->expression;
+				instance->attributes[attribCnt].source=ExprToHandler(((ParserAttribute *)element->list->members[i])->expression);
 				instance->attributes[attribCnt].handler=new GUIElementHandler();
 				attribCnt++;
 			}
@@ -1008,6 +933,7 @@ GUIElement * recursionProcessTree(ParserGUIElement * element)
 				instance->handlers[handlerCnt]=GUIElementHandler();
 				instance->handlers[handlerCnt].name=((ParserHandler *)element->list->members[i])->name;
 				instance->handlers[handlerCnt].code=((ParserHandler *)element->list->members[i])->code;
+				instance->handlers[handlerCnt].source=SourceToHandler(((ParserHandler *)element->list->members[i])->code);
 				handlerCnt++;
 			}
 			else if(element->list->members[i]->type==TYPE_PROPERTY)
@@ -1023,6 +949,8 @@ GUIElement * recursionProcessTree(ParserGUIElement * element)
 					instance->attributes[attribCnt].name=prop->attribute->name;
 					instance->attributes[attribCnt].name2=0;
 					instance->attributes[attribCnt].expression=prop->attribute->expression;
+					instance->attributes[attribCnt].source=ExprToHandler(prop->attribute->expression);
+
 					instance->attributes[attribCnt].handler=new GUIElementHandler();
 
 					attribCnt++;
@@ -1903,7 +1831,7 @@ void processTreeImports(ParserList* elementTree, int importGInd)
 
 		// just one element
 		/*rootElements[rootElementCount]=id;
-		recursionProcessTree((ParserGUIElement*)elementTree->members[i]);
+		recursionConstructGUIStructures((ParserGUIElement*)elementTree->members[i]);
 		elements[rootElements[rootElementCount]].parentId=-1;
 		rootElementCount++;*/
 	}
@@ -1936,7 +1864,7 @@ void processTree(ParserList* elementTree, int treeInd)
 
 		// just one element as root
 		rootElements[rootElementCount]=id;
-		recursionProcessTree((ParserGUIElement*)elementTree->members[i]);
+		recursionConstructGUIStructures((ParserGUIElement*)elementTree->members[i]);
 		elements[rootElements[rootElementCount]].parentId=-1;
 		rootElementCount++;
 	}
@@ -1965,6 +1893,11 @@ void processTree(ParserList* elementTree, int treeInd)
 	}
 
 	int customClassCount=0;
+
+	//for(int i=0;i<elementCount;i++)
+	{
+	}
+
 	// create existence checkers
 	for(int i=0;i<elementCount;i++)
 	{
@@ -2028,8 +1961,8 @@ void processTree(ParserList* elementTree, int treeInd)
 			}
 			else
 			{
-				temp.type=elements[i].properties[j].typeName;
-				temp.name=temp.name+"*";
+				temp.type=elements[i].properties[j].typeName+string("*");
+				temp.name=temp.name;
 			}
 
 			elements[i].classContainer->AddProp(temp);
@@ -2091,7 +2024,8 @@ void processTree(ParserList* elementTree, int treeInd)
 			}
 			att->graphInd=graphInd;
 			
-			processSrcReferences(att->expression,treeInd,i,false,false,graphInd,att->handler);
+			att->source->Process(treeInd,i);
+			//processSrcReferences(att->expression,treeInd,i,false,false,graphInd,att->handler);
 		}
 
 		for(int j=0;j<elements[i].handlerCount;j++)
@@ -2144,8 +2078,10 @@ void processTree(ParserList* elementTree, int treeInd)
 				handler->isProperty=false;
 				// actual handler
 			}
-
-			processSrcReferences(handler->code,treeInd,i,false,false,graphInd,handler);
+			string alp;
+			handler->source->Print(alp);
+			handler->source->Process(treeInd,i);
+			//processSrcReferences(handler->code,treeInd,i,false,false,graphInd,handler);
 		}
 	}
 }
