@@ -83,6 +83,8 @@ public:
 class SourceExprToken: public SourceToken, public SourceTokenContainer
 {
 	vector<SourceToken *> tokens;
+	bool isVar;
+	int variableId;
 public:
 	SourceExprToken(SrcNode *);
 	void PushToken(SourceToken *);
@@ -92,7 +94,8 @@ public:
 
 class SourceAssignmentToken : public SourceToken
 {
-	vector<SourceToken *> nodes;
+	//vector<SourceToken *> nodes;
+	vector<SourceExprToken *> nodes;
 	vector<AssignmentOperator> ops;
 public:
 	SourceAssignmentToken(SrcNode *);
@@ -112,7 +115,7 @@ SourceHandler* SourceToHandler(SrcNode * node);
 class SetGetter
 {
 public:
-	virtual void print();//=0;
+	virtual void Print(string&)=0;
 };
 
 
@@ -124,6 +127,7 @@ class GetterFromElement: public SetGetter
 	int getToId;
 public:
 	GetterFromElement(int fileId, int elementId, string propName, int getToId);
+	void Print(string&);
 };
 class GetterFromVar: public SetGetter
 {
@@ -132,6 +136,16 @@ class GetterFromVar: public SetGetter
 	int getToId;
 public:
 	GetterFromVar(int srcId, string propName, int getToId);
+	void Print(string&);
+};
+
+class ExprSetter: public SetGetter
+{
+	int variableId;
+	SourceExprToken* token;
+public:
+	ExprSetter(int v, SourceExprToken* t);
+	void Print(string&);
 };
 
 class SetterFromElement: public SetGetter
@@ -142,6 +156,7 @@ class SetterFromElement: public SetGetter
 	int setFromId;
 public:
 	SetterFromElement(int fileId, int elementId, string propName, int setFromId);
+	void Print(string&);
 };
 class SetterFromVar: public SetGetter
 {
@@ -150,5 +165,6 @@ class SetterFromVar: public SetGetter
 	int setFromId;
 public:
 	SetterFromVar(int srcId, string propName, int setFromId);
+	void Print(string&);
 };
 

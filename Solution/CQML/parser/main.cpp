@@ -180,7 +180,10 @@ void printHandlers()
 				}
 				fprintf(file_classes2, "static void _QML_element%d_%s(QML_Context * context, QMLEvent Event)\n{\n",i,handler->name);
 				
-				PrintNodeToFile(file_classes2,handler->code);
+				string hSrc;
+				handler->source->Print(hSrc);
+				//PrintNodeToFile(file_classes2,handler->code);
+				fprintf(file_classes2, "%s\n",hSrc.c_str());
 				fprintf(file_classes2, "\n}\n");
 			}
 		}
@@ -229,7 +232,10 @@ void printAttributes()
 					assert(false);
 				}
 				
-				PrintNodeToFile(file_classes2,att->expression);
+				//PrintNodeToFile(file_classes2,att->expression);
+				string hSrc;
+				att->source->Print(hSrc);
+				fprintf(file_classes2, "%s\n",hSrc.c_str());
 				fprintf(file_classes2, ";\n");
 			}
 		}
@@ -1894,10 +1900,8 @@ void processTree(ParserList* elementTree, int treeInd)
 
 	int customClassCount=0;
 
-	//for(int i=0;i<elementCount;i++)
-	{
-	}
 
+	
 	// create existence checkers
 	for(int i=0;i<elementCount;i++)
 	{
@@ -2079,7 +2083,7 @@ void processTree(ParserList* elementTree, int treeInd)
 				// actual handler
 			}
 			string alp;
-			handler->source->Print(alp);
+			//handler->source->Print(alp);
 			handler->source->Process(treeInd,i);
 			//processSrcReferences(handler->code,treeInd,i,false,false,graphInd,handler);
 		}

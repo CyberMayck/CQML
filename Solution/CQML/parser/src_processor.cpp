@@ -2,6 +2,7 @@
 #include "parameter_handling.h"
 #include "elements.h"
 #include "parser_tree.h"
+#include "utils.h"
 
 extern GUIElement * elements;
 //extern std::unordered_map<string, int>* idMaps;
@@ -161,6 +162,7 @@ void SourceHandler::Print(string& dest)
 {
 	for(int i=0;i<tokens.size();i++)
 		tokens[i]->Print(dest);
+	
 }
 void SourceStringToken::Print(string& dest)
 {
@@ -168,20 +170,48 @@ void SourceStringToken::Print(string& dest)
 }
 void SourceStatementToken::Print(string& dest)
 {
+	string s;
+	for(int i=0;i<setGetters.size();i++)
+	{
+		setGetters[i]->Print(s);
+	}
+	dest+=s;
 	for(int i=0;i<tokens.size();i++)
 	{
 		this->tokens[i]->Print(dest);
 	}
+	/*for(int i=0;i<tokens.size();i++)
+	{
+		this->tokens[i]->Print(dest);
+	}*/
 }
 void SourceIdToken::Print(string& dest)
 {
-	dest+=str;
+	//this->
+	if(this->isElement)
+	{
+		dest+="(*((GUI_Rootoutput"+INTTOSTR(this->fileId)+"*)context->root)->"+
+		"_QML_element"+INTTOSTR(this->elementId)+")";
+	}
+	else if(this->isVar)
+	{
+		dest+="_QVar"+INTTOSTR(this->variableId);
+	}
+	else
+		dest+=str;
 }
 void SourceDotToken::Print(string& dest)
 {
-	for(int i=0;i<tokens.size();i++)
+	if(this->isVarReplaced)
 	{
-		this->tokens[i]->Print(dest);
+		dest+="_QVar"+INTTOSTR(this->variableId);
+	}
+	else
+	{
+		for(int i=0;i<tokens.size();i++)
+		{
+			this->tokens[i]->Print(dest);
+		}
 	}
 }
 void SourceExprToken::Print(string& dest)
@@ -193,12 +223,14 @@ void SourceExprToken::Print(string& dest)
 }
 void SourceAssignmentToken::Print(string& dest)
 {
-	this->nodes[0]->Print(dest);
+	//this->nodes[nodes.size()-1]->Print(dest);
+	/*this->nodes[0]->Print(dest);
+
 	for(int i=1;i<nodes.size();i++)
 	{
 		dest+=this->ops[i-1].str;
 		this->nodes[i]->Print(dest);
-	}
+	}*/
 }
 
 int varId=0;
@@ -260,7 +292,7 @@ void SourceIdToken::Process(int treeInd, int currentElementId, SourceStatementTo
 			}
 			else
 			{
-				// leave alone might be user's global
+				// leave alone. might be user's global
 			}
 	}
 }
@@ -280,14 +312,14 @@ void SourceDotToken::Process(int treeInd, int currentElementId, SourceStatementT
 		{
 			if(isRightVal || i<cnt-1)
 			{
+				prevVarId=varId;
+				varId++;
 				if(i==1)
 		lastStatement->PushSetGetter(new GetterFromElement(treeInd,curId,identifiers[i]->GetId(),varId));
 					//ap.addGetter(std::string(str),std::string(node->text),varId);
 				else
 		lastStatement->PushSetGetter(new GetterFromVar(prevVarId,identifiers[i]->GetId(),varId));
 					//ap.addGetter(prevVarId,std::string(node->text),varId);
-				prevVarId=varId;
-				varId++;
 			}
 			else
 			{
@@ -315,14 +347,14 @@ void SourceDotToken::Process(int treeInd, int currentElementId, SourceStatementT
 			{
 				if(isRightVal || i<cnt-1)
 				{
+				prevVarId=varId;
+				varId++;
 					if(i==0)
 		lastStatement->PushSetGetter(new GetterFromElement(treeInd,curId,identifiers[i]->GetId(),varId));
 					//ap.addGetter(std::string(str),std::string(node->text),varId);
 				else
 		lastStatement->PushSetGetter(new GetterFromVar(prevVarId,identifiers[i]->GetId(),varId));
 					//ap.addGetter(prevVarId,std::string(node->text),varId);
-				prevVarId=varId;
-				varId++;
 				}
 				else
 				{
@@ -359,12 +391,19 @@ void SourceExprToken::Process(int treeInd, int currentElementId, SourceStatement
 	{
 		this->tokens[i]->Process(treeInd,currentElementId,lastStatement,isRightVal);
 	}
+	if(isRightVal)
+	{
+		varId++;
+		isVar=true;
+		variableId=varId;
+		lastStatement->PushSetGetter(new ExprSetter(variableId,this));
+	}
 }
 
 void SourceAssignmentToken::Process(int treeInd, int currentElementId, SourceStatementToken* lastStatement, bool isRightVal)
 {
 	//SrcApendix * ap=node->apendix;
-	nodes[nodes.size()-1]->Process(treeInd, currentElementId,lastStatement, false);
+	nodes[nodes.size()-1]->Process(treeInd, currentElementId,lastStatement, true);
 
 	
 	//printSubnodesToStr(node,expStr);
@@ -424,7 +463,67 @@ string SourceIdToken::GetId()
 	return this->str;
 }
 
-void SetGetter::print()
+void GetterFromElement::Print(string& dest)
 {
+	dest+=string("QEGET(")
+		+"(*((GUI_Rootoutput"+INTTOSTR(fileId)+"*)context->root)->"
+		+"_QML_element"+INTTOSTR(elementId)+")"
+		+","
+		+"\""+propName+"\""
+		+","
+		+"_QVar"+INTTOSTR(getToId)
+		+")\n";
+}
+
+
+
+void GetterFromVar::Print(string& dest)
+{
+	dest+=string("QVGET(")
+		+"_QVar"+INTTOSTR(srcId)
+		+","
+		+"\""+propName+"\""
+		+","
+		+"_QVar"+INTTOSTR(getToId)
+		+")\n";
+}
+
+void SetterFromElement::Print(string& dest)
+{
+	dest+=string("QESET(")
+		+"(*((GUI_Rootoutput"+INTTOSTR(fileId)+"*)context->root)->"
+		+"_QML_element"+INTTOSTR(elementId)+")"
+		+","
+		+"\""+propName+"\""
+		+","
+		+"_QVar"+INTTOSTR(this->setFromId)
+		+")\n";
+}
+
+void SetterFromVar::Print(string& dest)
+{
+	dest+=string("QVSET(")
+		+"_QVar"+INTTOSTR(srcId)
+		+","
+		+"\""+propName+"\""
+		+","
+		+"_QVar"+INTTOSTR(setFromId)
+		+")\n";
+}
+
+ExprSetter::ExprSetter(int v, SourceExprToken* t)
+{
+	variableId=v;
+	token=t;
+}
+
+void ExprSetter::Print(string& dest)
+{
+	string s("");
+
+	s+=string("_QVar") + INTTOSTR(variableId) + "=";
+	token->Print(s);
+	s+="\n";
+	dest+=s;
 }
 
