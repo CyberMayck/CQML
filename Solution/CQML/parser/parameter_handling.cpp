@@ -132,18 +132,36 @@ HandlerAndType* ClassContainer::CheckHExistence(string s)
 vector<ClassContainer*> defaultClasses;
 unordered_map<string, int> defaultClassMap;
 
+
+vector<PrimitiveType*> primitiveTypes;
+unordered_map<string, int> primitiveTypeMap;
+
 vector<ClassContainer*> classes[100];
 unordered_map<string, int> classMaps[100];
 
 int totalClassCnt=0;
 
 void registerStruct(const char* name, const char* parent);
+void registerPrimitive(const char* name);
 void parserDeclare(const char* type, const char* name, const char* value);
 void parserDeclareFunc(const char* , const char* , const char*, const char * s);
 #define CQML_PARSER
 #include "..\CQML\struct_definition_macros.h"
 
 ClassContainer * curCont;
+
+void registerPrimitive(const char* name)
+{
+	string s=string(name);
+	PrimitiveType * cont=new PrimitiveType(s);
+	primitiveTypeMap[s]=primitiveTypes.size();
+	primitiveTypes.push_back(cont);
+}
+
+PrimitiveType::PrimitiveType(string s)
+{
+	name=s;
+}
 
 void registerStruct(const char* name, const char* parent)
 {

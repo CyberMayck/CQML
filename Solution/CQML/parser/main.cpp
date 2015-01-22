@@ -20,6 +20,9 @@ extern vector<ClassContainer*> defaultClasses;
 extern unordered_map<string, int> defaultClassMap;
 extern vector<ClassContainer*> classes[100];
 extern unordered_map<string, int> classMaps[100];
+extern vector<PrimitiveType*> primitiveTypes;
+extern unordered_map<string, int> primitiveTypeMap;
+
 extern int totalClassCnt;
 
 typedef struct yy_buffer_state *YY_BUFFER_STATE;
@@ -738,6 +741,19 @@ void printElementUpdaterAssignments()
 	}
 }
 
+void PrintTypesUnion(FILE* f)
+{
+	for(int i=0;i<primitiveTypes.size();i++)
+	{
+		fprintf(f,"%s ut_%s;\n",primitiveTypes[i]->name.c_str(),primitiveTypes[i]->name.c_str());
+	}
+	fprintf(f,"void* ut_ref;\n");
+	for(int i=0;i<defaultClasses.size();i++)
+	{
+		fprintf(f,"%s ut_%s;\n",defaultClasses[i]->className.c_str(),defaultClasses[i]->className.c_str());
+	}
+}
+
 void makeSource(std::string name, int treeInd)
 {
 	//ParserList* list;
@@ -745,6 +761,13 @@ void makeSource(std::string name, int treeInd)
 	std::string name1 = name+std::string(".h");
 	std::string name2 = name+std::string(".c");
 	std::string name3 = name+std::string("outer.h");
+
+	file=fopen("alltypes.h","w");
+	if(file)
+	{
+		PrintTypesUnion(file);
+		fclose(file);
+	}
 
 	//files=new FILE*[3*elementTreeCnt];
 	//for(int i=0;i<elementTreeCnt;i++)

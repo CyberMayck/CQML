@@ -70,6 +70,7 @@
 	M(void, CustomMouseScrolled, 0, GUI_Element*, QMLEvent)
 
 
+
 	// what about callbacks?
 
 #define STRUCT_RECTANGLE(F, M, INHERIT) \
@@ -83,6 +84,14 @@
 	F(GUI_Element*, right, 0, "right anchor")
 
 
+#ifdef CQML_PARSER
+#define REGPRIMITIVE(x)		registerPrimitive(#x);
+
+#else
+#define REGPRIMITIVE(x)
+
+
+#endif
 
 
 #define NOTHING(F, M, MACRO)
@@ -122,8 +131,14 @@
 	MACRO(PROP_FACTORY_PARSER_DECL4, PROP_FACTORY_PARSER_DECL_FUNC3P, NOTHING)
 
 
-
 #define REGISTRATION(MACRO2, MACRO3) \
+	REGPRIMITIVE(char)\
+	REGPRIMITIVE(short)\
+	REGPRIMITIVE(int)\
+	REGPRIMITIVE(long)\
+	REGPRIMITIVE(float)\
+	REGPRIMITIVE(double)\
+	REGPRIMITIVE(string)\
 	MACRO2(STRUCT_COLOR, GUI_Color) \
 	MACRO2(STRUCT_ELEMENT, GUI_Element) \
 	MACRO3(STRUCT_RECTANGLE, GUI_Rectangle, GUI_Element) \

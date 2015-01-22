@@ -29,6 +29,12 @@ public:
 	ClassContainer * cont;
 };
 
+class PrimitiveType
+{
+public:
+	string name;
+	PrimitiveType(string);
+};
 
 class ClassContainer
 {
