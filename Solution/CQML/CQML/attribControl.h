@@ -3,8 +3,29 @@
 #include <string.h>
 #include <stdlib.h>
 
+typedef union value_type value_type;
+
 typedef struct AttributeCheck AttributeCheck;
 typedef struct AttributeHash AttributeHash;
+
+typedef struct ClassAttibuteTable ClassAttibuteTable;
+typedef struct Attribute Attibute;
+
+struct ClassAttibuteTable
+{
+	//hash and bla
+	// is primitive?
+	int isPrimitive;
+	AttributeHash * AttributeHash;
+};
+
+struct ClassAttributeTable
+{
+	char * name;
+	long typeId;
+	void (*Setter)(void* obj,value_type in);
+	value_type (*Getter)(void* obj);
+};
 
 struct AttributeHash
 {

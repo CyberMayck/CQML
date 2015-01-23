@@ -1,5 +1,7 @@
 #include "hashing.h"
+#include "parameter_handling.h"
 #include <vector>
+#include <unordered_map>
 
 struct Edge
 {
@@ -197,4 +199,33 @@ PerfectHashData * makePerfectHash(string * strs, int cnt)
 
 	return data;
 
+}
+
+
+extern vector<ClassContainer*> defaultClasses;
+extern unordered_map<string, int> defaultClassMap;
+extern vector<ClassContainer*> classes[100];
+extern unordered_map<string, int> classMaps[100];
+extern vector<PrimitiveType*> primitiveTypes;
+extern unordered_map<string, int> primitiveTypeMap;
+extern int totalClassCnt;
+
+// todo count params
+// remember types and props all of em for each class
+// calc hash and stuff
+// print hashes too
+// print getters and setters and their initialization
+void MakeAllHashes()
+{
+	int i=0;
+	int j=0;
+	while(i<totalClassCnt)
+	{
+		for(int k=0;k<classes[j].size();k++)
+		{
+			classes[j][k];
+		}
+		i+=classes[j].size();
+		j++;
+	}
 }

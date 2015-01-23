@@ -12,3 +12,5 @@ struct PerfectHashData
 };
 
 PerfectHashData * makePerfectHash(string * strs, int cnt);
+
+void MakeAllHashes();

@@ -31,6 +31,19 @@ typedef union value_type
 	//include alltypes.h
 } value_type;
 
+int setterV(value_type setted,const char* name,value_type value)
+{
+}
+int setterE(void * setted,const char* name,value_type value)
+{
+}
+int getterV(value_type getted,const char* name,value_type &outValue)
+{
+}
+int getterE(void * getted,const char* name,value_type &outValue)
+{
+}
+
 int setter(const char* attName,value_type val)
 {
 	// check existence

@@ -1,17 +1,9 @@
-import "button.cqml" as Button
 Rectangle
 {
 	x : 0;
 	y : 0;
 	width : 500;
 	height : width;
-	Button
-	{
-		x : 30;
-		y : 30;
-		width : 40;
-		height : 40;
-	};
 	Rectangle
 	{
 		id : crap;
@@ -19,43 +11,16 @@ Rectangle
 		y : parent.height/2;
 		width : parent.width/2-10;
 		height : parent.height/2-10;
-		color.red : 1;
-		
-		Rectangle 
-		{
-			x : 5;
-			y : 5;
-			width  : parent.width-10;
-			height : parent.height/2-10;
-			color.red : crap.color.red;
-		}; 
-		Rectangle
-		{
-			x : 5;
-			y : parent.height/2+5;
-			width  : parent.width-10;
-			height : parent.height/2-10;
-		};
+		property Rectangle refAttempt : nope;
+		MousePressed : { refAttempt.rah.hey = refAttempt.rah2.hey2=refAttempt.rah3.hey3; };
 	};
 	Rectangle
 	{
 		id : nope;
 		x : crap.width+5;
 		y : 5;
+		property int hey : 0;
 		width : parent.width/2-10;
 		height : parent.height-10;
-		Rectangle
-		{
-			x : 5;
-			y : 5;
-			width : parent.width/2;
-			height : parent.height/2;
-			Rectangle {
-			x : 5;
-			y : 5;
-			width : parent.width/2;
-			height : parent.height/2;
-			};
-		}; 
-	}; 
+	};
 }
