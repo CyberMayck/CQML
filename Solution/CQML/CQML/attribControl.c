@@ -3,6 +3,7 @@
 
 static int classCnt;
 static AttributeCheck * classes;
+static ClassHashTable * classHashTables;
 
 
 int f1(const char* s, int * T, int n)
@@ -95,6 +96,22 @@ void InitClassesSize(int cnt)
 {
 	classCnt=cnt;
 	classes=(AttributeCheck*)malloc(classCnt*sizeof(AttributeCheck));
+
+	classHashTables=(ClassHashTable*)malloc(classCnt*sizeof(ClassHashTable));
+}
+
+void InitHashTab(ClassHashTable * tab, int n, int m)
+{
+	tab->n=n;
+	tab->m=m;
+	tab->keys=(char **)malloc(sizeof(char*)*m);
+	tab->T1=(int *)malloc(sizeof(int)*m);
+	tab->T2=(int *)malloc(sizeof(int)*m);
+	tab->g=(int *)malloc(sizeof(int)*n);
+}
+
+void Init()
+{
 }
 
 void InitAttribCnt(int classInd,int cnt, int parentInd)
@@ -116,5 +133,9 @@ void AddAttribute(int classInd, long nameHash, int offset, char*typeName, int ty
 	classes[classInd].attributCnt++;
 }
 
-
+void InitHashTabs(ClassHashTable*);
+void QMLInitHashes()
+{
+	InitHashTabs(classHashTables);
+}
 

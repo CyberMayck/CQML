@@ -588,6 +588,14 @@ FILE **files;
 
 void makeMainSource()
 {
+	
+	file=fopen("alltypes.h","w");
+	if(file)
+	{
+		PrintTypesUnion(file);
+		fclose(file);
+	}
+
 	file = fopen("parser_output.c","w");
 	fprintf(file,"#include \"output0outer.h\"\n\n#include \"qml_includes.h\"\n");
 	fprintf(file,"void _QML_Update();\n");
@@ -595,12 +603,13 @@ void makeMainSource()
 	fprintf(file,"GUI_Element* root;\n");
 	fprintf(file,"\nvoid _QML_Init()\n{\n\troot = (GUI_Element*) acGUI_Rootoutput0();\n\t_QML_Update();\n}\n");
 	fprintf(file,"\nvoid _QML_Update()\n{\n\troot->Update(root);\n}\n");
-
 	
-	fprintf(file,"void _QML_ClassTabsInit()\n");
+	PrintClassHashTabs(file,elementTreeCnt);
+	
+	/*fprintf(file,"void _QML_ClassTabsInit()\n");
 	fprintf(file,"{\n");
 	PrintClassTabs(file,elementTreeCnt);
-	fprintf(file,"}\n");
+	fprintf(file,"}\n");*/
 
 	fclose(file);
 }
@@ -762,12 +771,6 @@ void makeSource(std::string name, int treeInd)
 	std::string name2 = name+std::string(".c");
 	std::string name3 = name+std::string("outer.h");
 
-	file=fopen("alltypes.h","w");
-	if(file)
-	{
-		PrintTypesUnion(file);
-		fclose(file);
-	}
 
 	//files=new FILE*[3*elementTreeCnt];
 	//for(int i=0;i<elementTreeCnt;i++)
@@ -777,9 +780,9 @@ void makeSource(std::string name, int treeInd)
 		//file_classes2= fopen("custom_classes.c","w");
 
 		//file = fopen("parser_output.c","w");
-		file = fopen(name3.c_str(),"w");
 		file_classes= fopen(name1.c_str(),"w");
 		file_classes2= fopen(name2.c_str(),"w");
+		file = fopen(name3.c_str(),"w");
 
 		//makeSource(elementTrees[i]);
 	}
@@ -2246,7 +2249,7 @@ int main()
 
 		makeSource(std::string("output")+std::to_string(static_cast<long long>(i)),i);
 	}
-
+	MakeAllHashes();
 	makeMainSource();
 
 	//for(int i=0;)

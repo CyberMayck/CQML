@@ -9,6 +9,8 @@ struct PerfectHashData
 	int * T1;
 	int * T2;
 	int * g;
+	int m;
+	int n;
 };
 
 PerfectHashData * makePerfectHash(string * strs, int cnt);

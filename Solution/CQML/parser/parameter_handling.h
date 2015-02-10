@@ -2,11 +2,13 @@
 #include <string>
 #include <vector>
 #include<stdarg.h>
+#include "hashing.h"
 using namespace std;
 unsigned long CRC32(char * str, unsigned int len);
 
 int processBasicTypes();
 void PrintClassTabs(FILE * file, int cnt);
+void PrintClassHashTabs(FILE * file, int cnt);
 class ClassContainer;
 
 class PropertyAndType
@@ -47,6 +49,7 @@ public:
 	string className;
 	vector<PropertyAndType> props;
 	vector<HandlerAndType> handlers;
+	PerfectHashData * hashData;
 
 	ClassContainer(string str, int fileId, int classID);
 	void SetAncestor(ClassContainer *);

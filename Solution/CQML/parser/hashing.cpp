@@ -116,12 +116,11 @@ bool checkAcyclicity(int n, bool * visited, vector<int>* &neighbours)
 //{
 //}
 
-PerfectHashData * makePerfectHash(string * strs, int cnt)
+PerfectHashData * makePerfectHash(vector<string> & strs, int cnt)
 {
 	int * T1=new int[cnt];
 	int * T2=new int[cnt];
 	int n=3*cnt; // or alphabet size
-	int * g=new int[n];
 	bool *visited= new bool[n];
 	vector<int>*neighbours;
 	
@@ -136,8 +135,22 @@ PerfectHashData * makePerfectHash(string * strs, int cnt)
 			max=strs[i].length();
 	}
 
+	int hhh=0;
+	int treshold=100;
+
 	while(true)
 	{
+		if(hhh<treshold)
+		{
+			hhh++;
+		}
+		else
+		{
+			n++;
+			hhh=0;
+			delete visited;
+			visited=new bool[n];
+		}
 		for(int i=0;i<max;i++)
 		{
 			T1[i] = rand() % n;
@@ -164,6 +177,7 @@ PerfectHashData * makePerfectHash(string * strs, int cnt)
 		delete [] neighbours;
 		delete [] edges;
 	}
+	int * g=new int[n];
 
 	for(int i=0;i<n;i++)
 	{
@@ -192,6 +206,8 @@ PerfectHashData * makePerfectHash(string * strs, int cnt)
 	}
 	data->T1=T1;
 	data->T2=T2;
+	data->n=n;
+	data->m=m;
 
 	delete[] edges;
 	delete[] visited;
@@ -201,6 +217,25 @@ PerfectHashData * makePerfectHash(string * strs, int cnt)
 
 }
 
+PerfectHashData * makeHashFromClass(ClassContainer * cont)
+{
+	vector<string> names;
+	ClassContainer * curCont=cont;
+	while(true)
+	{
+		for(int i=0;i<curCont->props.size();i++)
+		{
+			names.push_back(curCont->props[i].name);
+		}
+
+		curCont=curCont->GetAncestor();
+		if(curCont==0)
+		{
+			break;
+		}
+	}
+	return makePerfectHash(names,names.size());
+}
 
 extern vector<ClassContainer*> defaultClasses;
 extern unordered_map<string, int> defaultClassMap;
@@ -209,6 +244,8 @@ extern unordered_map<string, int> classMaps[100];
 extern vector<PrimitiveType*> primitiveTypes;
 extern unordered_map<string, int> primitiveTypeMap;
 extern int totalClassCnt;
+extern int elementTreeCnt;
+
 
 // todo count params
 // remember types and props all of em for each class
@@ -217,15 +254,16 @@ extern int totalClassCnt;
 // print getters and setters and their initialization
 void MakeAllHashes()
 {
-	int i=0;
-	int j=0;
-	while(i<totalClassCnt)
+	for(int j=0;j<defaultClasses.size();j++)
+	{
+		defaultClasses[j]->hashData=makeHashFromClass(defaultClasses[j]);
+	}
+
+	for(int j=0;j<elementTreeCnt;j++)
 	{
 		for(int k=0;k<classes[j].size();k++)
 		{
-			classes[j][k];
+			classes[j][k]->hashData= makeHashFromClass(classes[j][k]);
 		}
-		i+=classes[j].size();
-		j++;
 	}
 }

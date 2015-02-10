@@ -240,8 +240,6 @@ void Redraw()
 		SDL_RenderCopy(SDLRenderer, strTex, NULL, &sdlRect);
 
 		SDL_RenderPresent(SDLRenderer);
-
-		
 }
 
 int main()

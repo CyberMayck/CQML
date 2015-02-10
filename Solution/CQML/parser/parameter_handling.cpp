@@ -262,9 +262,43 @@ void parserDeclare(const char* type, const char* name, const char* value)
 	cont->AddProp(temp);
 }
 
-
-void PrintClassTabs(FILE * file, int classCnt)
+void PrintHashTab(FILE * file, int classID, PerfectHashData * data)
 {
+	fprintf(file,"data=&hashTabs[%d]\n",classID);
+	fprintf(file,"InitHashTab(&data,%d,%d);\n",data->n,data->m);
+	for(int i=0;i<data->m;i++)
+	{
+		fprintf(file,"data->keys[%d]=(char *)malloc(sizeof(char) * %d);\n",i,data->keys[i].length()+1);
+		fprintf(file,"strcpy(data->keys[%d],\"%s\");\n",i,data->keys[i].c_str());
+	}
+	fprintf(file,"\n");
+	for(int i=0;i<data->m;i++)
+	{
+		fprintf(file,"data->T1[%d]=%d\n",i,data->T1[i]);
+	}
+	fprintf(file,"\n");
+	for(int i=0;i<data->m;i++)
+	{
+		fprintf(file,"data->T2[%d]=%d\n",i,data->T2[i]);
+	}
+	fprintf(file,"\n");
+	for(int i=0;i<data->n;i++)
+	{
+		fprintf(file,"data->g[%d]=%d\n",i,data->g[i]);
+	}
+	fprintf(file,"\n\n");
+
+}
+
+void PrintClassHashTabs(FILE * file, int classCnt)
+{
+	int classID=0;
+	PerfectHashData * data;
+	
+	fprintf(file,"void InitHashTabs(ClassHashTable * hashTabs)\n{\n");
+	fprintf(file,"ClassHashTable * data;");
+
+	//PrintClassTabs(file, classCnt);
 	int size=defaultClasses.size();
 	for(int i=0;i<classCnt;i++)
 	{
@@ -272,6 +306,30 @@ void PrintClassTabs(FILE * file, int classCnt)
 	}
 	fprintf(file,"InitClassesSize(%d);\n",size);
 
+
+
+	for(int i=0;i<defaultClasses.size();i++)
+	{
+		data=defaultClasses[i]->hashData;
+		PrintHashTab(file,classID,data);
+		classID++;
+	}
+	for(int j=0;j<classCnt;j++)
+	{
+		for(int i=0;i<classes[j].size();i++)
+		{
+			data=classes[j][i]->hashData;
+			PrintHashTab(file,classID,data);
+			classID++;
+		}
+	}
+	fprintf(file,"}\n\n");
+}
+
+void PrintClassTabs(FILE * file, int classCnt)
+{
+
+	return;
 	int ind=0;
 	int pInd=0;
 	ClassContainer * c;
