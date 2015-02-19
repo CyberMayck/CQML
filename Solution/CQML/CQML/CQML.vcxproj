@@ -94,6 +94,7 @@
     <ClCompile Include="parser_output.c">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="universal_variable.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="custombuild.bat" />
@@ -115,6 +116,7 @@
     <ClInclude Include="output2.h" />
     <ClInclude Include="qml_includes.h" />
     <ClInclude Include="struct_definition_macros.h" />
+    <ClInclude Include="universal_variable.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
