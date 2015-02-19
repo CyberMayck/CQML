@@ -1,9 +1,12 @@
 #include "attribControl.h"
 //#include "struct_definition_macros.h"
+#include "gui.h"
 
 static int classCnt;
 static AttributeCheck * classes;
+
 static ClassHashTable * classHashTables;
+static ClassAttributeTable * classAttTables;
 
 
 int f1(const char* s, int * T, int n)
@@ -32,8 +35,84 @@ typedef union value_type
 	//include alltypes.h
 } value_type;
 
+
+int f1(const char * s, int * T, int n)
+{
+	int sum=0;
+	int len=strlen(s);
+	for(int i=0;i<len;i++)
+	{
+		sum+=T[i]*(unsigned char)s[i];
+	}
+	sum=sum%n;
+	return sum;
+}
+
+int h(const char * s, int n,int m, int * T1, int *T2, int*g)
+{
+	int u=f1(s,T1,n);
+	int v=f1(s,T2,n);
+	int a=g[u];
+	int b=g[v];
+	int retVal=(g[u]+g[v])%m;
+	return retVal;
+}
+
+TableRecord* GetTableRecord(long classID, const char* name)
+{
+	ClassHashTable * hashTab=&classHashTables[classID];
+	int index= h(name,hashTab->n,hashTab->m,hashTab->T1,hashTab->T2,hashTab->g);
+	if(strcmp(hashTab->keys[index],name)==0)
+	{
+		return &classAttTables[classID].records[index];
+	}
+	else
+	{
+		return 0;
+	}
+}
+
+
+UniversalVar CreateUniversalVarFromElement(TableRecord * record,void * obj)
+{
+	unsigned char* pointer= (unsigned char*)obj;
+	pointer+=record->offset;
+
+	UniversalVar v(factories[record->typeId]((void*) pointer));
+	return v;
+}
+
+//QVGET(_QVar8,"rah3",_QVar9)
+int getterE(void * sourceElement, const char* name, UniversalVar& outValue)
+{
+	GUI_Element* element=(GUI_Element*)sourceElement;
+	long classID = element->classID;
+	// get class ID
+
+	TableRecord* record= GetTableRecord(classID,name);
+	// check class table for attribute handler - with hash of name
+	if(record==0)
+		return 0;
+
+	// now we have type of atribute and offset
+
+	// with type id we get struct with operations for certain types
+	// or we construct universal variable
+	outValue= CreateUniversalVar(record);
+
+	return 1;
+}
+
+int setterE(void * modifiedElement,const char* name,value_type value)
+{
+	GUI_Element* element=(GUI_Element*)modifiedElement;
+	long classID = element->classID;
+}
+
+
 int setterV(value_type setted,const char* name,value_type value)
 {
+	return 1;
 }
 int setterE(void * setted,const char* name,value_type value)
 {
@@ -43,6 +122,18 @@ int getterV(value_type getted,const char* name,value_type &outValue)
 }
 int getterE(void * getted,const char* name,value_type &outValue)
 {
+}
+
+
+
+
+void SetAttribute(void * obj,ClassAttribute* att, float a)
+{
+	unsigned char* pointer= (unsigned char*)obj;
+	pointer+=att->offset;
+
+	float * memberPointer=(float *)pointer;
+	*pointer=a;
 }
 
 int setter(const char* attName,value_type val)
@@ -138,4 +229,5 @@ void QMLInitHashes()
 {
 	InitHashTabs(classHashTables);
 }
+
 

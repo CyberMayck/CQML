@@ -144,7 +144,7 @@ void PrintMeMyFriend(char * str)
 	printf("Print: %s\n",str);
 }
 
-#include "parser_output.c"
+#include "parser_output.cpp"
 
 void GUIMainLoop()
 {

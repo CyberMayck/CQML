@@ -523,7 +523,7 @@ void ExprSetter::Print(string& dest)
 
 	s+=string("_QVar") + INTTOSTR(variableId) + "=";
 	token->Print(s);
-	s+="\n";
+	s+=";\n";
 	dest+=s;
 }
 

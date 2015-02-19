@@ -12,7 +12,7 @@ Rectangle
 		width : parent.width/2-10;
 		height : parent.height/2-10;
 		property Rectangle refAttempt : nope;
-		MousePressed : { refAttempt.rah.hey = refAttempt.rah2.hey2=refAttempt.rah3.hey3; };
+		MousePressed : { refAttempt.rah.hey = refAttempt.rah2.hey2=refAttempt.rah3.hey3 + 8; };
 	};
 	Rectangle
 	{

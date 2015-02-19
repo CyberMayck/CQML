@@ -13,6 +13,8 @@ typedef struct ClassHashTable;
 typedef struct ClassAttibuteTable ClassAttibuteTable;
 typedef struct Attribute Attibute;
 
+typedef struct TableRecord TableRecord;
+
 struct ClassAttibuteTable
 {
 	//hash and bla
@@ -21,12 +23,28 @@ struct ClassAttibuteTable
 	AttributeHash * AttributeHash;
 };
 
-struct ClassAttributeTable
+// record of parameter
+struct TableRecord
+{
+	char * name;
+	long typeId;
+	
+	//void ** updater; // pointer to pointer on updater function of said parameter
+	int updaterOffset;
+
+	int offset;
+	int size;
+};
+
+struct ClassAttribute
 {
 	char * name;
 	long typeId;
 	void (*Setter)(void* obj,value_type in);
 	value_type (*Getter)(void* obj);
+	
+	int offset;
+	int size;
 };
 
 struct AttributeHash
@@ -38,6 +56,21 @@ struct AttributeHash
 	//type
 };
 
+//obj.width = stuff.height
+class AttributeProxy
+{
+public:
+	long type;
+};
+
+class AttributeProxyFloat
+{
+	float * attPointer;
+
+};
+
+
+
 struct AttributeCheck
 {
 	int parentInd;
@@ -46,11 +79,21 @@ struct AttributeCheck
 };
 
 
+
+
+
 typedef struct Attribute Attribute;
 struct Attribute
 {
 	int typeId;
 	void * value;
+};
+
+
+struct ClassAttributeTable
+{
+	int size;
+	TableRecord * records;
 };
 
 struct ClassHashTable
@@ -62,6 +105,7 @@ struct ClassHashTable
 	int m;
 	int n;
 };
+
 
 int checkAttributeInd(int classInd, int attHash);
 int checkAttributeExistence(int classInd, int attHash);

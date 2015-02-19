@@ -274,17 +274,17 @@ void PrintHashTab(FILE * file, int classID, PerfectHashData * data)
 	fprintf(file,"\n");
 	for(int i=0;i<data->m;i++)
 	{
-		fprintf(file,"data->T1[%d]=%d\n",i,data->T1[i]);
+		fprintf(file,"data->T1[%d]=%d;\n",i,data->T1[i]);
 	}
 	fprintf(file,"\n");
 	for(int i=0;i<data->m;i++)
 	{
-		fprintf(file,"data->T2[%d]=%d\n",i,data->T2[i]);
+		fprintf(file,"data->T2[%d]=%d;\n",i,data->T2[i]);
 	}
 	fprintf(file,"\n");
 	for(int i=0;i<data->n;i++)
 	{
-		fprintf(file,"data->g[%d]=%d\n",i,data->g[i]);
+		fprintf(file,"data->g[%d]=%d;\n",i,data->g[i]);
 	}
 	fprintf(file,"\n\n");
 
@@ -298,13 +298,15 @@ void PrintClassHashTabs(FILE * file, int classCnt)
 	fprintf(file,"void InitHashTabs(ClassHashTable * hashTabs)\n{\n");
 	fprintf(file,"ClassHashTable * data;");
 
-	//PrintClassTabs(file, classCnt);
 	int size=defaultClasses.size();
 	for(int i=0;i<classCnt;i++)
 	{
 		size+=classes[i].size();
 	}
-	fprintf(file,"InitClassesSize(%d);\n",size);
+	fprintf(file,"InitClassesSize(%d);\n\n",size);
+
+	
+	PrintClassTabs(file, classCnt);
 
 
 
@@ -328,8 +330,9 @@ void PrintClassHashTabs(FILE * file, int classCnt)
 
 void PrintClassTabs(FILE * file, int classCnt)
 {
+	fprintf(file,"\n //PrintClassTabs()\n");
 
-	return;
+	//return;
 	int ind=0;
 	int pInd=0;
 	ClassContainer * c;
@@ -382,13 +385,13 @@ void PrintClassTabs(FILE * file, int classCnt)
 			{
 				PropertyAndType& p=classes[j][i]->props[k];
 			
-				fprintf(file,"AddAttribute(%d,%d,offsetof(%s,%s),\"%s\",member_size(%s,%s));\n",
+				fprintf(file,"AddAttribute(offsetof(%s,%s),\"%s\",member_size(%s,%s));\n",
 					ind,p.nameHash,p.cont->className.c_str(),p.name.c_str(),p.type.c_str(),p.cont->className.c_str(),p.name.c_str());
 			}
 			ind++;
 		}
 	}
-	
+	fprintf(file,"\n");
 
 }
 
