@@ -9,6 +9,14 @@ extern GUIElement * elements;
 extern std::unordered_map<std::string, int> idMaps[100];
 
 
+extern vector<ClassContainer*> classes[100];
+extern unordered_map<string, int> classMaps[100];
+extern vector<PrimitiveType*> primitiveTypes;
+extern unordered_map<string, int> primitiveTypeMap;
+extern vector<ClassContainer*> defaultClasses;
+extern unordered_map<string, int> defaultClassMap;
+
+
 void ConstructRecursion(SourceTokenContainer * cont, SrcNode * node);
 
 void fillIds(SrcNode * node, SourceDotToken * container)
@@ -202,9 +210,24 @@ void SourceIdToken::Print(string& dest)
 }
 void SourceDotToken::Print(string& dest)
 {
+	//this->
 	if(this->isVarReplaced)
 	{
-		dest+="_QVar"+INTTOSTR(this->variableId);
+		dest+="(*((GUI_Rootoutput"+INTTOSTR(this->fileId)+"*)context->root)->"+
+			"_QML_element"+INTTOSTR(this->variableId)+")";
+		for(int i=0;i<this->identifiers.size();i++)
+		{
+			if(this->isStatic[i])
+			{
+				dest+=string(".")+identifiers[i]->GetId();
+			}
+			else
+			{
+				dest+=string(".Get(\"")+identifiers[i]->GetId()+string("\")");
+			}
+		}
+		//dest+="_QVar"+INTTOSTR(this->variableId);
+		
 	}
 	else
 	{
@@ -303,73 +326,161 @@ void SourceDotToken::Process(int treeInd, int currentElementId, SourceStatementT
 	int curId=currentElementId;
 	int prevVarId=varId;
 	
+	fileId=treeInd;
+	
 	if(isOtherId)
 	{
 		curId=idMaps[treeInd][identifiers[0]->GetId()];
+
+		this->variableId=curId;
+		this->isVarReplaced=true;
 		
 		int cnt=this->identifiers.size();
+		ClassContainer * cont=elements[curId].classContainer;
+
+
+		bool isReference=false;
+		bool prevIsPrimitive=false;
 		for(int i=1;i<cnt;i++)
 		{
-			if(isRightVal || i<cnt-1)
+
+
+			if(!isReference)
 			{
-				prevVarId=varId;
-				varId++;
-				if(i==1)
-		lastStatement->PushSetGetter(new GetterFromElement(treeInd,curId,identifiers[i]->GetId(),varId));
-					//ap.addGetter(std::string(str),std::string(node->text),varId);
+				if(prevIsPrimitive)//cont==0)
+				{
+					// error primitive type
+					printf("primitive does doesnt have mmbers");
+					getchar();
+					exit(0);
+				}
+				//check existence
+				PropertyAndType * prop=cont->CheckExistence(identifiers[i]->GetId());
+
+				if(prop!=0)
+				{
+					//error does not exist
+				}
+				string typeName=prop->type;
+				classes[prop->cont->fileId][classMaps[prop->cont->fileId][prop->type]];
+
+				// is type a class defined in same file
+				if(prop->cont->fileId!=-1 && classMaps[prop->cont->fileId].count(prop->type)>0)
+				{
+					cont=classes[prop->cont->fileId][classMaps[prop->cont->fileId][prop->type]];
+				}
 				else
-		lastStatement->PushSetGetter(new GetterFromVar(prevVarId,identifiers[i]->GetId(),varId));
-					//ap.addGetter(prevVarId,std::string(node->text),varId);
+				{
+					// is default class
+					if(defaultClassMap.count(prop->type)>0)
+					{
+						cont=defaultClasses[defaultClassMap[prop->type]];
+					}
+					else
+					{
+						// is primitive
+						prevIsPrimitive=true;
+						cont=0;
+					}
+				}
+
+
+
+				if(cont!=0 && cont->isReferencable)
+				{
+					isReference=true;
+				}
+				this->isStatic.push_back(true);
+				// print t.thing
+
+				
 			}
 			else
 			{
-				if(i==1)
-		lastStatement->PushSetGetter(new SetterFromElement(treeInd,curId,identifiers[i]->GetId(),lastRightVarId));
-					//ap.addSetter(std::string(str),std::string(node->text),lastVar);
-				else
-		lastStatement->PushSetGetter(new SetterFromVar(varId,identifiers[i]->GetId(),lastRightVarId));
-					//ap.addSetter(prevVarId,std::string(node->text),lastVar);
+				// print getter
+				this->isStatic.push_back(false);
+
 			}
 		}
 	}
 	else
 	{
 		ClassContainer * cont=elements[curId].classContainer;
-		PropertyAndType * prop=cont->CheckExistence(identifiers[0]->GetId());
-		//PropertyAndType * prop=elements[curId].classContainer->CheckExistence(identifiers[0]->GetId());
+		//PropertyAndType * prop=cont->CheckExistence(identifiers[0]->GetId());
+
 		int cnt=this->identifiers.size();
 
-		if(prop!=0)
+		if(cont->CheckExistence(identifiers[0]->GetId())!=0)
 		{
-			//start from this
-			// if this
-			for(int i=0;i<cnt;i++)
-			{
-				if(isRightVal || i<cnt-1)
-				{
-				prevVarId=varId;
-				varId++;
-					if(i==0)
-		lastStatement->PushSetGetter(new GetterFromElement(treeInd,curId,identifiers[i]->GetId(),varId));
-					//ap.addGetter(std::string(str),std::string(node->text),varId);
-				else
-		lastStatement->PushSetGetter(new GetterFromVar(prevVarId,identifiers[i]->GetId(),varId));
-					//ap.addGetter(prevVarId,std::string(node->text),varId);
-				}
-				else
-				{
-				if(i==0)
-		lastStatement->PushSetGetter(new SetterFromElement(treeInd,curId,identifiers[i]->GetId(),lastRightVarId));
-					//ap.addSetter(std::string(str),std::string(node->text),lastVar);
-				else
-		lastStatement->PushSetGetter(new SetterFromVar(varId,identifiers[i]->GetId(),lastRightVarId));
-					//ap.addSetter(prevVarId,std::string(node->text),lastVar);
-				}
-			}
+			this->variableId=curId;
+			this->isVarReplaced=true;
 		}
 		else
+			return; //could be user stuff
+
+
+		bool isReference=false;
+		bool prevIsPrimitive=false;
+		for(int i=0;i<cnt;i++)
 		{
-			return;
+
+
+			if(!isReference)
+			{
+				if(prevIsPrimitive)//cont==0)
+				{
+					// error primitive type
+					printf("primitive does doesnt have mmbers");
+					getchar();
+					exit(0);
+				}
+				//check existence
+				PropertyAndType * prop=cont->CheckExistence(identifiers[i]->GetId());
+
+				if(prop!=0)
+				{
+					//error does not exist
+				}
+				string typeName=prop->type;
+				classes[prop->cont->fileId][classMaps[prop->cont->fileId][prop->type]];
+
+				// is type a class defined in same file
+				if(prop->cont->fileId!=-1 && classMaps[prop->cont->fileId].count(prop->type)>0)
+				{
+					cont=classes[prop->cont->fileId][classMaps[prop->cont->fileId][prop->type]];
+				}
+				else
+				{
+					// is default class
+					if(defaultClassMap.count(prop->type)>0)
+					{
+						cont=defaultClasses[defaultClassMap[prop->type]];
+					}
+					else
+					{
+						// is primitive
+						prevIsPrimitive=true;
+						cont=0;
+					}
+				}
+
+
+
+				if(cont!=0 && cont->isReferencable)
+				{
+					isReference=true;
+				}
+				// print t.thing
+				this->isStatic.push_back(true);
+
+				
+			}
+			else
+			{
+				// print getter
+				this->isStatic.push_back(false);
+
+			}
 		}
 	}
 	this->isVarReplaced=true;

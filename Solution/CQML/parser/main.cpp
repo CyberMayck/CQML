@@ -1595,15 +1595,7 @@ bool processSrcDots(SrcNode * node, int treeInd,int currentElementId, int graphI
 				}
 				else
 				{
-					//if(prop->cont)
-					{
-
-					}
-					//else
-					{
-						// is basic type
-						prevClassCont=0;
-					}
+					prevClassCont=0;
 				}
 			}
 		}

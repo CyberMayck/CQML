@@ -46,6 +46,7 @@ public:
 	long classHash;
 	int classID;
 	int fileId;
+	bool isReferencable;
 	string className;
 	vector<PropertyAndType> props;
 	vector<HandlerAndType> handlers;

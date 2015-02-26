@@ -71,8 +71,10 @@ class SourceDotToken : public SourceToken
 {
 	vector<SourceToken *> tokens;
 	vector<SourceIdToken *> identifiers;
+	vector<bool> isStatic;
 	bool isVarReplaced;
 	int variableId;
+	int fileId;
 public:
 	SourceDotToken(SrcNode *);
 	void PushToken(SourceToken *);
