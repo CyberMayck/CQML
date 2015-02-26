@@ -121,6 +121,9 @@
 
 #define PROP_FACTORY_PARSER_DECL4(t, n, d, c) parserDeclare(#t,#n,#d);
    
+#define PARSER_DECLARE2_REF(MACRO, NAME) \
+	registerStructRef(#NAME, 0); \
+	MACRO(PROP_FACTORY_PARSER_DECL4, PROP_FACTORY_PARSER_DECL_FUNC3P, NOTHING)
 
 #define PARSER_DECLARE2(MACRO, NAME) \
 	registerStruct(#NAME, 0); \

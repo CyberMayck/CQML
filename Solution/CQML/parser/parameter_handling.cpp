@@ -171,13 +171,41 @@ void registerStruct(const char* name, const char* parent)
 	defaultClasses.push_back(cont);
 
 	curCont=cont;
+	cont->isReferencable=false;
+
+	if(parent!=0)
+	{
+		string sp=string(parent);
+		cont->SetAncestor(defaultClasses[defaultClassMap[sp]]);
+
+		ClassContainer * ancestor= cont->GetAncestor();
+		while(ancestor!=0)
+		{
+			cont->isReferencable=ancestor->isReferencable;
+
+			ancestor=ancestor->GetAncestor();
+
+		}
+	}
+}
+
+void registerStructRef(const char* name, const char* parent)
+{
+	string s=string(name);
+	ClassContainer * cont= new ClassContainer(s,-1,totalClassCnt++);
+	defaultClassMap[s]=defaultClasses.size();
+	defaultClasses.push_back(cont);
+
+	curCont=cont;
 
 	if(parent!=0)
 	{
 		string sp=string(parent);
 		cont->SetAncestor(defaultClasses[defaultClassMap[sp]]);
 	}
+	cont->isReferencable=true;
 }
+
 
 void parserDeclareFunc(const char* type, const char* name, const char* value, const char* args)
 {
