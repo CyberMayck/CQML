@@ -215,11 +215,11 @@ void SourceDotToken::Print(string& dest)
 	{
 		dest+="(*((GUI_Rootoutput"+INTTOSTR(this->fileId)+"*)context->root)->"+
 			"_QML_element"+INTTOSTR(this->variableId)+")";
-		for(int i=0;i<this->identifiers.size();i++)
+		for(int i=0;i<this->isStatic.size();i++)
 		{
 			if(this->isStatic[i])
 			{
-				dest+=string(".")+identifiers[i]->GetId();
+				dest+=string(".")+identifiers[identifiers.size()-isStatic.size()+i]->GetId();
 			}
 			else
 			{
@@ -331,17 +331,34 @@ void SourceDotToken::Process(int treeInd, int currentElementId, SourceStatementT
 	if(isOtherId)
 	{
 		curId=idMaps[treeInd][identifiers[0]->GetId()];
+		
+		int cnt=this->identifiers.size();
+		int i;
+		for(i=1;i<cnt;i++)
+		{
+			if(identifiers[i]->GetId()==string("parent"))
+			{
+				curId=elements[curId].parentId;
+				if(curId==-1)
+				{
+					//error
+					printf("element has no parent\n");
+					getchar();
+					exit(0);
+				}
+			}
+			else
+				break;
+		}
 
 		this->variableId=curId;
 		this->isVarReplaced=true;
-		
-		int cnt=this->identifiers.size();
 		ClassContainer * cont=elements[curId].classContainer;
 
 
 		bool isReference=false;
 		bool prevIsPrimitive=false;
-		for(int i=1;i<cnt;i++)
+		for(;i<cnt;i++)
 		{
 
 
@@ -362,7 +379,6 @@ void SourceDotToken::Process(int treeInd, int currentElementId, SourceStatementT
 					//error does not exist
 				}
 				string typeName=prop->type;
-				classes[prop->cont->fileId][classMaps[prop->cont->fileId][prop->type]];
 
 				// is type a class defined in same file
 				if(prop->cont->fileId!=-1 && classMaps[prop->cont->fileId].count(prop->type)>0)
@@ -405,10 +421,28 @@ void SourceDotToken::Process(int treeInd, int currentElementId, SourceStatementT
 	}
 	else
 	{
-		ClassContainer * cont=elements[curId].classContainer;
 		//PropertyAndType * prop=cont->CheckExistence(identifiers[0]->GetId());
 
 		int cnt=this->identifiers.size();
+
+		int i;
+		for(i=0;i<cnt;i++)
+		{
+			if(identifiers[i]->GetId()==string("parent"))
+			{
+				curId=elements[curId].parentId;
+				if(curId==-1)
+				{
+					//error
+					printf("element has no parent\n");
+					getchar();
+					exit(0);
+				}
+			}
+			else
+				break;
+		}
+		ClassContainer * cont=elements[curId].classContainer;
 
 		if(cont->CheckExistence(identifiers[0]->GetId())!=0)
 		{
@@ -417,11 +451,11 @@ void SourceDotToken::Process(int treeInd, int currentElementId, SourceStatementT
 		}
 		else
 			return; //could be user stuff
-
+		
 
 		bool isReference=false;
 		bool prevIsPrimitive=false;
-		for(int i=0;i<cnt;i++)
+		for(;i<cnt;i++)
 		{
 
 
@@ -442,7 +476,6 @@ void SourceDotToken::Process(int treeInd, int currentElementId, SourceStatementT
 					//error does not exist
 				}
 				string typeName=prop->type;
-				classes[prop->cont->fileId][classMaps[prop->cont->fileId][prop->type]];
 
 				// is type a class defined in same file
 				if(prop->cont->fileId!=-1 && classMaps[prop->cont->fileId].count(prop->type)>0)

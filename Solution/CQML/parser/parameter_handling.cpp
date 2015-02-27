@@ -142,6 +142,7 @@ unordered_map<string, int> classMaps[100];
 int totalClassCnt=0;
 
 void registerStruct(const char* name, const char* parent);
+void registerStructRef(const char* name, const char* parent);
 void registerPrimitive(const char* name);
 void parserDeclare(const char* type, const char* name, const char* value);
 void parserDeclareFunc(const char* , const char* , const char*, const char * s);
