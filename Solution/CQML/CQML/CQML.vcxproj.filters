@@ -18,37 +18,34 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="parser_output.c">
       <Filter>Resource Files</Filter>
     </ClCompile>
-    <ClCompile Include="gui.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="input.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="dependance.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cqml.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="output0.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="output1.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="attribControl.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="context.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="universal_variable.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cqml.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="context.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="attribControl.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="dependance.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="gui.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="input.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="output0.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -76,18 +73,6 @@
     <ClInclude Include="qml_includes.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="output0.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="output0outer.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="output1.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="output1outer.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="output2.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -101,6 +86,9 @@
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="universal_variable.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="output0.h">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>

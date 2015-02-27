@@ -9,7 +9,7 @@ static ClassHashTable * classHashTables;
 static ClassAttributeTable * classAttTables;
 
 
-int f1(const char* s, int * T, int n)
+/*int f1(const char* s, int * T, int n)
 {
 	int sum=0;
 	for(int i=0,len=strlen(s);i<len;i++)
@@ -18,7 +18,8 @@ int f1(const char* s, int * T, int n)
 	}
 	sum=sum%n;
 	return sum;
-}
+}*/
+int f1(const char * s, int * T, int n);
 
 int hash(const char* s, int n,int m, int* T1, int* T2, int* g)
 {
@@ -73,17 +74,19 @@ TableRecord* GetTableRecord(long classID, const char* name)
 }
 
 
-UniversalVar CreateUniversalVarFromElement(TableRecord * record,void * obj)
-{
-	unsigned char* pointer= (unsigned char*)obj;
-	pointer+=record->offset;
 
-	UniversalVar v(factories[record->typeId]((void*) pointer));
-	return v;
-}
+
+//UniversalVar CreateUniversalVarFromElement(TableRecord * record,void * obj)
+//{
+	//unsigned char* pointer= (unsigned char*)obj;
+	//pointer+=record->offset;
+
+	//UniversalVar v(factories[record->typeId]((void*) pointer));
+	//return v;
+//}
 
 //QVGET(_QVar8,"rah3",_QVar9)
-int getterE(void * sourceElement, const char* name, UniversalVar& outValue)
+/*int getterE(void * sourceElement, const char* name, UniversalVar& outValue)
 {
 	GUI_Element* element=(GUI_Element*)sourceElement;
 	long classID = element->classID;
@@ -98,15 +101,16 @@ int getterE(void * sourceElement, const char* name, UniversalVar& outValue)
 
 	// with type id we get struct with operations for certain types
 	// or we construct universal variable
-	outValue= CreateUniversalVar(record);
+	//outValue= CreateUniversalVar(record);
 
 	return 1;
-}
+}*/
 
 int setterE(void * modifiedElement,const char* name,value_type value)
 {
 	GUI_Element* element=(GUI_Element*)modifiedElement;
 	long classID = element->classID;
+	return 1;
 }
 
 
@@ -114,14 +118,13 @@ int setterV(value_type setted,const char* name,value_type value)
 {
 	return 1;
 }
-int setterE(void * setted,const char* name,value_type value)
-{
-}
 int getterV(value_type getted,const char* name,value_type &outValue)
 {
+	return 1;
 }
 int getterE(void * getted,const char* name,value_type &outValue)
 {
+	return 1;
 }
 
 
@@ -139,16 +142,18 @@ void SetAttribute(void * obj,ClassAttribute* att, float a)
 int setter(const char* attName,value_type val)
 {
 	// check existence
-
+	return 1;
 
 }
 
 int setTypeByID()
 {
+	return 1;
 }
 
 int getter(const char* attName,value_type val)
 {
+	return 1;
 }
 
 int checkAttributeInd(int classInd, int attHash)

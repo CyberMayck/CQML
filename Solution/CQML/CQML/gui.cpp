@@ -41,13 +41,13 @@ GUI_Element* acGUI_Element()
 GUI_Rectangle cGUI_Rectangle()
 {
 	GUI_Rectangle instance;
-	instance.base=cGUI_Element();
-	instance.base.Draw=mGUI_Rectangle_Draw;
+	//instance.base=cGUI_Element();
+	instance.Draw=mGUI_Rectangle_Draw;
 	
-	instance.base.MouseMoved=mGUI_Rectangle_MouseMoved;
-	instance.base.MousePressed=mGUI_Rectangle_MousePressed;
-	instance.base.MouseReleased=mGUI_Rectangle_MouseReleased;
-	instance.base.MouseScrolled=mGUI_Rectangle_MouseScrolled;
+	instance.MouseMoved=mGUI_Rectangle_MouseMoved;
+	instance.MousePressed=mGUI_Rectangle_MousePressed;
+	instance.MouseReleased=mGUI_Rectangle_MouseReleased;
+	instance.MouseScrolled=mGUI_Rectangle_MouseScrolled;
 
 	instance.color.red=1.0f;
 	instance.color.green=1.0f;

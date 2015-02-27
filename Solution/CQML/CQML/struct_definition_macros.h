@@ -9,6 +9,7 @@
 
 #ifndef CQML_PARSER
 	#include "context.h"
+	#include "CQMLObject.h"
 #endif
     /* property factory macros */
 	#define PROP_FACTORY_DECL_VAR4(t, n, d, c) t n; QML_Context * n##_context; void (* n##_Update)(QML_Context*);
@@ -55,8 +56,8 @@
 	F(int, y, 0, "y coordinate in pixels") \
 	F(int, width, 0, "width in pixels") \
 	F(int, height, 0, "height in pixels")\
-	M(int, Draw, 0, GUI_Element* bah) \
-	M(int, Update, 0, GUI_Element*) \
+	M(void, Draw, 0, GUI_Element* bah) \
+	M(void, Update, 0, GUI_Element*) \
 	M(int, MousePressed, 0, GUI_Element*, int, int, int) \
 	M(int, MouseReleased, 0, GUI_Element*, int, int, int) \
 	M(int, MouseMoved, 0, GUI_Element*, int, int, int, int) \
@@ -101,17 +102,17 @@
 
 	
 #define MAKE_STRUCTURE2(MACRO, NAME) \
-	struct NAME { \
-		int classID; \
+	struct NAME : public CQMLObject { \
+		/*int classID;*/ \
 		MACRO(PROP_FACTORY_DECL_VAR4, PROP_FACTORY_DECL_FUNC3P, NOTHING) \
 	}; \
 	typedef struct NAME NAME;
 
 #define MAKE_STRUCTURE3(MACRO, NAME, PARENT) \
-	struct NAME { \
-		union { \
-		int classID; \
-		PARENT base; }; \
+	struct NAME : public PARENT { \
+		/*union { */\
+		/*int classID;*/ \
+		/*PARENT base;};*/ \
 		MACRO(PROP_FACTORY_DECL_VAR4, PROP_FACTORY_DECL_FUNC3P, NOTHING) \
 	}; \
 	typedef struct NAME NAME;
@@ -134,7 +135,7 @@
 	MACRO(PROP_FACTORY_PARSER_DECL4, PROP_FACTORY_PARSER_DECL_FUNC3P, NOTHING)
 
 
-#define REGISTRATION(MACRO2, MACRO3) \
+#define REGISTRATION(MACRO2, MACRO2REF, MACRO3) \
 	REGPRIMITIVE(char)\
 	REGPRIMITIVE(short)\
 	REGPRIMITIVE(int)\
@@ -143,7 +144,7 @@
 	REGPRIMITIVE(double)\
 	REGPRIMITIVE(string)\
 	MACRO2(STRUCT_COLOR, GUI_Color) \
-	MACRO2(STRUCT_ELEMENT, GUI_Element) \
+	MACRO2REF(STRUCT_ELEMENT, GUI_Element) \
 	MACRO3(STRUCT_RECTANGLE, GUI_Rectangle, GUI_Element) \
 	MACRO2(STRUCT_ANCHOR, GUI_Anchor)
 
@@ -151,7 +152,7 @@
 #ifdef CQML_PARSER
 void DefaultDeclaration()
 {
-	REGISTRATION(PARSER_DECLARE2,PARSER_DECLARE3)
+	REGISTRATION(PARSER_DECLARE2,PARSER_DECLARE2_REF,PARSER_DECLARE3)
     /* user code - register structure for parser */
 	//PARSER_DECLARE2(STRUCT_COLOR, GUI_Color)
 	//PARSER_DECLARE2(STRUCT_ELEMENT, GUI_Element)
@@ -161,7 +162,7 @@ void DefaultDeclaration()
 
 #ifndef CQML_PARSER
     
-	REGISTRATION(MAKE_STRUCTURE2,MAKE_STRUCTURE3)
+	REGISTRATION(MAKE_STRUCTURE2, MAKE_STRUCTURE2, MAKE_STRUCTURE3)
     /* user code - register structures for GUI */
 	//MAKE_STRUCTURE2(STRUCT_COLOR, GUI_Color)
 	//MAKE_STRUCTURE2(STRUCT_ELEMENT, GUI_Element)

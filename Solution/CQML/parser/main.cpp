@@ -267,7 +267,7 @@ void classDeclaration(const char* rootName)
 		
 		fprintf(file_class_header,"typedef struct GUI_%s GUI_%s;\n\n",elements[i].name,elements[i].name);
 	}
-	
+	///here
 	// header
 	for(int i=0;i<elementCount;i++)
 	{
@@ -280,6 +280,8 @@ void classDeclaration(const char* rootName)
 		{
 			GUIElementProperty * prop= &elements[i].properties[j];
 			fprintf(file_class_header,"\t%s %s;\n",prop->typeName,prop->name);
+			fprintf(file_class_header,"\tQML_Context * %s_context;\n",prop->name);
+			fprintf(file_class_header,"\tvoid (* %s_Update)(QML_Context*);\n",prop->name);
 		}
 		fprintf(file_class_header,"};\n");
 
@@ -295,7 +297,7 @@ void classDeclaration(const char* rootName)
 		fprintf(file_class_source,"GUI_%s* acGUI_%s()\n{\n",elements[i].name,elements[i].name);
 		fprintf(file_class_source,"\tGUI_%s * pointer;\n\tpointer=(GUI_%s*)malloc(sizeof(GUI_%s));\n",elements[i].name,elements[i].name,elements[i].name);
 
-		fprintf(file_class_source,"\tpointer->original=cGUI_%s();\n",elements[i].origClassName);
+//		fprintf(file_class_source,"\tpointer->original=cGUI_%s();\n",elements[i].origClassName);
 		fprintf(file_class_source,"\treturn pointer;\n");
 
 		fprintf(file_class_source,"}\n");
@@ -310,7 +312,7 @@ void rootElementDeclaration(const char * rootName)
 	//fprintf(file_class_header,"GUI_Element base;\n"); //no base
 	for(int i=0;i<elementCount;i++)
 	{
-		fprintf(file_class_header, "\tGUI_Element* _QML_element%d;\n",i);
+		fprintf(file_class_header, "\t%s* _QML_element%d;\n",elements[i].classContainer->className.c_str(),i);
 	}
 	fprintf(file_class_header,"};\n");
 	fprintf(file_class_header,"GUI_Root%s* acGUI_Root%s();\n",rootName,rootName);
@@ -1968,7 +1970,7 @@ void processTree(ParserList* elementTree, int treeInd)
 			if(elements[i].propertiesCount>0)
 			{
 				//[0]
-				std::string className=std::string(elements[i].name)+std::string("Custom")+std::to_string(static_cast<long long>(customClassCount));
+				std::string className=std::string("GUI_")+std::string(elements[i].name)+std::string("Custom")+std::to_string(static_cast<long long>(customClassCount));
 				customClassCount++;
 				ClassContainer * cont=new ClassContainer(className,treeInd,totalClassCnt++);
 				cont->SetAncestor(elementGroups[importFileInd][0].classContainer);
@@ -1984,7 +1986,7 @@ void processTree(ParserList* elementTree, int treeInd)
 		{
 			if(elements[i].propertiesCount>0)
 			{
-				std::string className=std::string(elements[i].name)+std::string("Custom")+std::to_string(static_cast<long long>(customClassCount));
+				std::string className=std::string("GUI_")+std::string(elements[i].name)+std::string("Custom")+std::to_string(static_cast<long long>(customClassCount));
 				customClassCount++;
 				ClassContainer * cont=new ClassContainer(className, treeInd,totalClassCnt++);
 				cont->SetAncestor(defaultClasses[defaultClassMap[string("GUI_")+string(elements[i].name)]]);

@@ -46,24 +46,28 @@ Variant::Variant(CQMLObject * a)
 }
 
 //#include all_constructors
+#include "CQMLObject.h"
 
+Variant Variant::Get(char * s)
+{
+	if(this->typeID!=TYPE_CQMLOBJECT)
+	{
+		throw 0;
+		return 0;
+	}
+	return value.v_r_CQMLObject->Get(s);
+
+	//return *this;
+}
 
 
 const Variant& Variant::operator=(Variant & rhs)
 {
 	typeID=rhs.typeID;
 	value=rhs.value;
+	return *this;
 }
 
-#define TYPE_INT (1)
-#define TYPE_LONG (2)
-#define TYPE_LONG_LONG (3)
-#define TYPE_UNSIGNED_INT (4)
-#define TYPE_UNSIGNED_LONG (5)
-#define TYPE_UNSIGNED_LONG_LONG (6)
-#define TYPE_FLOAT (7)
-#define TYPE_DOUBLE (8)
-#define TYPE_LONG_DOUBLE (9)
 
 #define VARIANT_SIMPLE_OPERATOR(OP) \
 const Variant Variant::operator##OP (Variant & rhs) const \

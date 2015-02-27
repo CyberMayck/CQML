@@ -88,6 +88,7 @@
     </ClInclude>
     <ClInclude Include="elements.h" />
     <ClInclude Include="hashing.h" />
+    <ClInclude Include="output0.h" />
     <ClInclude Include="parameter_handling.h" />
     <ClInclude Include="parser_tree.h" />
     <ClInclude Include="src_apendix.h" />

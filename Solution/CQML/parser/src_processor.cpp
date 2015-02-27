@@ -223,7 +223,7 @@ void SourceDotToken::Print(string& dest)
 			}
 			else
 			{
-				dest+=string(".Get(\"")+identifiers[i]->GetId()+string("\")");
+				dest+=string(".Get(\"")+identifiers[identifiers.size()-isStatic.size()+i]->GetId()+string("\")");
 			}
 		}
 		//dest+="_QVar"+INTTOSTR(this->variableId);
