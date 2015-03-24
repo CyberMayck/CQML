@@ -48,6 +48,9 @@
     <ClCompile Include="output0.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="CQMLObject.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="custombuild.bat">
@@ -89,6 +92,12 @@
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="output0.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CQMLObject.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="output0outer.h">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>

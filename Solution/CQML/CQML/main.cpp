@@ -14,6 +14,7 @@
 
 #ifdef USESDL
 #include <SDL/SDL.h>
+#undef main
 #include <SDL/SDL_TTF.h>
 #endif
 
@@ -123,7 +124,7 @@ void InitSDLDrawer()
 
 //GUI_Element ** drawQueue;
 //GUI_Element ** updateQueue;
-GUI_Element ** allElements;
+CQMLGUI::Element ** allElements;
 int allElementCount;
 int * drawQueue;
 int * updateQueue;
@@ -184,17 +185,17 @@ int InputHandling()
 			break;
 		case SDL_MOUSEBUTTONDOWN:
 			printf("mouse click %d %d\n",sdlEvent.button.x,sdlEvent.button.y);
-			root->MousePressed(root,sdlEvent.button.x,sdlEvent.button.y,sdlEvent.button.button);
+			root->MousePressed(sdlEvent.button.x,sdlEvent.button.y,sdlEvent.button.button);
 			break;
 //			
 		case SDL_MOUSEBUTTONUP:
-			root->MouseReleased(root,sdlEvent.button.x,sdlEvent.button.y,sdlEvent.button.button);
+			root->MouseReleased(sdlEvent.button.x,sdlEvent.button.y,sdlEvent.button.button);
 			break;
 		case SDL_MOUSEMOTION:
-			root->MouseMoved(root,sdlEvent.motion.x,sdlEvent.motion.y,sdlEvent.motion.xrel,sdlEvent.motion.yrel);
+			root->MouseMoved(sdlEvent.motion.x,sdlEvent.motion.y,sdlEvent.motion.xrel,sdlEvent.motion.yrel);
 			break;
 		case SDL_MOUSEWHEEL:
-			root->MouseScrolled(root,sdlEvent.wheel.x,sdlEvent.wheel.y,sdlEvent.wheel.x,sdlEvent.wheel.y);
+			root->MouseScrolled(sdlEvent.wheel.x,sdlEvent.wheel.y,sdlEvent.wheel.x,sdlEvent.wheel.y);
 			break;
 	}
 	}
@@ -230,7 +231,8 @@ void Redraw()
 		SDL_SetRenderDrawColor(SDLRenderer,0,0,0,255);
 		SDL_RenderClear(SDLRenderer);
 
-		mGUI_Element_Draw((GUI_Element*)root);
+		root->Draw();
+		//CQMLGUI::mGUI_Element_Draw((CQMLGUI::Element*)root);
 
 
 		sprintf(fpsStr,"%d",fps);
@@ -280,7 +282,8 @@ int main()
 		SDL_SetRenderDrawColor(SDLRenderer,255,0,0,255);
 		SDL_RenderClear(SDLRenderer);
 		SDL_SetRenderDrawColor(SDLRenderer,0,0,0,255);
-		mGUI_Element_Draw((GUI_Element*)root);
+		root->Draw();
+		//CQMLGUI::mGUI_Element_Draw((CQMLGUI::Element*)root);
 		SDL_RenderPresent(SDLRenderer);
 	}
 	//SDL_Delay(3000);

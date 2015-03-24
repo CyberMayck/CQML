@@ -5,10 +5,11 @@
 #include "attribControl.h"
 
 
+void InitGUI();
 void InitQML()
 {
 	QMLInitInput();
-	InitGUI();
+	CQMLGUI::InitGUI();
 	QMLInitHashes();
 }
 

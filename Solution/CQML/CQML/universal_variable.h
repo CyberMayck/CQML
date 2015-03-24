@@ -1,16 +1,25 @@
 #pragma once
+#include <type_traits>
 
 struct CQMLObject;
-#define TYPE_INT (1)
-#define TYPE_LONG (2)
-#define TYPE_LONG_LONG (3)
-#define TYPE_UNSIGNED_INT (4)
-#define TYPE_UNSIGNED_LONG (5)
-#define TYPE_UNSIGNED_LONG_LONG (6)
-#define TYPE_FLOAT (7)
-#define TYPE_DOUBLE (8)
-#define TYPE_LONG_DOUBLE (9)
-#define TYPE_CQMLOBJECT (10)
+
+	// enum here
+
+enum type_variant
+{
+	TYPE_INT,
+	TYPE_LONG,
+	TYPE_LONG_LONG,
+	TYPE_UNSIGNED_INT,
+	TYPE_UNSIGNED_LONG,
+	TYPE_UNSIGNED_LONG_LONG,
+	TYPE_FLOAT,
+	TYPE_DOUBLE,
+	TYPE_LONG_DOUBLE,
+	TYPE_VOID_PTR,
+	TYPE_CQMLOBJECT
+
+};
 
 struct Variant
 {
@@ -32,46 +41,10 @@ struct Variant
 	} value;
 	//template<typename T>
 	//T AS()(const T& obj) { this->AS}
+
+	template<typename T>
+	typename std::enable_if<std::is_arithmetic<T>::value, T>::type As() const;
 	
-	template<typename T> T AS()
-	{
-		switch(typeID)
-		{
-		case TYPE_INT:
-			return value.v_int;
-			break;
-		case TYPE_LONG:
-			return value.v_long;
-			break;
-		case TYPE_LONG_LONG:
-			return value.v_long_long;
-			break;
-		case TYPE_UNSIGNED_INT:
-			return value.v_unsigned_int;
-			break;
-		case TYPE_UNSIGNED_LONG:
-			return value.v_unsigned_long;
-			break;
-		case TYPE_UNSIGNED_LONG_LONG:
-			return value.v_unsigned_long_long;
-			break;
-		case TYPE_FLOAT:
-			return value.v_float;
-			break;
-		case TYPE_DOUBLE:
-			return value.v_double;
-			break;
-		case TYPE_LONG_DOUBLE:
-			return value.v_long_double;
-			break;
-
-		default:
-			throw 0;
-			break;
-		}
-		return 0;
-	}
-
 	Variant(int);
 	Variant(long);
 	Variant(long long);
@@ -99,10 +72,48 @@ struct Variant
 	const Variant operator/(Variant & rhs) const;
 	const Variant operator%(Variant & rhs) const;
 
-	//int As_int();
-	//long As_long();
-	//long long As_long_long();
-	//float As_float();
-	//double As_double();
-	//long double As_long_double();
 };
+
+// SFINAE
+
+
+template<typename T>
+typename std::enable_if<std::is_arithmetic<T>::value, T>::type Variant::As() const
+{
+	switch(typeID)
+	{
+	case TYPE_INT:
+		return value.v_int;
+		break;
+	case TYPE_LONG:
+		return value.v_long;
+		break;
+	case TYPE_LONG_LONG:
+		return value.v_long_long;
+		break;
+	case TYPE_UNSIGNED_INT:
+		return value.v_unsigned_int;
+		break;
+	case TYPE_UNSIGNED_LONG:
+		return value.v_unsigned_long;
+		break;
+	case TYPE_UNSIGNED_LONG_LONG:
+		return value.v_unsigned_long_long;
+		break;
+	case TYPE_FLOAT:
+		return value.v_float;
+		break;
+	case TYPE_DOUBLE:
+		return value.v_double;
+		break;
+	case TYPE_LONG_DOUBLE:
+		return value.v_long_double;
+		break;
+	default:
+		throw 0;
+		break;
+	}
+	return 0;
+}
+
+

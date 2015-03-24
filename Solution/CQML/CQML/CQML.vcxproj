@@ -88,6 +88,7 @@
     <ClCompile Include="attribControl.cpp" />
     <ClCompile Include="context.cpp" />
     <ClCompile Include="cqml.cpp" />
+    <ClCompile Include="CQMLObject.cpp" />
     <ClCompile Include="dependance.cpp" />
     <ClCompile Include="gui.cpp" />
     <ClCompile Include="input.cpp" />
@@ -105,6 +106,7 @@
     <ClInclude Include="attribControl.h" />
     <ClInclude Include="context.h" />
     <ClInclude Include="cqml.h" />
+    <ClInclude Include="CQMLObject.h" />
     <ClInclude Include="custom_classes.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </ClInclude>
@@ -112,6 +114,7 @@
     <ClInclude Include="gui.h" />
     <ClInclude Include="input.h" />
     <ClInclude Include="output0.h" />
+    <ClInclude Include="output0outer.h" />
     <ClInclude Include="output2.h" />
     <ClInclude Include="qml_includes.h" />
     <ClInclude Include="struct_definition_macros.h" />

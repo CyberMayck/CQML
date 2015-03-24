@@ -143,6 +143,7 @@ void PrintNode(SrcNode* node)
 
 void printHandlerAssignment()
 {
+	fprintf(file_class_source, "//printHandlerAssignment()");
 	int i;
 
 	int currentId;
@@ -159,7 +160,7 @@ void printHandlerAssignment()
 				{
 					continue;
 				}
-				fprintf(file_class_source, "\tself->_QML_element%d->Custom%s=_QML_element%d_%s;\n",i,handler->name,i,handler->name);
+				fprintf(file_class_source, "\t_QML_element%d->Custom%s=_QML_element%d_%s;\n",i,handler->name,i,handler->name);
 			}
 		}
 	}
@@ -172,6 +173,8 @@ void printHandlers()
 	int currentId;
 	currentId=id;
 
+	fprintf(file_class_source, "\n//printHandlers()\n");
+
 	for(int k=compInd-1;k>=0;k--)
 	{
 		for(int i=0;i<elementCount;i++)
@@ -183,7 +186,7 @@ void printHandlers()
 				{
 					continue;
 				}
-				fprintf(file_class_source, "static void _QML_element%d_%s(QML_Context * context, QMLEvent Event)\n{\n",i,handler->name);
+				fprintf(file_class_source, "static void _QML_element%d_%s(CQMLGUI::QML_Context * context, QMLEvent Event)\n{\n",i,handler->name);
 				
 				string hSrc;
 				handler->source->Print(hSrc);
@@ -226,9 +229,9 @@ void printAttributes()
 					if(prop->cont)
 					{
 						if(att->name2==0)
-							fprintf(file_class_source, "\t((GUI_%s*)self->_QML_element%d)->%s=",prop->cont->className.c_str(),i,att->name);
+							fprintf(file_class_source, "\t((CQMLGUI::%s*)self->_QML_element%d)->%s=",prop->cont->className.c_str(),i,att->name);
 						else
-							fprintf(file_class_source, "\t((GUI_%s*)self->_QML_element%d)->%s.%s=",prop->cont->className.c_str(),i,att->name,att->name2);
+							fprintf(file_class_source, "\t((CQMLGUI::%s*)self->_QML_element%d)->%s.%s=",prop->cont->className.c_str(),i,att->name,att->name2);
 					}
 				}
 				else
@@ -249,7 +252,8 @@ void printAttributes()
 void classDeclaration(const char* rootName)
 {
 	int customClassCount=0;
-	fprintf(file_class_header,"typedef struct GUI_Root%s GUI_Root%s;\n\n",rootName,rootName);
+	//fprintf(file_class_header,"typedef struct GUI_Root%s GUI_Root%s;\n\n",rootName,rootName);
+	fprintf(file_class_header,"struct Root%s;\n\n",rootName);
 
 	// header
 	for(int i=0;i<elementCount;i++)
@@ -265,16 +269,18 @@ void classDeclaration(const char* rootName)
 		elements[i].origClassName=elements[i].name;
 		elements[i].name=customClassName;
 		
-		fprintf(file_class_header,"typedef struct GUI_%s GUI_%s;\n\n",elements[i].name,elements[i].name);
+		//fprintf(file_class_header,"typedef struct GUI_%s GUI_%s;\n\n",elements[i].name,elements[i].name);
+		fprintf(file_class_header,"struct %s;\n\n",elements[i].name);
 	}
-	///here
+
 	// header
 	for(int i=0;i<elementCount;i++)
 	{
 		if(!elements[i].hasCustomClass)
 			continue;
-		fprintf(file_class_header,"struct GUI_%s\n",elements[i].name);
-		fprintf(file_class_header,"\t: GUI_%s\n{\n",elements[i].origClassName);
+		fprintf(file_class_header,"struct %s\n",elements[i].name);
+	//	fprintf(file_class_header,"\t: %s\n{\n\t%s();",elements[i].origClassName,elements[i].name);
+		fprintf(file_class_header,"\t: %s\n{\n;",elements[i].origClassName,elements[i].name);
 
 		for(int j=0;j<elements[i].propertiesCount;j++)
 		{
@@ -285,7 +291,7 @@ void classDeclaration(const char* rootName)
 		}
 		fprintf(file_class_header,"};\n");
 
-		fprintf(file_class_header,"GUI_%s* acGUI_%s();\n\n",elements[i].name,elements[i].name);
+		fprintf(file_class_header,"%s* ac%s();\n\n",elements[i].name,elements[i].name);
 	}
 	
 	// source
@@ -294,8 +300,9 @@ void classDeclaration(const char* rootName)
 		if(!elements[i].hasCustomClass)
 			continue;
 
-		fprintf(file_class_source,"GUI_%s* acGUI_%s()\n{\n",elements[i].name,elements[i].name);
-		fprintf(file_class_source,"\tGUI_%s * pointer;\n\tpointer=(GUI_%s*)malloc(sizeof(GUI_%s));\n",elements[i].name,elements[i].name,elements[i].name);
+		fprintf(file_class_source,"CQMLGUI::%s* CQMLGUI::ac%s()\n{\n",elements[i].name,elements[i].name);
+		//fprintf(file_class_source,"\tCQMLGUI::%s * pointer;\n\tpointer=(CQMLGUI::%s*)malloc(sizeof(CQMLGUI::%s));\n",elements[i].name,elements[i].name,elements[i].name);
+		fprintf(file_class_source,"\tCQMLGUI::%s * pointer;\n\tpointer=new CQMLGUI::%s();\n",elements[i].name,elements[i].name);
 
 //		fprintf(file_class_source,"\tpointer->original=cGUI_%s();\n",elements[i].origClassName);
 		fprintf(file_class_source,"\treturn pointer;\n");
@@ -308,15 +315,15 @@ void classDeclaration(const char* rootName)
 
 void rootElementDeclaration(const char * rootName)
 {
-	fprintf(file_class_header,"struct GUI_Root%s\n{\n",rootName);
+	fprintf(file_class_header,"struct Root%s\n\t:Component\n{\n\tRoot%s();\n",rootName,rootName);
 	//fprintf(file_class_header,"GUI_Element base;\n"); //no base
 	for(int i=0;i<elementCount;i++)
 	{
 		fprintf(file_class_header, "\t%s* _QML_element%d;\n",elements[i].classContainer->className.c_str(),i);
 	}
 	fprintf(file_class_header,"};\n");
-	fprintf(file_class_header,"GUI_Root%s* acGUI_Root%s();\n",rootName,rootName);
-	fprintf(file_class_header,"GUI_Root%s cGUI_Root%s();\n",rootName,rootName);
+	fprintf(file_class_header,"Root%s* acGUI_Root%s();\n",rootName,rootName);
+	fprintf(file_class_header,"Root%s cGUI_Root%s();\n",rootName,rootName);
 }
 
 void printAttributeUpdaters();
@@ -329,15 +336,16 @@ void rootElementAllocation(const char * rootName, int treeInd)
 	
 	fprintf(file_class_source, "\n //rootElementAllocation() \n");
 
-		fprintf(file_class_source,"GUI_Root%s* acGUI_Root%s()\n{\n",rootName,rootName);
-		fprintf(file_class_source,"\tGUI_Root%s * pointer;\n\tpointer=(GUI_Root%s*)malloc(sizeof(GUI_Root%s));\n",rootName,rootName,rootName);
+		fprintf(file_class_source,"CQMLGUI::Root%s* CQMLGUI::acGUI_Root%s()\n{\n",rootName,rootName);
+		fprintf(file_class_source,"\tCQMLGUI::Root%s * pointer;\n\tpointer=new CQMLGUI::Root%s();\n",rootName,rootName);
 
 		////fprintf(file_class_source,"pointer->original=cGUI_Root();\n",elements[i].origClassName);
-		fprintf(file_class_source,"\t*pointer=cGUI_Root%s((GUI_Element *)pointer);\n",rootName);
+		//fprintf(file_class_source,"\t*pointer=cGUI_Root%s((CQMLGUI::Element *)pointer);\n",rootName);
 		
 		//fprintf(file_class_source, "mGUI_Element_InsertChild((GUI_Element*)pointer, (GUI_Element*)pointer->_QML_element0);\n");
 		//fprintf(file_class_source,"return pointer;\n");
-		fprintf(file_class_source,"\treturn (GUI_Root%s*)pointer->_QML_element0;\n",rootName);
+
+		fprintf(file_class_source,"\treturn (CQMLGUI::Root%s*)pointer->_QML_element0;\n",rootName);
 			
 
 		fprintf(file_class_source,"}\n");
@@ -347,9 +355,10 @@ void rootElementConstructor(const char * rootName, int treeInd)
 {
 	fprintf(file_class_source, "\n //rootElementConstructor() \n");
 
-	fprintf(file_class_source,"GUI_Root%s cGUI_Root%s(GUI_Element * pointer)\n{\n",rootName,rootName);
-	fprintf(file_class_source,"\tGUI_Root%s s;\n",rootName);
-	fprintf(file_class_source,"\tGUI_Root%s * self=&s;\n",rootName);
+	fprintf(file_class_source,"CQMLGUI::Root%s::Root%s()\n{\n",rootName,rootName);
+	//fprintf(file_class_source,"\tCQMLGUI::Root%s s;\n",rootName);
+	//fprintf(file_class_source,"\tCQMLGUI::Root%s * self=&s;\n",rootName);
+
 	//fprintf(file_class_source,"self->base=cGUI_Element();\n"); //no base
 	//fprintf(file_class_source,"self->base.root=(GUI_Element*)self;\n");
 
@@ -359,18 +368,18 @@ void rootElementConstructor(const char * rootName, int treeInd)
 		if(isImportName)
 		{
 			const char *nam= importPathToName[imports[importToKeyMaps[treeInd][std::string(elements[i].name)]].path].c_str();
-			fprintf(file_class_source, "\tself->_QML_element%d = (GUI_Element*)acGUI_Root%s();\n",i,nam);
+			fprintf(file_class_source, "\t_QML_element%d = (CQMLGUI::Element*)CQMLGUI::acGUI_Root%s();\n",i,nam);
 		}
 		else
-			fprintf(file_class_source, "\tself->_QML_element%d = (GUI_Element*)acGUI_%s();\n",i,elements[i].name);
-		fprintf(file_class_source, "\tself->_QML_element%d->root=pointer;\n",i);
+			fprintf(file_class_source, "\t_QML_element%d = CQMLGUI::acGUI_%s();\n",i,elements[i].name);
+		fprintf(file_class_source, "\t_QML_element%d->root=(CQMLGUI::Element*)this;\n",i);
 	}
 	for(int i=0;i<elementCount;i++)
 	{
 	//	fprintf(file, "_QML_element%d = (GUI_Element*)acGUI_%s();\n",i,elements[i].name);
 		for(int j=0;j<elements[i].childrenCount;j++)
 		{
-			fprintf(file_class_source, "\tmGUI_Element_InsertChild((GUI_Element*)self->_QML_element%d, (GUI_Element*)self->_QML_element%d);\n",i,elements[i].children[j]->id);
+			fprintf(file_class_source, "\tmGUI_Element_InsertChild((CQMLGUI::Element*)_QML_element%d, (CQMLGUI::Element*)_QML_element%d);\n",i,elements[i].children[j]->id);
 		}
 	}
 
@@ -391,11 +400,13 @@ void rootElementConstructor(const char * rootName, int treeInd)
 
 	//fprintf(file_class_source,"self->base.Update=_QML_Update;\n"); //
 	printElementUpdaterAssignments();
-	fprintf(file_class_source,"\t_QML_Update((GUI_Element *)self->_QML_element0);\n");
+	fprintf(file_class_source,"\t_QML_Update((CQMLGUI::Element *)_QML_element0);\n");
 
 	
 	//fprintf(file_class_source,"self->base.root=pointer;\n");
-	fprintf(file_class_source,"\treturn *self;\n}\n");
+
+	fprintf(file_class_source,"\n}\n");
+	//fprintf(file_class_source,"\treturn *self;\n}\n");
 }
 
 
@@ -403,8 +414,9 @@ void rootElementUpdater(const char * rootName, int treeInd)
 {
 	fprintf(file_class_source, "\n //rootElementUpdater() \n");
 
-	fprintf(file_class_source,"static void _QML_Update(GUI_Element *s)\n{\n\tGUI_Root%s * self=(GUI_Root%s *)s;\n",rootName,rootName);
-	fprintf(file_class_source,"\tmGUI_Element_Update((GUI_Element *)self);\n");
+	fprintf(file_class_source,"static void _QML_Update(CQMLGUI::Element *s)\n{\n\tCQMLGUI::Root%s * self=(CQMLGUI::Root%s *)s;\n",rootName,rootName);
+	//fprintf(file_class_source,"\tmGUI_Element_Update((CQMLGUI::Element *)self);\n");
+	fprintf(file_class_source,"\ts->Update();\n");
 	//printAttributes(); // original
 	fprintf(file_class_source,"\n}\n");
 }
@@ -422,7 +434,7 @@ void printElementUpdatersHeaders()
 		for(int i=0;i<elementCount;i++)
 		{
 
-			fprintf(file_class_source, "static void Update_E%d(GUI_Element *self);\n",i);
+			fprintf(file_class_source, "static void Update_E%d(CQMLGUI::Element *self);\n",i);
 		}
 	}
 }
@@ -457,11 +469,11 @@ void printAttributeUpdatersHeaders()
 					{
 						if(att->name2==0)
 						{
-							fprintf(file_class_source, "static void Update_E%d_%s(QML_Context *);\n",i,att->name);
+							fprintf(file_class_source, "static void Update_E%d_%s(CQMLGUI::QML_Context *);\n",i,att->name);
 						}
 						else
 						{
-							fprintf(file_class_source, "static void Update_E%d_%s_%s(QML_Context *);\n",i,att->name,att->name2);
+							fprintf(file_class_source, "static void Update_E%d_%s_%s(CQMLGUI::QML_Context *);\n",i,att->name,att->name2);
 						}
 					}
 				}
@@ -504,16 +516,16 @@ void printAttributeUpdaters()
 					{
 						if(att->name2==0)
 						{
-							fprintf(file_class_source, "\t((%s*)self->_QML_element%d)->%s_context",prop->cont->className.c_str(),i,att->name);
-							fprintf(file_class_source, "  = acQML_Context((GUI_Group*)self,(GUI_Element*)self->_QML_element%d);\n",i);
-							fprintf(file_class_source, "\t((%s*)self->_QML_element%d)->%s_Update",prop->cont->className.c_str(),i,att->name);
+							fprintf(file_class_source, "\t((%s*)_QML_element%d)->%s_context",prop->cont->className.c_str(),i,att->name);
+							fprintf(file_class_source, "  = acQML_Context((CQMLGUI::Component*)this,(CQMLGUI::Element*)_QML_element%d);\n",i);
+							fprintf(file_class_source, "\t((%s*)_QML_element%d)->%s_Update",prop->cont->className.c_str(),i,att->name);
 							fprintf(file_class_source, "  = Update_E%d_%s;\n",i,att->name);
 						}
 						else
 						{
-							fprintf(file_class_source, "\t((%s*)self->_QML_element%d)->%s_%s_context",prop->cont->className.c_str(),i,att->name,att->name2);
-							fprintf(file_class_source, "  = acQML_Context((GUI_Group*)self,(GUI_Element*)((%s*)self->_QML_element%d)->%s);\n",prop->cont->className.c_str(),i,att->name);
-							fprintf(file_class_source, "\t((%s*)self->_QML_element%d)->%s_%s_Update",prop->cont->className.c_str(),i,att->name,att->name2);
+							fprintf(file_class_source, "\t((%s*)_QML_element%d)->%s_%s_context",prop->cont->className.c_str(),i,att->name,att->name2);
+							fprintf(file_class_source, "  = acQML_Context((CQMLGUI::Component*)this,(CQMLGUI::Element*)((%s*)_QML_element%d)->%s);\n",prop->cont->className.c_str(),i,att->name);
+							fprintf(file_class_source, "\t((%s*)_QML_element%d)->%s_%s_Update",prop->cont->className.c_str(),i,att->name,att->name2);
 							fprintf(file_class_source, "  = Update_E%d_%s_%s;\n",i,att->name,att->name2);
 						}
 					}
@@ -649,9 +661,9 @@ void makeMainSource()
 	fprintf(file,"#include \"output0outer.h\"\n\n#include \"qml_includes.h\"\n");
 	fprintf(file,"void _QML_Update();\n");
 	fprintf(file,"void _QML_ClassTabsInit();\n");
-	fprintf(file,"GUI_Element* root;\n");
-	fprintf(file,"\nvoid _QML_Init()\n{\n\troot = (GUI_Element*) acGUI_Rootoutput0();\n\t_QML_Update();\n}\n");
-	fprintf(file,"\nvoid _QML_Update()\n{\n\troot->Update(root);\n}\n");
+	fprintf(file,"CQMLGUI::Element* root;\n");
+	fprintf(file,"\nvoid _QML_Init()\n{\n\troot = (CQMLGUI::Element*) acGUI_Rootoutput0();\n\t_QML_Update();\n}\n");
+	fprintf(file,"\nvoid _QML_Update()\n{\n\troot->Update();\n}\n");
 	
 	PrintClassHashTabs(file,elementTreeCnt);
 	
@@ -676,8 +688,8 @@ void printElementUpdaters()
 		for(int i=0;i<elementCount;i++)
 		{
 
-			fprintf(file_class_source, "static void Update_E%d(GUI_Element *self)\n{\n",i);
-			fprintf(file_class_source, "\tmGUI_Element_Update((GUI_Element *)self);\n",i);
+			fprintf(file_class_source, "static void Update_E%d(CQMLGUI::Element *self)\n{\n",i);
+			fprintf(file_class_source, "\tself->Update();\n",i);
 			for(int j=0;j<elements[i].attributeCount;j++)
 			{
 				GUIElementAttribute* att=&elements[i].attributes[j];
@@ -693,13 +705,13 @@ void printElementUpdaters()
 				{
 					if(att->name2==0)
 					{
-						fprintf(file_class_source, "\t((%s*)self)->%s_Update",prop->cont->className.c_str(),att->name);
-						fprintf(file_class_source, "\t(((%s*)self)->%s_context);\n",prop->cont->className.c_str(),att->name);
+						fprintf(file_class_source, "\t((CQMLGUI::%s*)self)->%s_Update",prop->cont->className.c_str(),att->name);
+						fprintf(file_class_source, "\t(((CQMLGUI::%s*)self)->%s_context);\n",prop->cont->className.c_str(),att->name);
 					}
 					else
 					{
-						fprintf(file_class_source, "\t((%s*)self)->%s_%s_Update",prop->cont->className.c_str(),att->name,att->name2);
-						fprintf(file_class_source, "\t(((%s*)self)->%s_%s_context);\n",prop->cont->className.c_str(),att->name,att->name2);
+						fprintf(file_class_source, "\t((CQMLGUI::%s*)self)->%s_%s_Update",prop->cont->className.c_str(),att->name,att->name2);
+						fprintf(file_class_source, "\t(((CQMLGUI::%s*)self)->%s_%s_context);\n",prop->cont->className.c_str(),att->name,att->name2);
 					}
 				}
 				else
@@ -746,29 +758,37 @@ void printAttributesBodies()
 				{
 					if(att->name2==0)
 					{
-						fprintf(file_class_source, "static void Update_E%d_%s(QML_Context *context)\n",i,att->name);
+						fprintf(file_class_source, "static void Update_E%d_%s(CQMLGUI::QML_Context *context)\n",i,att->name);
 						fprintf(file_class_source, "{\n");
 						// add dynamic check //todo
 
 						att->handler->CheckerPrint(file_class_source);
 
-						fprintf(file_class_source,"\t((%s*)context->self)->%s=",prop->cont->className.c_str(),att->name);
+						fprintf(file_class_source,"\t((CQMLGUI::%s*)context->self)->%s=",prop->cont->className.c_str(),att->name);
+						string str="";
+						att->source->Print(str);
+						//PrintNodeToFile(file_class_source,att->expression);
 						
-						PrintNodeToFile(file_class_source,att->expression);
+						fprintf(file_class_source, "%s",str.c_str());
 						fprintf(file_class_source, ";\n");
 						
 						fprintf(file_class_source, "}\n");
 					}
 					else
 					{
-						fprintf(file_class_source, "static void Update_E%d_%s_%s(QML_Context *context)\n",i,att->name,att->name2);
+						fprintf(file_class_source, "static void Update_E%d_%s_%s(CQMLGUI::QML_Context *context)\n",i,att->name,att->name2);
 						fprintf(file_class_source, "{\n");
 						// add dynamic check
 						att->handler->CheckerPrint(file_class_source);
 
-						fprintf(file_class_source,"\t((%s*)context->self)->%s.%s=",prop->cont->className.c_str(),att->name,att->name2);
+						fprintf(file_class_source,"\t((CQMLGUI::%s*)context->self)->%s.%s=",prop->cont->className.c_str(),att->name,att->name2);
 						
-						PrintNodeToFile(file_class_source,att->expression);
+						string str="";
+						att->source->Print(str);
+						//PrintNodeToFile(file_class_source,att->expression);
+						
+						fprintf(file_class_source, "%s",str.c_str());
+						
 						fprintf(file_class_source, ";\n");
 						fprintf(file_class_source, "}\n");
 					}
@@ -798,7 +818,7 @@ void printElementUpdaterAssignments()
 	{
 		for(int i=0;i<elementCount;i++)
 		{
-			fprintf(file_class_source,"\t((GUI_Element *)self->_QML_element%d)->Update=Update_E%d;\n",i,i);
+			fprintf(file_class_source,"\t((CQMLGUI::Element *)_QML_element%d)->CustomUpdate=Update_E%d;\n",i,i);
 		}
 	}
 }
@@ -847,7 +867,7 @@ void makeSource(std::string name, int treeInd)
 	//file_class_header= fopen("custom_classes.h","w");
 	//file_class_source= fopen("custom_classes.cpp","w");
 	
-	fprintf(file_class_header,"#include \"qml_includes.h\"\n");
+	fprintf(file_class_header,"#include \"qml_includes.h\"\nnamespace CQMLGUI{");
 	fprintf(file_class_source,"#include \"%s\"\n\n#include \"qml_includes.h\"\n",name1.c_str());
 	for(int i=0;i<importCnt;i++)
 	{
@@ -865,8 +885,11 @@ void makeSource(std::string name, int treeInd)
 	classDeclaration(name.c_str());
 
 	
-	fprintf(file,"typedef struct GUI_Root%s GUI_Root%s;\n\n",name.c_str(),name.c_str());
-	fprintf(file,"GUI_Root%s* acGUI_Root%s();\n",name.c_str(),name.c_str());
+	//fprintf(file,"typedef struct GUI_Root%s GUI_Root%s;\n\n",name.c_str(),name.c_str());
+	//fprintf(file,"GUI_Root%s* acGUI_Root%s();\n",name.c_str(),name.c_str());
+	
+	fprintf(file,"struct Root%s;\n\n",name.c_str());
+	fprintf(file,"Root%s* acGUI_Root%s();\n",name.c_str(),name.c_str());
 	//here
 
 	rootElementDeclaration(name.c_str());
@@ -876,7 +899,7 @@ void makeSource(std::string name, int treeInd)
 	sortTopologically(graphNodes);
 	
 	
-	fprintf(file_class_source,"static void _QML_Update(GUI_Element *s);\n\n");
+	fprintf(file_class_source,"static void _QML_Update(CQMLGUI::Element *s);\n\n");
 
 	printHandlers();
 	
@@ -900,6 +923,9 @@ void makeSource(std::string name, int treeInd)
 	printAttributesBodies();
 
 	printElementUpdaters();
+
+	
+	fprintf(file_class_header,"};");
 
 	fclose(file);
 	fclose(file_class_header);
@@ -1090,7 +1116,7 @@ bool processDots(SrcNode * node, int treeInd,int currentElementId, int graphInd,
 	else
 	{
 		PropertyAndType * prop=elements[curId].classContainer->CheckExistence(identifiers[0]);
-		sprintf(str,"(*((GUI_Rootoutput%d *)context->root)->_QML_element%d)",treeInd,curId);
+		sprintf(str,"(*((CQMLGUI::Rootoutput%d *)context->root)->_QML_element%d)",treeInd,curId);
 		if(prop!=0)
 		{
 			//start from this
@@ -1147,7 +1173,7 @@ void processRefs(SrcNode * node, int treeInd, int currentElementId, int graphInd
 			curId=idMaps[treeInd][std::string(node->text)];
 			
 			free(node->text);
-			sprintf(str,"(*((GUI_Rootoutput%d *)context->root)->_QML_element%d)",treeInd,curId);
+			sprintf(str,"(*((CQMLGUI::Rootoutput%d *)context->root)->_QML_element%d)",treeInd,curId);
 			//sprintf(str,"(*self->localGroup->members[%d])",otherId);
 			node->text=new char[strlen(str)+1];
 			strcpy(node->text,str);
@@ -1158,7 +1184,7 @@ void processRefs(SrcNode * node, int treeInd, int currentElementId, int graphInd
 			ClassContainer * cont=elements[currentElementId].classContainer;
 			PropertyAndType * prop=cont->CheckExistence(std::string(node->text));
 			
-			sprintf(str,"(*((GUI_Rootoutput%d *)context->root)->_QML_element%d)",treeInd,curId);
+			sprintf(str,"(*((CQMLGUI::Rootoutput%d *)context->root)->_QML_element%d)",treeInd,curId);
 			if(prop!=0)
 			{
 				// ap
@@ -1343,7 +1369,7 @@ void processSrcReferences(SrcNode * node, int treeInd, int currentId, bool leftM
 			{
 				int otherId=idMaps[treeInd][std::string(node->text)];
 				free(node->text);
-				sprintf(str,"(*((GUI_Rootoutput%d *)context->root)->_QML_element%d)",treeInd,otherId);
+				sprintf(str,"(*((CQMLGUI::Rootoutput%d *)context->root)->_QML_element%d)",treeInd,otherId);
 				//sprintf(str,"(*self->localGroup->members[%d])",otherId);
 				node->text=new char[strlen(str)+1];
 				strcpy(node->text,str);
@@ -1353,7 +1379,7 @@ void processSrcReferences(SrcNode * node, int treeInd, int currentId, bool leftM
 				int otherId=importToKeyMaps[treeInd][std::string(node->text)];
 				
 				free(node->text);
-				sprintf(str,"GUI_Root%s",importPathToName[imports[otherId].path].c_str());
+				sprintf(str,"CQMLGUI::Root%s",importPathToName[imports[otherId].path].c_str());
 				//sprintf(str,"(*self->localGroup->members[%d])",otherId);
 				node->text=new char[strlen(str)+1];
 				strcpy(node->text,str);
@@ -1363,7 +1389,7 @@ void processSrcReferences(SrcNode * node, int treeInd, int currentId, bool leftM
 				if(strcmp("parent",node->text)==0)
 				{
 					free(node->text);
-					sprintf(str,"(*((GUI_Rootoutput%d *)context->root)->_QML_element%d->parent)",treeInd,currentId);
+					sprintf(str,"(*((CQMLGUI::Rootoutput%d *)context->root)->_QML_element%d->parent)",treeInd,currentId);
 					//sprintf(str,"(*self->localGroup->members[%d]->parent)",currentId);
 					node->text=new char[strlen(str)+1];
 					strcpy(node->text,str);
@@ -1375,8 +1401,8 @@ void processSrcReferences(SrcNode * node, int treeInd, int currentId, bool leftM
 					if(prop!=0)
 					{
 						//
-						sprintf(str,"((%s*)((GUI_Rootoutput%d *)context->root)->_QML_element%d)->%s",prop->cont->className.c_str(),treeInd,currentId,node->text);
-							string checkStr=string("((GUI_Rootoutput")
+						sprintf(str,"((%s*)((CQMLGUI::Rootoutput%d *)context->root)->_QML_element%d)->%s",prop->cont->className.c_str(),treeInd,currentId,node->text);
+							string checkStr=string("((CQMLGUI::Rootoutput")
 							+std::to_string(static_cast<long long>(treeInd))
 							+string(" *)context->root)->_QML_element")
 							+std::to_string(static_cast<long long>(currentId));
@@ -1547,7 +1573,7 @@ bool processSrcDots(SrcNode * node, int treeInd,int currentElementId, int graphI
 			// id.parent.parent end
 			if(prevElement)
 			{
-				completeName=string("((GUI_Rootoutput")
+				completeName=string("((CQMLGUI::Rootoutput")
 					+std::to_string(static_cast<long long>(treeInd))
 					+string(" *)context->root)->_QML_element")
 					+std::to_string(static_cast<long long>(treeInd));
@@ -1986,16 +2012,16 @@ void processTree(ParserList* elementTree, int treeInd)
 		{
 			if(elements[i].propertiesCount>0)
 			{
-				std::string className=std::string("GUI_")+std::string(elements[i].name)+std::string("Custom")+std::to_string(static_cast<long long>(customClassCount));
+				std::string className=std::string("")+std::string(elements[i].name)+std::string("Custom")+std::to_string(static_cast<long long>(customClassCount));
 				customClassCount++;
 				ClassContainer * cont=new ClassContainer(className, treeInd,totalClassCnt++);
-				cont->SetAncestor(defaultClasses[defaultClassMap[string("GUI_")+string(elements[i].name)]]);
+				cont->SetAncestor(defaultClasses[defaultClassMap[string("")+string(elements[i].name)]]);
 				
 				elements[i].classContainer=cont;
 			}
 			else
 			{
-				elements[i].classContainer=defaultClasses[defaultClassMap[string("GUI_")+string(elements[i].name)]];
+				elements[i].classContainer=defaultClasses[defaultClassMap[string("")+string(elements[i].name)]];
 			}
 		}
 
@@ -2006,7 +2032,7 @@ void processTree(ParserList* elementTree, int treeInd)
 			// todo check default type
 			if(strcmp(elements[i].properties[j].typeName,"int")!=0)
 			{
-				temp.type=(string("GUI_")+string(elements[i].properties[j].typeName));
+				temp.type=(string("")+string(elements[i].properties[j].typeName));
 			}
 			else
 			{
@@ -2081,8 +2107,8 @@ void processTree(ParserList* elementTree, int treeInd)
 		{
 			GUIElementHandler * handler=&elements[i].handlers[j];
 
-			PropertyAndType* t= elements[i].classContainer->CheckExistence(std::string(handler->name));
-			HandlerAndType* h= elements[i].classContainer->CheckHExistence(std::string(handler->name));
+			PropertyAndType* t= elements[i].classContainer->CheckExistence(std::string("Custom")+std::string(handler->name));
+			HandlerAndType* h= elements[i].classContainer->CheckHExistence(std::string("Custom")+std::string(handler->name));
 			///here
 			if(t==0 && h==0)
 			{

@@ -1,17 +1,18 @@
 #pragma once
 /* Copyright (C) 2014 Tomas Barak */
 // Edited by Michal Hotovec
-    #include <stdio.h>
-    #include <string.h>
+   // #include <stdio.h>
+   // #include <string.h>
 #ifdef CQML_PARSER
     #include <cstdio>
 #endif
 
 #ifndef CQML_PARSER
-	#include "context.h"
-	#include "CQMLObject.h"
+
+
 #endif
     /* property factory macros */
+	#define PROP_FACTORY_DECL_MVAR4(t, n, d, c) t n;
 	#define PROP_FACTORY_DECL_VAR4(t, n, d, c) t n; QML_Context * n##_context; void (* n##_Update)(QML_Context*);
     #define PROP_FACTORY_ASSIGN_DEFAULT4(t, n, d, c) self->n = d;
     #define PROP_FACTORY_HAVE_STRCMP4(t, n, d, c) if(strcmp(name, #n) == 0) return 1;
@@ -19,6 +20,8 @@
     #define PROP_FACTORY_DUMP_VAR4(t, n, d, c) t##_to_string(self->n, buffer, buffer_size); printf("%s = %s [%s]\n", #n, buffer, c);
 
 	#define PROP_FACTORY_DECL_FUNC3P(t, n, d, ...) t (*n)(__VA_ARGS__); QML_Context n##_context;
+	#define PROP_FACTORY_DECL_METH3P(t, n, d, ...) virtual t n(__VA_ARGS__);
+	#define PROP_FACTORY_DECL_METHV3P(t, n, d, ...) t n(__VA_ARGS__);
      
     /* helper functions */
    /* int string_to_int(const char * str, int * outInt) {
@@ -40,49 +43,59 @@
     }*/
 	
 // user declared structs
-#define STRUCT_COLOR(F, M, INHERIT) \
+#define STRUCT_COLOR(MF, F, M, ME, MEV, INHERIT) \
 	F(float, red, 0, "red") \
 	F(float, green, 0, "green") \
 	F(float, blue, 0, "blue") 
 	
 
-#define STRUCT_ELEMENT(F, M, INHERIT) \
-	F(GUI_Element*, root, 0, "id of the class") \
-	F(GUI_Element*, parent, 0, "id of the class") \
-	F(GUI_Element**, children, 0, "id of the class") \
-	F(int, childrenCount, 0, "id of the class") \
-	F(int, flags, 0, "flags") \
+#define STRUCT_ELEMENT(MF, F, M, ME, MEV, INHERIT) \
+	MF(Element*, root, 0, "id of the class") \
+	MF(Element*, parent, 0, "id of the class") \
+	MF(Element**, children, 0, "id of the class") \
+	MF(int, childrenCount, 0, "id of the class") \
+	MF(int, flags, 0, "flags") \
 	F(int, x, 0, "x coordinate in pixels") \
 	F(int, y, 0, "y coordinate in pixels") \
 	F(int, width, 0, "width in pixels") \
 	F(int, height, 0, "height in pixels")\
-	M(void, Draw, 0, GUI_Element* bah) \
-	M(void, Update, 0, GUI_Element*) \
-	M(int, MousePressed, 0, GUI_Element*, int, int, int) \
-	M(int, MouseReleased, 0, GUI_Element*, int, int, int) \
-	M(int, MouseMoved, 0, GUI_Element*, int, int, int, int) \
-	M(int, MouseScrolled, 0, GUI_Element*, int, int, int, int) \
-	M(void, CustomMouseClicked, 0, GUI_Element*, QMLEvent) \
-	M(void, CustomMousePressed, 0, GUI_Element*, QMLEvent) \
-	M(void, CustomMouseReleased, 0, GUI_Element*, QMLEvent) \
-	M(void, CustomMouseMoved, 0, GUI_Element*, QMLEvent) \
-	M(void, CustomMouseEntered, 0, GUI_Element*, QMLEvent) \
-	M(void, CustomMouseExited, 0, GUI_Element*, QMLEvent) \
-	M(void, CustomMouseScrolled, 0, GUI_Element*, QMLEvent)
+	ME(int, Top, 0)\
+	ME(int, Left, 0)\
+	MEV(void, Draw, 0) \
+	MEV(void, Update, 0) \
+	M(void, CustomUpdate, 0, Element*) \
+	MEV(int, MousePressed, 0, int, int, int) \
+	MEV(int, MouseReleased, 0, int, int, int) \
+	MEV(int, MouseClicked, 0, int, int, int) \
+	MEV(int, MouseMoved, 0, int, int, int, int) \
+	ME(int, MouseScrolled, 0, int, int, int, int) \
+	M(void, CustomMouseClicked, 0, Element*, QMLEvent) \
+	M(void, CustomMousePressed, 0, Element*, QMLEvent) \
+	M(void, CustomMouseReleased, 0, Element*, QMLEvent) \
+	M(void, CustomMouseMoved, 0, Element*, QMLEvent) \
+	M(void, CustomMouseEntered, 0, Element*, QMLEvent) \
+	M(void, CustomMouseExited, 0, Element*, QMLEvent) \
+	M(void, CustomMouseScrolled, 0, Element*, QMLEvent)
 
 
 
 	// what about callbacks?
 
-#define STRUCT_RECTANGLE(F, M, INHERIT) \
+#define STRUCT_RECTANGLE(MF, F, M, ME, MEV, INHERIT) \
 	INHERIT(F, M, STRUCT_ELEMENT) \
-	F(GUI_Color, color, 0, "color")
+	MEV(void, Draw, 0) \
+	MEV(int, MousePressed, 0, int, int, int) \
+	MEV(int, MouseReleased, 0, int, int, int) \
+	MEV(int, MouseClicked, 0, int, int, int) \
+	MEV(int, MouseMoved, 0, int, int, int, int) \
+	MEV(int, MouseScrolled, 0, int, int, int, int) \
+	F(Color, color, 0, "color")
 
-#define STRUCT_ANCHOR(F, M, INHERIT) \
-	F(GUI_Element*, top, 0, "top anchor") \
-	F(GUI_Element*, bottom, 0, "bottom anchor") \
-	F(GUI_Element*, left, 0, "left anchor") \
-	F(GUI_Element*, right, 0, "right anchor")
+#define STRUCT_ANCHOR(MF, F, M, ME, MEV, INHERIT) \
+	F(Element*, top, 0, "top anchor") \
+	F(Element*, bottom, 0, "bottom anchor") \
+	F(Element*, left, 0, "left anchor") \
+	F(Element*, right, 0, "right anchor")
 
 
 #ifdef CQML_PARSER
@@ -90,7 +103,6 @@
 
 #else
 #define REGPRIMITIVE(x)
-
 
 #endif
 
@@ -103,36 +115,34 @@
 	
 #define MAKE_STRUCTURE2(MACRO, NAME) \
 	struct NAME : public CQMLObject { \
-		/*int classID;*/ \
-		MACRO(PROP_FACTORY_DECL_VAR4, PROP_FACTORY_DECL_FUNC3P, NOTHING) \
+		NAME();\
+		MACRO(PROP_FACTORY_DECL_MVAR4, PROP_FACTORY_DECL_VAR4, PROP_FACTORY_DECL_FUNC3P, PROP_FACTORY_DECL_METH3P, PROP_FACTORY_DECL_METHV3P, NOTHING) \
 	}; \
-	typedef struct NAME NAME;
+
 
 #define MAKE_STRUCTURE3(MACRO, NAME, PARENT) \
 	struct NAME : public PARENT { \
-		/*union { */\
-		/*int classID;*/ \
-		/*PARENT base;};*/ \
-		MACRO(PROP_FACTORY_DECL_VAR4, PROP_FACTORY_DECL_FUNC3P, NOTHING) \
+		NAME();\
+		MACRO(PROP_FACTORY_DECL_MVAR4, PROP_FACTORY_DECL_VAR4, PROP_FACTORY_DECL_FUNC3P, PROP_FACTORY_DECL_METH3P, PROP_FACTORY_DECL_METHV3P, NOTHING) \
 	}; \
-	typedef struct NAME NAME;
      
 
 #define PROP_FACTORY_PARSER_DECL_FUNC3P(t, n, d, ...) parserDeclareFunc(#t, #n, #d, #__VA_ARGS__);
 
 #define PROP_FACTORY_PARSER_DECL4(t, n, d, c) parserDeclare(#t,#n,#d);
+#define PROP_FACTORY_PARSER_DECL_METH3P(t, n, d, ...)
    
 #define PARSER_DECLARE2_REF(MACRO, NAME) \
 	registerStructRef(#NAME, 0); \
-	MACRO(PROP_FACTORY_PARSER_DECL4, PROP_FACTORY_PARSER_DECL_FUNC3P, NOTHING)
+	MACRO(PROP_FACTORY_PARSER_DECL4, PROP_FACTORY_PARSER_DECL4, PROP_FACTORY_PARSER_DECL_FUNC3P, PROP_FACTORY_PARSER_DECL_METH3P, PROP_FACTORY_PARSER_DECL_METH3P, NOTHING)
 
 #define PARSER_DECLARE2(MACRO, NAME) \
 	registerStruct(#NAME, 0); \
-	MACRO(PROP_FACTORY_PARSER_DECL4, PROP_FACTORY_PARSER_DECL_FUNC3P, NOTHING)
+	MACRO(PROP_FACTORY_PARSER_DECL4, PROP_FACTORY_PARSER_DECL4, PROP_FACTORY_PARSER_DECL_FUNC3P, PROP_FACTORY_PARSER_DECL_METH3P, PROP_FACTORY_PARSER_DECL_METH3P, NOTHING)
 	
 #define PARSER_DECLARE3(MACRO, NAME, PARENT) \
 	registerStruct(#NAME, #PARENT); \
-	MACRO(PROP_FACTORY_PARSER_DECL4, PROP_FACTORY_PARSER_DECL_FUNC3P, NOTHING)
+	MACRO(PROP_FACTORY_PARSER_DECL4, PROP_FACTORY_PARSER_DECL4, PROP_FACTORY_PARSER_DECL_FUNC3P, PROP_FACTORY_PARSER_DECL_METH3P, PROP_FACTORY_PARSER_DECL_METH3P, NOTHING)
 
 
 #define REGISTRATION(MACRO2, MACRO2REF, MACRO3) \
@@ -143,10 +153,10 @@
 	REGPRIMITIVE(float)\
 	REGPRIMITIVE(double)\
 	REGPRIMITIVE(string)\
-	MACRO2(STRUCT_COLOR, GUI_Color) \
-	MACRO2REF(STRUCT_ELEMENT, GUI_Element) \
-	MACRO3(STRUCT_RECTANGLE, GUI_Rectangle, GUI_Element) \
-	MACRO2(STRUCT_ANCHOR, GUI_Anchor)
+	MACRO2(STRUCT_COLOR, Color) \
+	MACRO2REF(STRUCT_ELEMENT, Element) \
+	MACRO3(STRUCT_RECTANGLE, Rectangle, Element) \
+	MACRO2(STRUCT_ANCHOR, Anchor)
 
 
 #ifdef CQML_PARSER
@@ -161,13 +171,35 @@ void DefaultDeclaration()
 #endif
 
 #ifndef CQML_PARSER
-    
+	
+namespace CQMLGUI
+{
+#include "context.h"
+	//struct Element : public CQMLObject { 
+	//	Element();
+	//	PROP_FACTORY_DECL_VAR4(Element*, root, 0, "id of the class");
+	/////	PROP_FACTORY_DECL_VAR4(Element*, parent, 0, "id of the class");
+	//PROP_FACTORY_DECL_VAR4(Element**, children, 0, "id of the class");
+	//PROP_FACTORY_DECL_VAR4(int, childrenCount, 0, "id of the class");
+
+	
+	//PROP_FACTORY_DECL_METH3P(int, Left, 0)
+	//PROP_FACTORY_DECL_METHV3P(void, Draw, 0)
+
+	//	STRUCT_ELEMENT(PROP_FACTORY_DECL_VAR4, PROP_FACTORY_DECL_FUNC3P, PROP_FACTORY_DECL_METH3P, PROP_FACTORY_DECL_METHV3P, NOTHING) \
+	//};
+	//MAKE_STRUCTURE2(STRUCT_COLOR, Color)
+	//MAKE_STRUCTURE2(STRUCT_ELEMENT, Element)
 	REGISTRATION(MAKE_STRUCTURE2, MAKE_STRUCTURE2, MAKE_STRUCTURE3)
+
+
     /* user code - register structures for GUI */
 	//MAKE_STRUCTURE2(STRUCT_COLOR, GUI_Color)
 	//MAKE_STRUCTURE2(STRUCT_ELEMENT, GUI_Element)
 	//MAKE_STRUCTURE3(STRUCT_RECTANGLE, GUI_Rectangle, GUI_Element)
 
+// end namspace 
+};
 #endif
 
 #ifdef MEH

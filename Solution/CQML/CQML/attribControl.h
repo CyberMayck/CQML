@@ -8,7 +8,7 @@ typedef union value_type value_type;
 typedef struct AttributeCheck AttributeCheck;
 typedef struct AttributeHash AttributeHash;
 
-typedef struct ClassHashTable;
+typedef struct ClassHashTable ClassHashTable;
 
 typedef struct ClassAttibuteTable ClassAttibuteTable;
 typedef struct Attribute Attibute;

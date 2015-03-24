@@ -1,4 +1,7 @@
-typedef struct GUI_Rootoutput0 GUI_Rootoutput0;
+namespace CQMLGUI
+{
 
-GUI_Rootoutput0* acGUI_Rootoutput0();
+struct Rootoutput0;
 
+Rootoutput0* acGUI_Rootoutput0();
+};

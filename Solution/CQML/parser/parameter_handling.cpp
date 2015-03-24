@@ -400,8 +400,8 @@ void PrintClassTabs(FILE * file, int classCnt)
 		{
 			PropertyAndType& p=defaultClasses[i]->props[k];
 			
-			fprintf(file,"AddAttribute(%d,%d,offsetof(%s,%s),\"%s\",member_size(%s,%s));\n",
-				ind,p.nameHash,p.cont->className.c_str(),p.name.c_str(),p.type.c_str(),p.cont->className.c_str(),p.name.c_str());
+			//fprintf(file,"AddAttribute(%d,%d,offsetof(%s,%s),\"%s\",member_size(%s,%s));\n",
+			//	ind,p.nameHash,p.cont->className.c_str(),p.name.c_str(),p.type.c_str(),p.cont->className.c_str(),p.name.c_str());
 		}
 		ind++;
 	}
@@ -414,8 +414,8 @@ void PrintClassTabs(FILE * file, int classCnt)
 			{
 				PropertyAndType& p=classes[j][i]->props[k];
 			
-				fprintf(file,"AddAttribute(offsetof(%s,%s),\"%s\",member_size(%s,%s));\n",
-					ind,p.nameHash,p.cont->className.c_str(),p.name.c_str(),p.type.c_str(),p.cont->className.c_str(),p.name.c_str());
+				//fprintf(file,"AddAttribute(offsetof(%s,%s),\"%s\",member_size(%s,%s));\n",
+				//	ind,p.nameHash,p.cont->className.c_str(),p.name.c_str(),p.type.c_str(),p.cont->className.c_str(),p.name.c_str());
 			}
 			ind++;
 		}

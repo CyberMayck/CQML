@@ -88,7 +88,7 @@ TableRecord* GetTableRecord(long classID, const char* name)
 //QVGET(_QVar8,"rah3",_QVar9)
 /*int getterE(void * sourceElement, const char* name, UniversalVar& outValue)
 {
-	GUI_Element* element=(GUI_Element*)sourceElement;
+	Element* element=(Element*)sourceElement;
 	long classID = element->classID;
 	// get class ID
 
@@ -108,7 +108,7 @@ TableRecord* GetTableRecord(long classID, const char* name)
 
 int setterE(void * modifiedElement,const char* name,value_type value)
 {
-	GUI_Element* element=(GUI_Element*)modifiedElement;
+	CQMLGUI::Element* element=(CQMLGUI::Element*)modifiedElement;
 	long classID = element->classID;
 	return 1;
 }

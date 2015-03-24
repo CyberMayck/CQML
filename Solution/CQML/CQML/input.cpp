@@ -45,7 +45,7 @@ void unlock()
 
 #include "gui.h"
 
-extern GUI_Element* root;
+extern CQMLGUI::Element* root;
 QMLEventQueue * eventQueue;
 
 QMLEventQueue * MakeQueue()
@@ -114,24 +114,24 @@ QMLEvent PopEvent()
 }
 
 
-extern GUI_Element * lastPressed;
+extern CQMLGUI::Element * lastPressed;
 
 void ProcessMouseEvent(QMLMouseEvent * mouseEvent)
 {
 	switch(mouseEvent->action)
 	{
 	case MOUSE_BUTTON_PRESSED:
-		root->MousePressed(root,mouseEvent->x,mouseEvent->y,mouseEvent->button);
+		root->MousePressed(mouseEvent->x,mouseEvent->y,mouseEvent->button);
 		break;
 	case MOUSE_BUTTON_RELEASED:
-		root->MouseReleased(root,mouseEvent->x,mouseEvent->y,mouseEvent->button);
+		root->MouseReleased(mouseEvent->x,mouseEvent->y,mouseEvent->button);
 		lastPressed=0;
 		break;
 	case MOUSE_WHEEL_SCROLLED:
-		root->MouseScrolled(root,mouseEvent->x,mouseEvent->y,mouseEvent->relativeX,mouseEvent->relativeX);
+		root->MouseScrolled(mouseEvent->x,mouseEvent->y,mouseEvent->relativeX,mouseEvent->relativeX);
 		break;
 	case MOUSE_MOVEMENT:
-		root->MouseMoved(root,mouseEvent->x,mouseEvent->y,mouseEvent->relativeX,mouseEvent->relativeX);
+		root->MouseMoved(mouseEvent->x,mouseEvent->y,mouseEvent->relativeX,mouseEvent->relativeX);
 		break;
 	default:
 		break;

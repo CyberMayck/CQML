@@ -1,48 +1,60 @@
 #include "universal_variable.h"
 
+
 Variant::Variant(int a)
 {
 	value.v_int=a;
+	typeID=TYPE_INT;
 }
 Variant::Variant(long a)
 {
 	value.v_long=a;
+	typeID=TYPE_LONG;
 }
 Variant::Variant(long long a)
 {
 	value.v_long_long=a;
+	typeID=TYPE_LONG_LONG;
 }
 Variant::Variant(unsigned int a)
 {
 	value.v_unsigned_int=a;
+	typeID=TYPE_UNSIGNED_INT;
 }
 Variant::Variant(unsigned long a)
 {
 	value.v_unsigned_long=a;
+	typeID=TYPE_UNSIGNED_LONG;
 }
 Variant::Variant(unsigned long long a)
 {
 	value.v_unsigned_long_long=a;
+	typeID=TYPE_UNSIGNED_LONG_LONG;
 }
 Variant::Variant(float a)
 {
 	value.v_float=a;
+	typeID=TYPE_FLOAT;
 }
 Variant::Variant(double a)
 {
 	value.v_double=a;
+	typeID=TYPE_DOUBLE;
 }
 Variant::Variant(long double a)
 {
 	value.v_long_double=a;
+	typeID=TYPE_LONG_DOUBLE;
 }
 Variant::Variant(void * a)
 {
 	value.v_r_void = a;
+	typeID=TYPE_VOID_PTR;
 }
 Variant::Variant(CQMLObject * a)
 {
 	value.v_r_CQMLObject = a;
+	typeID=TYPE_CQMLOBJECT;
 }
 
 //#include all_constructors
@@ -76,31 +88,31 @@ const Variant Variant::operator##OP (Variant & rhs) const \
 	switch(typeID) \
 	{ \
 	case TYPE_INT: \
-		v.value.v_int=v.value.v_int OP rhs.AS<int>(); \
+		v.value.v_int=v.value.v_int OP rhs.As<int>(); \
 		break; \
 	case TYPE_LONG: \
-		v.value.v_long=v.value.v_long OP rhs.AS<long>(); \
+		v.value.v_long=v.value.v_long OP rhs.As<long>(); \
 		break; \
 	case TYPE_LONG_LONG: \
-		v.value.v_long_long=v.value.v_long_long OP rhs.AS<long long>(); \
+		v.value.v_long_long=v.value.v_long_long OP rhs.As<long long>(); \
 		break; \
 	case TYPE_UNSIGNED_INT: \
-		v.value.v_unsigned_int=v.value.v_unsigned_int OP rhs.AS<unsigned int>(); \
+		v.value.v_unsigned_int=v.value.v_unsigned_int OP rhs.As<unsigned int>(); \
 		break; \
 	case TYPE_UNSIGNED_LONG: \
-		v.value.v_unsigned_long=v.value.v_unsigned_long OP rhs.AS<unsigned long>(); \
+		v.value.v_unsigned_long=v.value.v_unsigned_long OP rhs.As<unsigned long>(); \
 		break; \
 	case TYPE_UNSIGNED_LONG_LONG: \
-		v.value.v_unsigned_long_long=v.value.v_unsigned_long_long OP rhs.AS<unsigned long long>(); \
+		v.value.v_unsigned_long_long=v.value.v_unsigned_long_long OP rhs.As<unsigned long long>(); \
 		break; \
 	case TYPE_FLOAT: \
-		v.value.v_float=v.value.v_float OP rhs.AS<float>(); \
+		v.value.v_float=v.value.v_float OP rhs.As<float>(); \
 		break; \
 	case TYPE_DOUBLE: \
-		v.value.v_double=v.value.v_double OP rhs.AS<double>(); \
+		v.value.v_double=v.value.v_double OP rhs.As<double>(); \
 		break; \
 	case TYPE_LONG_DOUBLE: \
-		v.value.v_long_double=v.value.v_long_double OP rhs.AS<long double>(); \
+		v.value.v_long_double=v.value.v_long_double OP rhs.As<long double>(); \
 		break; \
 	default: \
 		throw 0; \
@@ -117,22 +129,22 @@ const Variant Variant::operator##OP (Variant & rhs) const \
 	switch(typeID) \
 	{ \
 	case TYPE_INT: \
-		v.value.v_int=v.value.v_int OP rhs.AS<int>(); \
+		v.value.v_int=v.value.v_int OP rhs.As<int>(); \
 		break; \
 	case TYPE_LONG: \
-		v.value.v_long=v.value.v_long OP rhs.AS<long>(); \
+		v.value.v_long=v.value.v_long OP rhs.As<long>(); \
 		break; \
 	case TYPE_LONG_LONG: \
-		v.value.v_long_long=v.value.v_long_long OP rhs.AS<long long>(); \
+		v.value.v_long_long=v.value.v_long_long OP rhs.As<long long>(); \
 		break; \
 	case TYPE_UNSIGNED_INT: \
-		v.value.v_unsigned_int=v.value.v_unsigned_int OP rhs.AS<unsigned int>(); \
+		v.value.v_unsigned_int=v.value.v_unsigned_int OP rhs.As<unsigned int>(); \
 		break; \
 	case TYPE_UNSIGNED_LONG: \
-		v.value.v_unsigned_long=v.value.v_unsigned_long OP rhs.AS<unsigned long>(); \
+		v.value.v_unsigned_long=v.value.v_unsigned_long OP rhs.As<unsigned long>(); \
 		break; \
 	case TYPE_UNSIGNED_LONG_LONG: \
-		v.value.v_unsigned_long_long=v.value.v_unsigned_long_long OP rhs.AS<unsigned long long>(); \
+		v.value.v_unsigned_long_long=v.value.v_unsigned_long_long OP rhs.As<unsigned long long>(); \
 		break; \
 	default: \
 		throw 0; \
@@ -157,31 +169,31 @@ const Variant Variant::operator+(Variant & rhs) const
 	switch(typeID)
 	{
 	case TYPE_INT:
-		v.value.v_int=v.value.v_int+rhs.AS<int>();
+		v.value.v_int=v.value.v_int+rhs.As<int>();
 		break;
 	case TYPE_LONG:
-		v.value.v_long=v.value.v_long+rhs.AS<long>();
+		v.value.v_long=v.value.v_long+rhs.As<long>();
 		break;
 	case TYPE_LONG_LONG:
-		v.value.v_long_long=v.value.v_long_long+rhs.AS<long long>();
+		v.value.v_long_long=v.value.v_long_long+rhs.As<long long>();
 		break;
 	case TYPE_UNSIGNED_INT:
-		v.value.v_unsigned_int=v.value.v_unsigned_int+rhs.AS<unsigned int>();
+		v.value.v_unsigned_int=v.value.v_unsigned_int+rhs.As<unsigned int>();
 		break;
 	case TYPE_UNSIGNED_LONG:
-		v.value.v_unsigned_long=v.value.v_unsigned_long+rhs.AS<unsigned long>();
+		v.value.v_unsigned_long=v.value.v_unsigned_long+rhs.As<unsigned long>();
 		break;
 	case TYPE_UNSIGNED_LONG_LONG:
-		v.value.v_unsigned_long_long=v.value.v_unsigned_long_long+rhs.AS<unsigned long long>();
+		v.value.v_unsigned_long_long=v.value.v_unsigned_long_long+rhs.As<unsigned long long>();
 		break;
 	case TYPE_FLOAT:
-		v.value.v_float=v.value.v_float+rhs.AS<float>();
+		v.value.v_float=v.value.v_float+rhs.As<float>();
 		break;
 	case TYPE_DOUBLE:
-		v.value.v_double=v.value.v_double+rhs.AS<double>();
+		v.value.v_double=v.value.v_double+rhs.As<double>();
 		break;
 	case TYPE_LONG_DOUBLE:
-		v.value.v_long_double=v.value.v_long_double+rhs.AS<long double>();
+		v.value.v_long_double=v.value.v_long_double+rhs.As<long double>();
 		break;
 
 	default:

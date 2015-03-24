@@ -117,29 +117,29 @@ void SourceHandler::PushToken(SourceToken * t)
 void ConstructRecursion(SourceTokenContainer * cont, SrcNode * node)
 {
 	bool processChildren=true;
-	if(node->text!=0)
-		cont->PushToken(new SourceStringToken(node));
 	if(node->type==NODE_TYPE_STATM)
 	{
 		SourceStatementToken * sToken=new SourceStatementToken();
 		cont->PushToken(sToken);
 		cont = sToken;
 	}
-	if(node->type==NODE_TYPE_ASSIGN)
+	else if(node->type==NODE_TYPE_ASSIGN)
 	{
 		cont->PushToken(new SourceAssignmentToken(node));
 		processChildren=false;
 	}
-	if(node->type==NODE_TYPE_ID)
+	else if(node->type==NODE_TYPE_ID)
 	{
 		cont->PushToken(new SourceIdToken(node));
 		processChildren=false;
 	}
-	if(node->type==NODE_TYPE_DOT)
+	else if(node->type==NODE_TYPE_DOT)
 	{
 		cont->PushToken(new SourceDotToken(node));
 		processChildren=false;
 	}
+	else if(node->text!=0)
+		cont->PushToken(new SourceStringToken(node));
 
 	if(processChildren)
 	{
@@ -179,31 +179,29 @@ void SourceStringToken::Print(string& dest)
 void SourceStatementToken::Print(string& dest)
 {
 	string s;
-	for(int i=0;i<setGetters.size();i++)
+	/*for(int i=0;i<setGetters.size();i++)
 	{
 		setGetters[i]->Print(s);
-	}
+	}*/
 	dest+=s;
 	for(int i=0;i<tokens.size();i++)
 	{
 		this->tokens[i]->Print(dest);
 	}
-	/*for(int i=0;i<tokens.size();i++)
-	{
-		this->tokens[i]->Print(dest);
-	}*/
 }
 void SourceIdToken::Print(string& dest)
 {
 	//this->
 	if(this->isElement)
 	{
-		dest+="(*((GUI_Rootoutput"+INTTOSTR(this->fileId)+"*)context->root)->"+
+		dest+="(*((CQMLGUI::Rootoutput"+INTTOSTR(this->fileId)+"*)context->root)->"+
 		"_QML_element"+INTTOSTR(this->elementId)+")";
 	}
 	else if(this->isVar)
 	{
-		dest+="_QVar"+INTTOSTR(this->variableId);
+		//dest+="_QVar"+INTTOSTR(this->variableId);
+		dest+="(*((CQMLGUI::Rootoutput"+INTTOSTR(this->fileId)+"*)context->root)->"+
+			"_QML_element"+INTTOSTR(this->elementId)+")."+this->str;
 	}
 	else
 		dest+=str;
@@ -213,7 +211,7 @@ void SourceDotToken::Print(string& dest)
 	//this->
 	if(this->isVarReplaced)
 	{
-		dest+="(*((GUI_Rootoutput"+INTTOSTR(this->fileId)+"*)context->root)->"+
+		dest+="(*((CQMLGUI::Rootoutput"+INTTOSTR(this->fileId)+"*)context->root)->"+
 			"_QML_element"+INTTOSTR(this->variableId)+")";
 		for(int i=0;i<this->isStatic.size();i++)
 		{
@@ -247,6 +245,13 @@ void SourceExprToken::Print(string& dest)
 void SourceAssignmentToken::Print(string& dest)
 {
 	//this->nodes[nodes.size()-1]->Print(dest);
+	this->nodes[0]->Print(dest);
+
+	for(int i=1;i<nodes.size();i++)
+	{
+		dest+=this->ops[i-1].str;
+		this->nodes[i]->Print(dest);
+	}
 	/*this->nodes[0]->Print(dest);
 
 	for(int i=1;i<nodes.size();i++)
@@ -282,6 +287,8 @@ void SourceIdToken::Process(int treeInd, int currentElementId, SourceStatementTo
 {
 	bool isOtherId=idMaps[treeInd].count(this->str)!=0;
 	int curId=currentElementId;
+	isElement=false;
+	isVar=false;
 
 	if(isOtherId)
 	{
@@ -295,8 +302,18 @@ void SourceIdToken::Process(int treeInd, int currentElementId, SourceStatementTo
 			curId=currentElementId;
 			ClassContainer * cont=elements[curId].classContainer;
 			PropertyAndType * prop=cont->CheckExistence(this->str);
-
 			if(prop!=0)
+			{
+		fileId=treeInd;
+		elementId=curId;
+				//this->variableId=curId;
+				//this->isVarReplaced=true;
+				isVar=true;
+			}
+			else
+				return;
+
+			/*if(prop!=0)
 			{
 				//fileId=treeInd;
 				//elementId=curId;
@@ -304,7 +321,7 @@ void SourceIdToken::Process(int treeInd, int currentElementId, SourceStatementTo
 				if(isRightVal)
 				{
 					isVar=true;
-					lastStatement->PushSetGetter(new GetterFromElement(treeInd,curId,this->str,varId));
+			//		lastStatement->PushSetGetter(new GetterFromElement(treeInd,curId,this->str,varId));
 					variableId=varId;
 					varId++;
 				}
@@ -316,7 +333,7 @@ void SourceIdToken::Process(int treeInd, int currentElementId, SourceStatementTo
 			else
 			{
 				// leave alone. might be user's global
-			}
+			}*/
 	}
 }
 
@@ -367,14 +384,14 @@ void SourceDotToken::Process(int treeInd, int currentElementId, SourceStatementT
 				if(prevIsPrimitive)//cont==0)
 				{
 					// error primitive type
-					printf("primitive does doesnt have mmbers");
+					printf("primitive doesnt have members");
 					getchar();
 					exit(0);
 				}
 				//check existence
 				PropertyAndType * prop=cont->CheckExistence(identifiers[i]->GetId());
 
-				if(prop!=0)
+				if(prop==0)
 				{
 					//error does not exist
 				}
@@ -516,8 +533,8 @@ void SourceDotToken::Process(int treeInd, int currentElementId, SourceStatementT
 			}
 		}
 	}
-	this->isVarReplaced=true;
-	this->variableId=varId;
+//	this->isVarReplaced=true;
+//	this->variableId=varId;
 
 }
 
@@ -535,30 +552,26 @@ void SourceExprToken::Process(int treeInd, int currentElementId, SourceStatement
 	{
 		this->tokens[i]->Process(treeInd,currentElementId,lastStatement,isRightVal);
 	}
-	if(isRightVal)
+	/*if(isRightVal)
 	{
 		varId++;
 		isVar=true;
 		variableId=varId;
 		lastStatement->PushSetGetter(new ExprSetter(variableId,this));
-	}
+	}*/
 }
 
 void SourceAssignmentToken::Process(int treeInd, int currentElementId, SourceStatementToken* lastStatement, bool isRightVal)
 {
-	//SrcApendix * ap=node->apendix;
 	nodes[nodes.size()-1]->Process(treeInd, currentElementId,lastStatement, true);
 
 	
-	//printSubnodesToStr(node,expStr);
-	//ap->addExpr(varId,expStr);
-	//varId++;
-
-	lastRightVarId=varId;
+	//lastRightVarId=varId;
 
 	for(int i=nodes.size()-2;i>=0;i--)
 	{
-		nodes[i]->Process(treeInd, currentElementId,lastStatement, false);
+		nodes[i]->Process(treeInd, currentElementId,lastStatement, true);
+		//nodes[i]->Process(treeInd, currentElementId,lastStatement, false);
 	}
 
 }
@@ -610,7 +623,7 @@ string SourceIdToken::GetId()
 void GetterFromElement::Print(string& dest)
 {
 	dest+=string("QEGET(")
-		+"(*((GUI_Rootoutput"+INTTOSTR(fileId)+"*)context->root)->"
+		+"(*((CQMLGUI::Rootoutput"+INTTOSTR(fileId)+"*)context->root)->"
 		+"_QML_element"+INTTOSTR(elementId)+")"
 		+","
 		+"\""+propName+"\""
@@ -635,7 +648,7 @@ void GetterFromVar::Print(string& dest)
 void SetterFromElement::Print(string& dest)
 {
 	dest+=string("QESET(")
-		+"(*((GUI_Rootoutput"+INTTOSTR(fileId)+"*)context->root)->"
+		+"(*((CQMLGUI::Rootoutput"+INTTOSTR(fileId)+"*)context->root)->"
 		+"_QML_element"+INTTOSTR(elementId)+")"
 		+","
 		+"\""+propName+"\""
