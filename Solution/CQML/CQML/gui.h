@@ -28,9 +28,10 @@ struct Component
 
 	void InitGUI();
 
-	CQMLGUI::Element* acGUI_Element();
+	CQMLGUI::Element* acElement();
 
-	CQMLGUI::Rectangle* acGUI_Rectangle();
+	CQMLGUI::Rectangle* acRectangle();
+	CQMLGUI::Text* acText();
 
 
 	void mGUI_Element_InsertChild(CQMLGUI::Element *self,CQMLGUI::Element *child);

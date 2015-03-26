@@ -1,4 +1,4 @@
-#include "universal_variable.h"
+#include "variant.h"
 
 
 Variant::Variant(int a)
@@ -46,6 +46,18 @@ Variant::Variant(long double a)
 	value.v_long_double=a;
 	typeID=TYPE_LONG_DOUBLE;
 }
+Variant::Variant(const char * a)
+{
+	value.v_string=new char[strlen(a)+1];
+	strcpy(value.v_string, a);
+	typeID=TYPE_STRING;
+}
+Variant::Variant(std::string a)
+{
+	value.v_string=new char[a.length()+1];
+	strcpy(value.v_string, a.c_str());
+	typeID=TYPE_STRING;
+}
 Variant::Variant(void * a)
 {
 	value.v_r_void = a;
@@ -56,16 +68,21 @@ Variant::Variant(CQMLObject * a)
 	value.v_r_CQMLObject = a;
 	typeID=TYPE_CQMLOBJECT;
 }
+Variant::~Variant()
+{
+	if(typeID==TYPE_STRING)
+		delete value.v_string;
+}
 
 //#include all_constructors
 #include "CQMLObject.h"
 
-Variant Variant::Get(char * s)
+Variant& Variant::Get(char * s)
 {
 	if(this->typeID!=TYPE_CQMLOBJECT)
 	{
 		throw 0;
-		return 0;
+	//	return 0;
 	}
 	return value.v_r_CQMLObject->Get(s);
 

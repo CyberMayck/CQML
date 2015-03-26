@@ -175,6 +175,8 @@ void SourceHandler::Print(string& dest)
 void SourceStringToken::Print(string& dest)
 {
 	dest+=str;
+	if(str==";")
+		dest+="\n";
 }
 void SourceStatementToken::Print(string& dest)
 {

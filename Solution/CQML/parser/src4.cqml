@@ -4,6 +4,19 @@ Rectangle
 	y : 0;
 	width : 500;
 	height : width;
+	Text
+	{
+		id : outputtxt;
+		x : 5;
+		y : 5;
+		width : parent.width/2-10;
+		height : parent.height/2-10;
+		font.family : "C64.ttf";
+		font.size : 12;
+		text_color.red : 1;
+		text_color.green : 0;
+		text_color.blue : 1;
+	};
 	Rectangle
 	{
 		id : crap;
@@ -11,22 +24,13 @@ Rectangle
 		y : parent.height/2;
 		width : parent.width/2-10;
 		height : parent.height/2-10;
-		property Rectangle refAttempt : refAttempt.rah.hey;
-		property int gammma;
 		MousePressed : 
-		{ 
-		a = 0;
-		refAttempt.rah.hey = refAttempt.rah2.hey2=refAttempt.rah3.hey3 + 8; 
-		
+		{
+			outputtxt.text = "pressed";
 		};
-	};
-	Rectangle
-	{
-		id : nope;
-		x : crap.width+5;
-		y : 5;
-		property int hey : 0;
-		width : parent.width/2-10;
-		height : parent.height-10;
+		MouseReleased : 
+		{
+			outputtxt.text = "released";
+		};
 	};
 }

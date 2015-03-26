@@ -21,9 +21,6 @@
     <ClCompile Include="parser_output.c">
       <Filter>Resource Files</Filter>
     </ClCompile>
-    <ClCompile Include="universal_variable.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="cqml.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -49,6 +46,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="CQMLObject.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="variant.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -88,9 +88,6 @@
     <ClInclude Include="attribControl.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="universal_variable.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="output0.h">
       <Filter>Source Files</Filter>
     </ClInclude>
@@ -98,6 +95,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="output0outer.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="variant.h">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>

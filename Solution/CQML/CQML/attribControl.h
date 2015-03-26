@@ -109,7 +109,7 @@ struct ClassHashTable
 
 int checkAttributeInd(int classInd, int attHash);
 int checkAttributeExistence(int classInd, int attHash);
-void InitClassesSize(int cnt);
+void InitClassesSize(ClassHashTable*& tabs,int cnt);
 void InitAttribCnt(int classInd,int cnt, int parentInd);
 void AddAttribute(int classInd,long nameHash, int offset, char*typeName, int typeSize);
 void InitHashTab(ClassHashTable * tab, int n, int m);

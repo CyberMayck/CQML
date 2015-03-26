@@ -188,7 +188,7 @@ int checkAttributeExistence(int classInd, int attHash)
 	return returnVal;
 }
 
-void InitClassesSize(int cnt)
+void InitClassesSize(ClassHashTable *&classHashTables ,int cnt)
 {
 	classCnt=cnt;
 	classes=(AttributeCheck*)malloc(classCnt*sizeof(AttributeCheck));

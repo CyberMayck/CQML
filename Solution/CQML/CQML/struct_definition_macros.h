@@ -8,7 +8,8 @@
 #endif
 
 #ifndef CQML_PARSER
-
+#include <iostream>
+using namespace std;
 
 #endif
     /* property factory macros */
@@ -21,7 +22,7 @@
 
 	#define PROP_FACTORY_DECL_FUNC3P(t, n, d, ...) t (*n)(__VA_ARGS__); QML_Context n##_context;
 	#define PROP_FACTORY_DECL_METH3P(t, n, d, ...) virtual t n(__VA_ARGS__);
-	#define PROP_FACTORY_DECL_METHV3P(t, n, d, ...) t n(__VA_ARGS__);
+	#define PROP_FACTORY_DECL_METHV3P(t, n, d, ...) virtual t n(__VA_ARGS__);
      
     /* helper functions */
    /* int string_to_int(const char * str, int * outInt) {
@@ -47,6 +48,13 @@
 	F(float, red, 0, "red") \
 	F(float, green, 0, "green") \
 	F(float, blue, 0, "blue") 
+
+#define STRUCT_FONT(MF, F, M, ME, MEV, INHERIT) \
+	F(int, capital, 0, "capital") \
+	F(int, italic, 0, "italic") \
+	F(int, bold, 0, "bold") \
+	F(int, size, 0, "size") \
+	F(string, family, 0, "family")
 	
 
 #define STRUCT_ELEMENT(MF, F, M, ME, MEV, INHERIT) \
@@ -63,19 +71,18 @@
 	ME(int, Left, 0)\
 	MEV(void, Draw, 0) \
 	MEV(void, Update, 0) \
-	M(void, CustomUpdate, 0, Element*) \
 	MEV(int, MousePressed, 0, int, int, int) \
 	MEV(int, MouseReleased, 0, int, int, int) \
 	MEV(int, MouseClicked, 0, int, int, int) \
 	MEV(int, MouseMoved, 0, int, int, int, int) \
 	ME(int, MouseScrolled, 0, int, int, int, int) \
-	M(void, CustomMouseClicked, 0, Element*, QMLEvent) \
-	M(void, CustomMousePressed, 0, Element*, QMLEvent) \
-	M(void, CustomMouseReleased, 0, Element*, QMLEvent) \
-	M(void, CustomMouseMoved, 0, Element*, QMLEvent) \
-	M(void, CustomMouseEntered, 0, Element*, QMLEvent) \
-	M(void, CustomMouseExited, 0, Element*, QMLEvent) \
-	M(void, CustomMouseScrolled, 0, Element*, QMLEvent)
+	M(void, CustomMouseClicked, 0, QML_Context*, QMLEvent) \
+	M(void, CustomMousePressed, 0, QML_Context*, QMLEvent) \
+	M(void, CustomMouseReleased, 0, QML_Context*, QMLEvent) \
+	M(void, CustomMouseMoved, 0, QML_Context*, QMLEvent) \
+	M(void, CustomMouseEntered, 0, QML_Context*, QMLEvent) \
+	M(void, CustomMouseExited, 0, QML_Context*, QMLEvent) \
+	M(void, CustomMouseScrolled, 0, QML_Context*, QMLEvent)
 
 
 
@@ -84,12 +91,28 @@
 #define STRUCT_RECTANGLE(MF, F, M, ME, MEV, INHERIT) \
 	INHERIT(F, M, STRUCT_ELEMENT) \
 	MEV(void, Draw, 0) \
+	MEV(void, Update, 0) \
 	MEV(int, MousePressed, 0, int, int, int) \
 	MEV(int, MouseReleased, 0, int, int, int) \
 	MEV(int, MouseClicked, 0, int, int, int) \
 	MEV(int, MouseMoved, 0, int, int, int, int) \
 	MEV(int, MouseScrolled, 0, int, int, int, int) \
 	F(Color, color, 0, "color")
+
+
+#define STRUCT_TEXT(MF, F, M, ME, MEV, INHERIT)\
+	INHERIT(F, M, STRUCT_RECTANGLE)\
+	MEV(void, Draw, 0) \
+	MEV(void, Update, 0) \
+	F(Color, text_color, 0, "text color")\
+	F(string, text, 0, "text color")\
+	F(Font, font, 0, "font style")
+
+#define STRUCT_TEXT_INPUT(MF, F, M, ME, MEV, INHERIT)\
+	INHERIT(F, M, STRUCT_RECTANGLE)\
+	MEV(void, Update, 0) \
+	MEV(void, Draw, 0) 
+
 
 #define STRUCT_ANCHOR(MF, F, M, ME, MEV, INHERIT) \
 	F(Element*, top, 0, "top anchor") \
@@ -154,9 +177,12 @@
 	REGPRIMITIVE(double)\
 	REGPRIMITIVE(string)\
 	MACRO2(STRUCT_COLOR, Color) \
+	MACRO2(STRUCT_FONT, Font) \
 	MACRO2REF(STRUCT_ELEMENT, Element) \
 	MACRO3(STRUCT_RECTANGLE, Rectangle, Element) \
-	MACRO2(STRUCT_ANCHOR, Anchor)
+	MACRO2(STRUCT_ANCHOR, Anchor) \
+	MACRO3(STRUCT_TEXT, Text, Rectangle) \
+	MACRO3(STRUCT_TEXT_INPUT, TextInput, Text)
 
 
 #ifdef CQML_PARSER

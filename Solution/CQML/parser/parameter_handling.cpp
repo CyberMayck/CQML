@@ -151,6 +151,37 @@ void parserDeclareFunc(const char* , const char* , const char*, const char * s);
 
 ClassContainer * curCont;
 
+
+
+bool PropertyAndType::IsPrimitive()
+{
+	if(primitiveTypeMap.count(type)>0)
+	{
+		return true;
+	}
+}
+ClassContainer* GetClassContainer(string n, int treeInd)
+{
+	if(classMaps[treeInd].count(n)>0)
+	{
+		return classes[treeInd][classMaps[treeInd][n]];
+	}
+	if(defaultClassMap.count(n)>0)
+	{
+		return defaultClasses[defaultClassMap[n]];
+	}
+	return 0;
+}
+
+ClassContainer* GetDefaultClassContainer(string n)
+{
+	if(defaultClassMap.count(n)>0)
+	{
+		return defaultClasses[defaultClassMap[n]];
+	}
+	return 0;
+}
+
 void registerPrimitive(const char* name)
 {
 	string s=string(name);
@@ -163,6 +194,7 @@ PrimitiveType::PrimitiveType(string s)
 {
 	name=s;
 }
+
 
 void registerStruct(const char* name, const char* parent)
 {
@@ -317,6 +349,24 @@ void PrintHashTab(FILE * file, int classID, PerfectHashData * data)
 	}
 	fprintf(file,"\n\n");
 
+}
+
+void InitClassIDs(int classCnt)
+{
+	int classID=0;
+	
+	for(int i=0;i<defaultClasses.size();i++)
+	{
+		defaultClasses[i]->classID=classID++;
+	}
+	for(int j=0;j<classCnt;j++)
+	{
+		for(int i=0;i<classes[j].size();i++)
+		{
+			classes[j][i]->classID=classID++;
+			
+		}
+	}
 }
 
 void PrintClassHashTabs(FILE * file, int classCnt)

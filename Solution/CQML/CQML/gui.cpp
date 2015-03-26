@@ -1,13 +1,17 @@
 #include "gui.h"
 
 
+
+CQMLGUI::Element * focused;
 CQMLGUI::Element * lastPressed;
+
 
 namespace CQMLGUI
 {
 
 Element::Element()
 {
+	classID=2;
 	children=0;
 	parent=0;
 	childrenCount=0;
@@ -35,16 +39,28 @@ Element::Element()
 	//return instance;
 }
 
-Element* acGUI_Element()
+Element* acElement()
 {
+	Element * a;
 	return new Element();
 }
+Text* acText()
+{
+	Text * t=new Text();
+	//Element * e=t;
+	//e->Draw();
+	return t;
+}
+
 
 Color::Color()
 {
 	red=0;
+	red_Update=0;
 	green=0;
+	green_Update=0;
 	blue=0;
+	blue_Update=0;
 }
 
 Rectangle::Rectangle()
@@ -58,14 +74,15 @@ Rectangle::Rectangle()
 	//instance.MouseReleased=mGUI_Rectangle_MouseReleased;
 	//instance.MouseScrolled=mGUI_Rectangle_MouseScrolled;
 	
-	color.red=1.0f;
-	color.green=1.0f;
-	color.blue=1.0f;
+	this->color_Update=0;
+	//color.red=1.0f;
+	//color.green=1.0f;
+	//color.blue=1.0f;
 
 	//return instance;
 }
 
-Rectangle* acGUI_Rectangle()
+Rectangle* acRectangle()
 {
 	return new Rectangle();
 }
@@ -97,11 +114,12 @@ void Element::Update()
 
 	for(i=0;i<childrenCount;i++)
 	{
-		if(children[i]->CustomUpdate!=0)
+		/*if(children[i]->CustomUpdate!=0)
 		{
 			children[i]->CustomUpdate(children[i]);
 		}
-		else children[i]->Update();
+		else */
+			children[i]->Update();
 	}
 	return;
 }
@@ -193,7 +211,7 @@ int Rectangle::MouseClicked(int x, int y,int button)
 	if(x1<x && x<x1+w && y1<y && y<y1+h)
 	{
 		if(CustomMouseClicked!=0)
-			CustomMouseClicked(this, MakeEvent());
+			CustomMouseClicked(&this->CustomMouseClicked_context, MakeEvent());
 			//self->CustomMouseClicked(self,x,y,button);
 		//me->color.r=1;
 		//me->color.g=0;
@@ -228,7 +246,7 @@ int Rectangle::MousePressed(int x, int y, int button)
 	{
 		lastPressed=this;
 		if(CustomMousePressed!=0)
-			CustomMousePressed(this, MakeEvent());
+			CustomMousePressed(&this->CustomMousePressed_context, MakeEvent());
 			//self->CustomMousePressed(self, x, y, button);
 		return 1;
 	}
@@ -253,10 +271,10 @@ int Rectangle::MouseReleased(int x, int y, int button)
 	if(x1<x && x<x1+w && y1<y && y<y1+h)
 	{
 		if(CustomMouseReleased!=0)
-			CustomMouseReleased(this, MakeEvent());
+			CustomMouseReleased(&this->CustomMousePressed_context, MakeEvent());
 			//self->CustomMouseReleased(self, x, y, button);
 		if(lastPressed==this && CustomMouseClicked!=0)
-			CustomMouseClicked(this, MakeEvent());
+			CustomMouseClicked(&this->CustomMouseClicked_context, MakeEvent());
 			//self->CustomMouseClicked(self, x, y, button);
 		return 1;
 	}
@@ -287,11 +305,11 @@ int Rectangle::MouseMoved(int x, int y, int relx, int rely)
 		if(CustomMouseEntered!=0)
 		{
 			if(!(x1<xold && xold<x1+w && y1<yold && yold<y1+h))
-				CustomMouseEntered(this, MakeEvent());
+				CustomMouseEntered(&this->CustomMouseEntered_context, MakeEvent());
 				//self->CustomMouseEntered(self, x, y, relx, rely);
 		}
 		if(CustomMouseMoved!=0)
-			CustomMouseMoved(this, MakeEvent());
+			CustomMouseMoved(&this->CustomMouseMoved_context, MakeEvent());
 			//self->CustomMouseMoved(self, x, y, relx, rely);
 		//return 0;
 	}
@@ -300,7 +318,7 @@ int Rectangle::MouseMoved(int x, int y, int relx, int rely)
 		if(CustomMouseExited!=0)
 		{
 			if(x1<xold && xold<x1+w && y1<yold && yold<y1+h)
-				CustomMouseExited(this, MakeEvent());
+				CustomMouseExited(&this->CustomMouseExited_context, MakeEvent());
 				//self->CustomMouseExited(self, x, y, relx, rely);
 		}
 	}
@@ -324,12 +342,29 @@ int Rectangle::MouseScrolled(int x, int y, int relx, int rely)
 	if(x1<x && x<x1+w && y1<y && y<y1+h)
 	{
 		if(CustomMouseScrolled!=0)
-			CustomMouseScrolled(this, MakeEvent());
+			CustomMouseScrolled(&this->CustomMouseScrolled_context, MakeEvent());
 			//self->CustomMouseScrolled(self, x, y, relx, rely);
 		return 1;
 	}
 
 	return 0;
+}
+void TextInput::Draw()
+{
+}
+
+void Text::Draw()
+{
+	int x,y,w,h;
+	x=Left();
+	y=Top();
+	w=width;
+	h=height;
+
+	drawer->DrawText(x,y,w,h,text.c_str(),font.family.c_str(),this->text_color.red,text_color.green, text_color.blue);
+	
+	//draw kids
+	CQMLGUI::Element::Draw();
 }
 
 

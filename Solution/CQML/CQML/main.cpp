@@ -35,6 +35,13 @@ SDL_Renderer* SDLRenderer;
 TTF_Font *fntCourier;
 SDL_Texture *strTex;
 
+struct SDL_Drawer
+	: DrawIFace
+{
+
+};
+
+
 void SDLInit()
 {
 	SDL_Init(SDL_INIT_EVERYTHING);
@@ -42,7 +49,9 @@ void SDLInit()
 	SDL_CreateWindowAndRenderer(800, 600,SDL_WINDOW_OPENGL,&SDLWindow,&SDLRenderer);
 
 	TTF_Init();
-	fntCourier = TTF_OpenFont( "C64.ttf", 12 );
+	fntCourier = TTF_OpenFont( "c64.ttf", 12 );
+	FILE* f= fopen("c64.ttf","r");
+
 	//Surf_Display = SDL_SetVideoMode(640, 480, 32, SDL_HWSURFACE | SDL_DOUBLEBUF);
 	
 }
@@ -113,11 +122,64 @@ void DrawRectangleFilled(int x,int y,int w,int h,float r, float g, float b)
 
 
 #ifdef USESDL
+struct SDLDrawer
+	: DrawIFace
+{
+	virtual void DrawRectangle(int x,int y,int w,int h,float r, float g, float b)
+	{
+		SDL_Rect sdlRect;
+		sdlRect.x=x;
+		sdlRect.y=y;
+		sdlRect.w=w;
+		sdlRect.h=h;
+	
+		SDL_SetRenderDrawColor(SDLRenderer,r,g,b,255);
+		SDL_RenderDrawRect(SDLRenderer, &sdlRect);
+	}
+	virtual void DrawFilledRectangle(int x,int y,int w,int h,float r, float g, float b)
+	{
+		SDL_Rect sdlRect;
+		sdlRect.x=x;
+		sdlRect.y=y;
+		sdlRect.w=w;
+		sdlRect.h=h;
+	
+		SDL_SetRenderDrawColor(SDLRenderer,r,g,b,255);
+		SDL_RenderFillRect(SDLRenderer, &sdlRect);
+	}
+	virtual void DrawLine(int x1,int y1,int x2,int y2,float r, float g, float b){}
+	virtual void DrawPoint(int x,int y,float r, float g, float b){}
+	virtual void DrawArc(int x,int y,int w,int h, float angle1, float angle2, float r, float g, float b){}
+	virtual void DrawFilledArc(int x,int y,int w,int h, float angle1, float angle2, float r, float g, float b){}
+	virtual void DrawText(int x, int y, int w, int h, const char* text, const char* family, float r, float g, float b)
+	{
+		
+	SDL_Rect sdlRect;
+		sdlRect.x=x;
+		sdlRect.y=y;
+		sdlRect.w=w;
+		sdlRect.h=h;
+
+		SDL_Surface *sText;
+		SDL_Color clrFg = {r*255,g*255,b*255,0};
+		
+		TTF_Font *fnt;
+		//fntCourier = TTF_OpenFont( "C64.ttf", 12 );
+		fnt = TTF_OpenFont( "LeagueGothic-CondensedRegular.otf", 12 );
+		printf("TTF_OpenFont: %s\n", TTF_GetError());
+
+		sText = TTF_RenderText_Solid( fnt, text, clrFg );
+		strTex=SDL_CreateTextureFromSurface(SDLRenderer, sText);
+		SDL_FreeSurface(sText);
+		SDL_RenderCopy(SDLRenderer, strTex, NULL, &sdlRect);
+	}
+};
+
 void InitSDLDrawer()
 {
-	DrawIFace * drawer=(DrawIFace * )malloc(sizeof(DrawIFace));
-	drawer->DrawRectangle=DrawRectangle;
-	drawer->DrawFilledRectangle=DrawRectangleFilled;
+	DrawIFace * drawer=new SDLDrawer();
+//	drawer->DrawRectangle=DrawRectangle;
+//	drawer->DrawFilledRectangle=DrawRectangleFilled;
 	SetDrawIFace(drawer);
 }
 #endif
@@ -234,13 +296,14 @@ void Redraw()
 		root->Draw();
 		//CQMLGUI::mGUI_Element_Draw((CQMLGUI::Element*)root);
 
-
+		/*
 		sprintf(fpsStr,"%d",fps);
+
 		sText = TTF_RenderText_Solid( fntCourier, fpsStr, clrFg );
 		strTex=SDL_CreateTextureFromSurface(SDLRenderer, sText);
 		SDL_FreeSurface(sText);
 		SDL_RenderCopy(SDLRenderer, strTex, NULL, &sdlRect);
-
+		*/
 		SDL_RenderPresent(SDLRenderer);
 }
 
@@ -264,7 +327,7 @@ int main()
 
 	GUIMainLoop();
 #ifdef USESDL
-	while(quit==0 && quit==1)
+	while(quit==0)
 	{
 		SDL_WaitEvent(&sdlEvent);
 		switch (sdlEvent.type)
@@ -276,8 +339,14 @@ int main()
 			printf("pressed %c\n",sdlEvent.key.keysym.sym);
 			break;
 		case SDL_MOUSEBUTTONDOWN:
+			root->MousePressed(sdlEvent.button.x,sdlEvent.button.y,1);
 			printf("mouse click %d %d\n",sdlEvent.button.x,sdlEvent.button.y);
 			break;
+		case SDL_MOUSEBUTTONUP:
+			root->MouseReleased(sdlEvent.button.x,sdlEvent.button.y,1);
+			printf("mouse click %d %d\n",sdlEvent.button.x,sdlEvent.button.y);
+			break;
+
 		}
 		SDL_SetRenderDrawColor(SDLRenderer,255,0,0,255);
 		SDL_RenderClear(SDLRenderer);

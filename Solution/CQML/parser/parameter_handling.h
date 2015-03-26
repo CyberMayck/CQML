@@ -9,6 +9,7 @@ unsigned long CRC32(char * str, unsigned int len);
 int processBasicTypes();
 void PrintClassTabs(FILE * file, int cnt);
 void PrintClassHashTabs(FILE * file, int cnt);
+
 class ClassContainer;
 
 class PropertyAndType
@@ -19,6 +20,7 @@ public:
 	long nameHash;
 	ClassContainer* cont;
 	bool IsReference();
+	bool IsPrimitive();
 };
 
 class HandlerAndType
@@ -61,3 +63,7 @@ public:
 	void AddHandler(HandlerAndType);
 	HandlerAndType* CheckHExistence(string);
 };
+
+
+ClassContainer* GetDefaultClassContainer(string);
+ClassContainer* GetClassContainer(string n, int treeInd);
