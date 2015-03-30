@@ -703,9 +703,14 @@ void makeMainSource()
 				if(parCont->props[j].IsPrimitive())
 				{
 					fprintf(file,"\t%s=%s;\n",parCont->props[j].name.c_str(), parCont->props[j].value.c_str());
-					if(!parCont->props[j].isDefault)
-						fprintf(file,"\t%s_Update=0;\n",parCont->props[j].name.c_str());
 				}
+				else if(parCont->props[j].IsReference())
+				{
+					fprintf(file,"\t%s=%s;\n",parCont->props[j].name.c_str(), parCont->props[j].value.c_str());
+					//fprintf(file,"\t%s_Update=0;\n",parCont->props[j].name.c_str());
+				}
+				if(!parCont->props[j].isDefault)
+					fprintf(file,"\t%s_Update=0;\n",parCont->props[j].name.c_str());
 			}
 			for(int j=0;j<parCont->handlers.size();j++)
 			{
