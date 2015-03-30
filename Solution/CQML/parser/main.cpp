@@ -687,12 +687,32 @@ void makeMainSource()
 	fprintf(file,"\nvoid _QML_Update()\n{\n\troot->Update();\n}\n");
 
 	
+	fprintf(file,"// print default constructors;\n");
 	for(int i=0;i<defaultClasses.size();i++)
 	{
 		ClassContainer * cont =defaultClasses[i];
-		fprintf(file,"QMLGUI::%s::%s()\n{\n",cont->className.c_str(),cont->className.c_str());
+		fprintf(file,"CQMLGUI::%s::%s()\n{\n",cont->className.c_str(),cont->className.c_str());
 		
 		fprintf(file,"\tclassID=%d;\n",cont->classID);
+
+		ClassContainer * parCont=cont;
+		//while(parCont!=0)
+		{
+			for(int j=0;j<parCont->props.size();j++)
+			{
+				if(parCont->props[j].IsPrimitive())
+				{
+					fprintf(file,"\t%s=%s;\n",parCont->props[j].name.c_str(), parCont->props[j].value.c_str());
+					if(!parCont->props[j].isDefault)
+						fprintf(file,"\t%s_Update=0;\n",parCont->props[j].name.c_str());
+				}
+			}
+			for(int j=0;j<parCont->handlers.size();j++)
+			{
+					fprintf(file,"\t%s=0;\n",parCont->handlers[j].name.c_str());
+			}
+			//parCont=parCont->GetAncestor();
+		}
 		
 		fprintf(file,"}\n");
 	}
@@ -1666,6 +1686,7 @@ bool processSrcDots(SrcNode * node, int treeInd,int currentElementId, int graphI
 	{
 		string nam = identifiers[i];
 		PropertyAndType * prop=prevClassCont->CheckExistence(identifiers[i]);
+		/// waaat
 		if(prop!=0)
 		{
 			if(identifiers[i]==std::string("parent"))

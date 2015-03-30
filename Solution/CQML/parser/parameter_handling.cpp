@@ -145,6 +145,7 @@ void registerStruct(const char* name, const char* parent);
 void registerStructRef(const char* name, const char* parent);
 void registerPrimitive(const char* name);
 void parserDeclare(const char* type, const char* name, const char* value);
+void parserDeclareDefault(const char* type, const char* name, const char* value);
 void parserDeclareFunc(const char* , const char* , const char*, const char * s);
 #define CQML_PARSER
 #include "..\CQML\struct_definition_macros.h"
@@ -309,6 +310,21 @@ void parserDeclareFunc(const char* type, const char* name, const char* value, co
 
 }
 
+void parserDeclareDefault(const char* type, const char* name, const char* value)
+{
+	string sType=string(type);
+	string sName=string(name);
+
+	ClassContainer * cont= curCont;
+
+	PropertyAndType temp;
+	temp.name=name;
+	temp.type=type;
+	temp.value=value;
+	temp.isDefault=1;
+
+	cont->AddProp(temp);
+}
 void parserDeclare(const char* type, const char* name, const char* value)
 {
 	string sType=string(type);
@@ -319,6 +335,8 @@ void parserDeclare(const char* type, const char* name, const char* value)
 	PropertyAndType temp;
 	temp.name=name;
 	temp.type=type;
+	temp.value=value;
+	temp.isDefault=0;
 
 	cont->AddProp(temp);
 }
@@ -375,14 +393,14 @@ void PrintClassHashTabs(FILE * file, int classCnt)
 	PerfectHashData * data;
 	
 	fprintf(file,"void InitHashTabs(ClassHashTable * hashTabs)\n{\n");
-	fprintf(file,"ClassHashTable * data;");
+	fprintf(file,"ClassHashTable * data;\n");
 
 	int size=defaultClasses.size();
 	for(int i=0;i<classCnt;i++)
 	{
 		size+=classes[i].size();
 	}
-	fprintf(file,"InitClassesSize(%d);\n\n",size);
+	fprintf(file,"InitClassesSize(hashTabs, %d);\n\n",size);
 
 	
 	PrintClassTabs(file, classCnt);

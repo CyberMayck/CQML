@@ -17,7 +17,9 @@ class PropertyAndType
 public:
 	string type;
 	string name;
+	string value;
 	long nameHash;
+	int isDefault;
 	ClassContainer* cont;
 	bool IsReference();
 	bool IsPrimitive();
