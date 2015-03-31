@@ -9,7 +9,7 @@ struct DrawIFace
 	virtual void DrawPoint(int x,int y,float r, float g, float b)=0;
 	virtual void DrawArc(int x,int y,int w,int h, float angle1, float angle2, float r, float g, float b)=0;
 	virtual void DrawFilledArc(int x,int y,int w,int h, float angle1, float angle2, float r, float g, float b)=0;
-	virtual void DrawText(int x, int y, int w, int h, const char* text, const char* family, float r, float g, float b)=0;
+	virtual void DrawText(int x, int y, int w, int h, const char* text, void* font, float r, float g, float b)=0;
 };
 extern DrawIFace * drawer;
 void SetDrawIFace(DrawIFace * dr);

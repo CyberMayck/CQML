@@ -14,29 +14,49 @@ InternalResourceManager::InternalResourceManager()
 	manager=0;
 }
 
-int InternalResourceManager::TryLoadFont(string txt)
+void InternalResourceManager::LoadImages()
 {
-	if(fonts.count(txt)>0)
+	for(int i=0;i<imageLoadQueue.size();i++)
 	{
+		string &txt=imageLoadQueue[i];
+		if(images.count(txt)>0)
+		{
+		}
+		else
+		{
+			void * image=manager->LoadImage(txt.c_str());
+			images[txt]=image;
+		}
 	}
-	else
+}
+void InternalResourceManager::LoadFonts()
+{
+	for(int i=0;i<fontLoadQueue.size();i++)
 	{
-		void * font=manager->LoadFont(txt.c_str());
-		fonts[txt]=font;
+		string &txt=fontLoadQueue[i];
+		int size=fontSizeLoadQueue[i];
+		string hashStr=txt+"__"+std::to_string(size);
+		if(fonts.count(hashStr)>0)
+		{
+		}
+		else
+		{
+			void * font=manager->LoadFont(txt.c_str(),size);
+			fonts[hashStr]=font;
+		}
 	}
+}
+
+int InternalResourceManager::TryLoadFont(string txt, int size)
+{
+	fontLoadQueue.push_back(txt);
+	fontSizeLoadQueue.push_back(size);
 	return 1;
 }
 
 int InternalResourceManager::TryLoadImage(string path)
 {
-	if(fonts.count(path)>0)
-	{
-	}
-	else
-	{
-		void * img=manager->LoadImage(path.c_str());
-		fonts[path]=img;
-	}
+	imageLoadQueue.push_back(path);
 	return 1;
 }
 

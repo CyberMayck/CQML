@@ -186,39 +186,3 @@ static void Update_E0_x(CQMLGUI::QML_Context *context)
 
  //printElementUpdaters() 
 using namespace CQMLGUI;
-void Rectangle::Update()
-{
-	if(color_Update)color_Update(color_context);
-	else
-	{
-		if(color.red_Update)color.red_Update(color.red_context);
-		if(color.green_Update)color.green_Update(color.green_context);
-		if(color.blue_Update)color.blue_Update(color.blue_context);
-	}
-	 Element::Update();
-}
-void Text::Update()
-{
-	if(text_color_Update)text_color_Update(text_color_context);
-	else
-	{
-		if(text_color.red_Update)text_color.red_Update(text_color.red_context);
-		if(text_color.green_Update)text_color.green_Update(text_color.green_context);
-		if(text_color.blue_Update)text_color.blue_Update(text_color.blue_context);
-	}
-	if(text_Update)text_Update(text_context);
-	if(font_Update)font_Update(font_context);
-	else
-	{
-		if(font.capital_Update)font.capital_Update(font.capital_context);
-		if(font.italic_Update)font.italic_Update(font.italic_context);
-		if(font.bold_Update)font.bold_Update(font.bold_context);
-		if(font.size_Update)font.size_Update(font.size_context);
-		if(font.family_Update)font.family_Update(font.family_context);
-	}
-	 Rectangle::Update();
-}
-void TextInput::Update()
-{
-	 Text::Update();
-}

@@ -1,4 +1,5 @@
 #include "gui.h"
+#include "resource_manager.h"
 
 
 
@@ -8,7 +9,7 @@ CQMLGUI::Element * lastPressed;
 
 namespace CQMLGUI
 {
-
+	/*
 Element::Element()
 {
 	classID=2;
@@ -37,7 +38,7 @@ Element::Element()
 	CustomMouseReleased=0;
 	CustomMouseScrolled=0;
 	//return instance;
-}
+}*/
 
 Element* acElement()
 {
@@ -52,7 +53,7 @@ Text* acText()
 	return t;
 }
 
-
+/*
 Color::Color()
 {
 	red=0;
@@ -61,8 +62,9 @@ Color::Color()
 	green_Update=0;
 	blue=0;
 	blue_Update=0;
-}
+}*/
 
+/*
 Rectangle::Rectangle()
 {
 	//Rectangle instance;
@@ -80,7 +82,7 @@ Rectangle::Rectangle()
 	//color.blue=1.0f;
 
 	//return instance;
-}
+}*/
 
 Rectangle* acRectangle()
 {
@@ -114,12 +116,7 @@ void Element::Update()
 
 	for(i=0;i<childrenCount;i++)
 	{
-		/*if(children[i]->CustomUpdate!=0)
-		{
-			children[i]->CustomUpdate(children[i]);
-		}
-		else */
-			children[i]->Update();
+		children[i]->Update();
 	}
 	return;
 }
@@ -349,8 +346,23 @@ int Rectangle::MouseScrolled(int x, int y, int relx, int rely)
 
 	return 0;
 }
+void TextInput::Init()
+{
+}
+void TextInput::DefaultUpdate()
+{
+}
+
 void TextInput::Draw()
 {
+}
+
+void Text::Init()
+{
+}
+void Text::DefaultUpdate()
+{
+	resourceManager.TryLoadFont(font.family,font.size);
 }
 
 void Text::Draw()
@@ -361,7 +373,8 @@ void Text::Draw()
 	w=width;
 	h=height;
 
-	drawer->DrawText(x,y,w,h,text.c_str(),font.family.c_str(),this->text_color.red,text_color.green, text_color.blue);
+	
+	drawer->DrawText(x,y,w,h,text.c_str(),resourceManager.fonts[font.family+"__"+std::to_string(font.size)],this->text_color.red,text_color.green, text_color.blue);
 	
 	//draw kids
 	CQMLGUI::Element::Draw();

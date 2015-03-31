@@ -35,11 +35,15 @@ SDL_Renderer* SDLRenderer;
 TTF_Font *fntCourier;
 SDL_Texture *strTex;
 
+#include "resource_manager.h"
+
 struct SDL_Drawer
 	: DrawIFace
 {
 
 };
+
+
 
 
 void SDLInit()
@@ -49,8 +53,8 @@ void SDLInit()
 	SDL_CreateWindowAndRenderer(800, 600,SDL_WINDOW_OPENGL,&SDLWindow,&SDLRenderer);
 
 	TTF_Init();
-	fntCourier = TTF_OpenFont( "c64.ttf", 12 );
-	FILE* f= fopen("c64.ttf","r");
+	//fntCourier = TTF_OpenFont( "c64.ttf", 12 );
+	//FILE* f= fopen("c64.ttf","r");
 
 	//Surf_Display = SDL_SetVideoMode(640, 480, 32, SDL_HWSURFACE | SDL_DOUBLEBUF);
 	
@@ -122,6 +126,20 @@ void DrawRectangleFilled(int x,int y,int w,int h,float r, float g, float b)
 
 
 #ifdef USESDL
+
+struct SDLResourceManager
+	: ResourceManagerIface
+{
+	virtual void* LoadFont(char * fontStr, int fontSize)
+	{
+		TTF_Font *fnt = TTF_OpenFont( (string(fontStr)+".otf").c_str(), fontSize );
+		return fnt;
+	}
+	virtual void* LoadImage(char *  path)
+	{
+		return 0;
+	}
+};
 struct SDLDrawer
 	: DrawIFace
 {
@@ -151,25 +169,26 @@ struct SDLDrawer
 	virtual void DrawPoint(int x,int y,float r, float g, float b){}
 	virtual void DrawArc(int x,int y,int w,int h, float angle1, float angle2, float r, float g, float b){}
 	virtual void DrawFilledArc(int x,int y,int w,int h, float angle1, float angle2, float r, float g, float b){}
-	virtual void DrawText(int x, int y, int w, int h, const char* text, const char* family, float r, float g, float b)
+	virtual void DrawText(int x, int y, int w, int h, const char* text, void* font, float r, float g, float b)
 	{
-		
-	SDL_Rect sdlRect;
+
+		SDL_Rect sdlRect;
 		sdlRect.x=x;
 		sdlRect.y=y;
-		sdlRect.w=w;
-		sdlRect.h=h;
+		sdlRect.w=w+10;
+		sdlRect.h=h+100;
 
 		SDL_Surface *sText;
+		SDL_Texture * strTex;
 		SDL_Color clrFg = {r*255,g*255,b*255,0};
 		
-		TTF_Font *fnt;
-		//fntCourier = TTF_OpenFont( "C64.ttf", 12 );
-		fnt = TTF_OpenFont( "LeagueGothic-CondensedRegular.otf", 12 );
-		printf("TTF_OpenFont: %s\n", TTF_GetError());
-
-		sText = TTF_RenderText_Solid( fnt, text, clrFg );
+		TTF_Font *fnt=(TTF_Font *)font;
+		sText = TTF_RenderText_Solid( fntCourier, text, clrFg );
 		strTex=SDL_CreateTextureFromSurface(SDLRenderer, sText);
+		SDL_QueryTexture(strTex, 0, 0, &sdlRect.w, &sdlRect.h);
+		SDL_FreeSurface(sText);
+		SDL_RenderCopy(SDLRenderer, strTex, NULL, &sdlRect);
+
 		SDL_FreeSurface(sText);
 		SDL_RenderCopy(SDLRenderer, strTex, NULL, &sdlRect);
 	}
@@ -285,10 +304,10 @@ void Redraw()
 		allElements[i]->Draw(allElements[i]);
 	}*/
 
-	SDL_Surface *sText;
+	/*SDL_Surface *sText;
 	SDL_Color clrFg = {255,255,255,0};
 	SDL_Rect sdlRect = {700,0,100,100};
-	char fpsStr[100];
+	char fpsStr[100];*/
 
 		SDL_SetRenderDrawColor(SDLRenderer,0,0,0,255);
 		SDL_RenderClear(SDLRenderer);
@@ -304,6 +323,32 @@ void Redraw()
 		SDL_FreeSurface(sText);
 		SDL_RenderCopy(SDLRenderer, strTex, NULL, &sdlRect);
 		*/
+		SDL_Rect sdlRect;
+		sdlRect.x=10;
+		sdlRect.y=10;
+		sdlRect.w=100;
+		sdlRect.h=100;
+
+		SDL_Surface *sText;
+		SDL_Color clrFg = {1*255,1*255,0*255,0};
+		
+		/*TTF_Font *fnt;
+		//fntCourier = TTF_OpenFont( "C64.ttf", 12 );
+		printf("TTF_OpenFont: %s\n", TTF_GetError());
+		fnt = TTF_OpenFont( "LeagueGothic-CondensedRegular.otf", 100 );
+		printf("TTF_OpenFont: %s\n", TTF_GetError());
+		const char *text = "200";
+		sText = TTF_RenderText_Solid( fnt, text, clrFg );
+		printf("TTF_OpenFont: %s\n", TTF_GetError());
+		strTex=SDL_CreateTextureFromSurface(SDLRenderer, sText);
+
+
+		printf("TTF_OpenFont: %s\n", TTF_GetError());
+		SDL_FreeSurface(sText);
+		SDL_RenderCopy(SDLRenderer, strTex, NULL, &sdlRect);*/
+
+
+
 		SDL_RenderPresent(SDLRenderer);
 }
 
@@ -324,6 +369,41 @@ int main()
 	_QML_Init();
 	InitSDLDrawer();
 	//mGUI_Element_Draw((GUI_Element*)root);
+
+
+
+	/*
+
+
+
+	
+	SDL_Rect sdlRect;
+		sdlRect.x=10;
+		sdlRect.y=10;
+		sdlRect.w=100;
+		sdlRect.h=100;
+
+		SDL_Surface *sText;
+		SDL_Color clrFg = {1*255,1*255,0*255,0};
+		
+		TTF_Font *fnt;
+		//fntCourier = TTF_OpenFont( "C64.ttf", 12 );
+		printf("TTF_OpenFont: %s\n", TTF_GetError());
+		fnt = TTF_OpenFont( "LeagueGothic-CondensedRegular.otf", 100 );
+		printf("TTF_OpenFont: %s\n", TTF_GetError());
+		const char *text = "200";
+		sText = TTF_RenderText_Solid( fnt, text, clrFg );
+		printf("TTF_OpenFont: %s\n", TTF_GetError());
+		strTex=SDL_CreateTextureFromSurface(SDLRenderer, sText);
+
+
+		printf("TTF_OpenFont: %s\n", TTF_GetError());
+		SDL_FreeSurface(sText);
+		SDL_RenderCopy(SDLRenderer, strTex, NULL, &sdlRect);
+		SDL_RenderPresent(SDLRenderer);
+		while (true)continue;
+
+	return 0;*/
 
 	GUIMainLoop();
 #ifdef USESDL

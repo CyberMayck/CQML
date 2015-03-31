@@ -14,52 +14,132 @@ void _QML_Init()
 void _QML_Update()
 {
 	root->Update();
-}/*
+}
+// print default constructors;
 CQMLGUI::Color::Color()
 {
 	classID=0;
-}*/
+	red=0;
+	red_Update=0;
+	green=0;
+	green_Update=0;
+	blue=0;
+	blue_Update=0;
+	Init();
+}
 CQMLGUI::Font::Font()
 {
 	classID=1;
+	capital=0;
+	capital_Update=0;
+	italic=0;
+	italic_Update=0;
+	bold=0;
+	bold_Update=0;
+	size=0;
+	size_Update=0;
+	family="";
+	family_Update=0;
+	Init();
 }
-/*CQMLGUI::Element::Element()
+CQMLGUI::Element::Element()
 {
 	classID=2;
-}*/
-/*
+	root=0;
+	parent=0;
+	children=0;
+	childrenCount=0;
+	flags=0;
+	x=0;
+	x_Update=0;
+	y=0;
+	y_Update=0;
+	width=0;
+	width_Update=0;
+	height=0;
+	height_Update=0;
+	CustomMouseClicked=0;
+	CustomMousePressed=0;
+	CustomMouseReleased=0;
+	CustomMouseMoved=0;
+	CustomMouseEntered=0;
+	CustomMouseExited=0;
+	CustomMouseScrolled=0;
+	Init();
+}
 CQMLGUI::Rectangle::Rectangle()
 {
 	classID=3;
-}*/
+	color_Update=0;
+	Init();
+}
 CQMLGUI::Anchor::Anchor()
 {
 	classID=4;
+	top=0;
+	top_Update=0;
+	bottom=0;
+	bottom_Update=0;
+	left=0;
+	left_Update=0;
+	right=0;
+	right_Update=0;
+	Init();
 }
 CQMLGUI::Text::Text()
 {
+	classID=5;
 	text_color_Update=0;
-	
-	text_color.red_Update=0;
-	text_color.green_Update=0;
-	text_color.blue_Update=0;
-	
+	text="";
 	text_Update=0;
 	font_Update=0;
-	font.capital_Update=0;
-	font.italic_Update=0;
-	font.bold_Update=0;
-	font.size_Update=0;
-	font.family_Update=0;
-	classID=5;
+	Init();
 }
 CQMLGUI::TextInput::TextInput()
 {
 	classID=6;
+	Init();
+}
+using namespace CQMLGUI;void Rectangle::Update()
+{
+	if(color_Update)color_Update(color_context);
+	else
+	{
+		if(color.red_Update)color.red_Update(color.red_context);
+		if(color.green_Update)color.green_Update(color.green_context);
+		if(color.blue_Update)color.blue_Update(color.blue_context);
+	}
+	 Element::Update();
+}
+void Text::Update()
+{
+	if(text_color_Update)text_color_Update(text_color_context);
+	else
+	{
+		if(text_color.red_Update)text_color.red_Update(text_color.red_context);
+		if(text_color.green_Update)text_color.green_Update(text_color.green_context);
+		if(text_color.blue_Update)text_color.blue_Update(text_color.blue_context);
+	}
+	if(text_Update)text_Update(text_context);
+	if(font_Update)font_Update(font_context);
+	else
+	{
+		if(font.capital_Update)font.capital_Update(font.capital_context);
+		if(font.italic_Update)font.italic_Update(font.italic_context);
+		if(font.bold_Update)font.bold_Update(font.bold_context);
+		if(font.size_Update)font.size_Update(font.size_context);
+		if(font.family_Update)font.family_Update(font.family_context);
+	}
+	 Rectangle::Update();
+}
+void TextInput::Update()
+{
+	 Text::Update();
 }
 void InitHashTabs(ClassHashTable * hashTabs)
 {
-ClassHashTable * data;InitClassesSize(hashTabs,7);
+ClassHashTable * data;
+InitClassesSize(hashTabs, 7);
 
 
  //PrintClassTabs()
