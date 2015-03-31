@@ -718,9 +718,62 @@ void makeMainSource()
 			}
 			//parCont=parCont->GetAncestor();
 		}
+		fprintf(file,"\tInit();\n");
 		
 		fprintf(file,"}\n");
 	}
+	
+	fprintf(file, "using namespace CQMLGUI;\n");
+	for(int i=0;i<defaultClasses.size();i++)
+		{
+			ClassContainer * cont=defaultClasses[i];
+			ClassContainer * parentCont=cont->GetAncestor();
+			if(defaultClasses[i]->isReferencable && parentCont)
+			{
+				fprintf(file, "void %s::Update()\n{\n",cont->className.c_str());
+				
+				for(int j=0;j<cont->props.size();j++)
+				{
+					PropertyAndType * prop = &cont->props[j];
+					if(prop->IsPrimitive())
+					{
+						fprintf(file, "\tif(%s_Update)%s_Update",prop->name.c_str(),prop->name.c_str());
+						fprintf(file, "(%s_context);\n",prop->name.c_str()); 
+					}
+					else
+					{
+						ClassContainer * tCont=GetDefaultClassContainer(prop->type);
+						if(tCont->isReferencable)
+						{
+							fprintf(file, "\tif(%s_Update)%s_Update",prop->name.c_str(),prop->name.c_str());
+							fprintf(file, "(%s_context);\n",prop->name.c_str()); 
+						}
+						else
+						{
+							// non referencable struct
+							fprintf(file, "\tif(%s_Update)%s_Update",prop->name.c_str(),prop->name.c_str());
+							fprintf(file, "(%s_context);\n",prop->name.c_str()); 
+							fprintf(file, "\telse\n\t{\n");
+
+							for(int k=0;k<tCont->props.size();k++)
+							{
+								const char * tName=tCont->props[k].name.c_str();
+								fprintf(file, "\t\tif(%s.%s_Update)%s.%s_Update",prop->name.c_str(),tName,prop->name.c_str(),tName);
+								fprintf(file, "(%s.%s_context);\n",prop->name.c_str(),tName); 
+							}
+
+							fprintf(file, "\t}\n");
+				
+						}
+					}
+				}
+
+
+				fprintf(file, "\t %s::Update();\nDefaultUpdate();\n",parentCont->className.c_str());
+				fprintf(file, "}\n");
+				//fprintf(file_class_source, "void %s::Update()\n{\n",cont->className.c_str());
+			}
+		}
 
 	
 	PrintClassHashTabs(file,elementTreeCnt);
@@ -801,56 +854,7 @@ void printElementUpdaters()
 			fprintf(file_class_source, "}\n",i);
 		}
 		
-		for(int i=0;i<defaultClasses.size();i++)
-		{
-			ClassContainer * cont=defaultClasses[i];
-			ClassContainer * parentCont=cont->GetAncestor();
-			if(defaultClasses[i]->isReferencable && parentCont)
-			{
-				fprintf(file_class_source, "void %s::Update()\n{\n",cont->className.c_str());
-				
-				for(int j=0;j<cont->props.size();j++)
-				{
-					PropertyAndType * prop = &cont->props[j];
-					if(prop->IsPrimitive())
-					{
-						fprintf(file_class_source, "\tif(%s_Update)%s_Update",prop->name.c_str(),prop->name.c_str());
-						fprintf(file_class_source, "(%s_context);\n",prop->name.c_str()); 
-					}
-					else
-					{
-						ClassContainer * tCont=GetDefaultClassContainer(prop->type);
-						if(tCont->isReferencable)
-						{
-							fprintf(file_class_source, "\tif(%s_Update)%s_Update",prop->name.c_str(),prop->name.c_str());
-							fprintf(file_class_source, "(%s_context);\n",prop->name.c_str()); 
-						}
-						else
-						{
-							// non referencable struct
-							fprintf(file_class_source, "\tif(%s_Update)%s_Update",prop->name.c_str(),prop->name.c_str());
-							fprintf(file_class_source, "(%s_context);\n",prop->name.c_str()); 
-							fprintf(file_class_source, "\telse\n\t{\n");
-
-							for(int k=0;k<tCont->props.size();k++)
-							{
-								const char * tName=tCont->props[k].name.c_str();
-								fprintf(file_class_source, "\t\tif(%s.%s_Update)%s.%s_Update",prop->name.c_str(),tName,prop->name.c_str(),tName);
-								fprintf(file_class_source, "(%s.%s_context);\n",prop->name.c_str(),tName); 
-							}
-
-							fprintf(file_class_source, "\t}\n");
-				
-						}
-					}
-				}
-
-
-				fprintf(file_class_source, "\t %s::Update();\n",parentCont->className.c_str());
-				fprintf(file_class_source, "}\n",i);
-				//fprintf(file_class_source, "void %s::Update()\n{\n",cont->className.c_str());
-			}
-		}
+		
 	}
 }
 
