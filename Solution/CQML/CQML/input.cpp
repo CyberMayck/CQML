@@ -1,9 +1,12 @@
+#include "dll_export.h"
+
+
 #include "input.h"
 #include "gui.h"
 
 #define WIN32
-
 #include <stdlib.h>
+
 #ifdef WIN32
 #include<windows.h>
  #include <stdio.h>

@@ -3,6 +3,7 @@
 #include "qml_includes.h"
 void _QML_Update();
 void _QML_ClassTabsInit();
+void _QML_Draw();
 CQMLGUI::Element* root;
 
 void _QML_Init()
@@ -13,7 +14,16 @@ void _QML_Init()
 
 void _QML_Update()
 {
+	CQMLGUI::PreUpdate();
 	root->Update();
+	CQMLGUI::PostUpdate();
+}
+
+void _QML_Draw()
+{
+	CQMLGUI::PreDraw();
+	root->Update();
+	CQMLGUI::PostDraw();
 }
 // print default constructors;
 CQMLGUI::Color::Color()
@@ -100,7 +110,192 @@ CQMLGUI::TextInput::TextInput()
 	classID=6;
 	Init();
 }
-using namespace CQMLGUI;void Rectangle::Update()
+Variant CQMLGUI::Color::Get(const char* s)
+{
+	int hash=GetHash(classID,s);
+	if(hash<0) return Variant(0);
+	switch(hash)
+	{
+	case 0:
+		return Variant(red);
+	case 1:
+		return Variant(green);
+	case 2:
+		return Variant(blue);
+	default: break;
+	}
+	return Variant(0);
+}
+Variant CQMLGUI::Font::Get(const char* s)
+{
+	int hash=GetHash(classID,s);
+	if(hash<0) return Variant(0);
+	switch(hash)
+	{
+	case 0:
+		return Variant(capital);
+	case 1:
+		return Variant(italic);
+	case 2:
+		return Variant(bold);
+	case 3:
+		return Variant(size);
+	case 4:
+		return Variant(family);
+	default: break;
+	}
+	return Variant(0);
+}
+Variant CQMLGUI::Element::Get(const char* s)
+{
+	int hash=GetHash(classID,s);
+	if(hash<0) return Variant(0);
+	switch(hash)
+	{
+	case 0:
+		return Variant(&root);
+	case 1:
+		return Variant(&parent);
+	case 2:
+		return Variant(&children);
+	case 3:
+		return Variant(childrenCount);
+	case 4:
+		return Variant(flags);
+	case 5:
+		return Variant(x);
+	case 6:
+		return Variant(y);
+	case 7:
+		return Variant(width);
+	case 8:
+		return Variant(height);
+	default: break;
+	}
+	return Variant(0);
+}
+Variant CQMLGUI::Rectangle::Get(const char* s)
+{
+	int hash=GetHash(classID,s);
+	if(hash<0) return Variant(0);
+	switch(hash)
+	{
+	case 0:
+		return Variant(&color);
+	case 1:
+		return Variant(&root);
+	case 2:
+		return Variant(&parent);
+	case 3:
+		return Variant(&children);
+	case 4:
+		return Variant(childrenCount);
+	case 5:
+		return Variant(flags);
+	case 6:
+		return Variant(x);
+	case 7:
+		return Variant(y);
+	case 8:
+		return Variant(width);
+	case 9:
+		return Variant(height);
+	default: break;
+	}
+	return Variant(0);
+}
+Variant CQMLGUI::Anchor::Get(const char* s)
+{
+	int hash=GetHash(classID,s);
+	if(hash<0) return Variant(0);
+	switch(hash)
+	{
+	case 0:
+		return Variant(&top);
+	case 1:
+		return Variant(&bottom);
+	case 2:
+		return Variant(&left);
+	case 3:
+		return Variant(&right);
+	default: break;
+	}
+	return Variant(0);
+}
+Variant CQMLGUI::Text::Get(const char* s)
+{
+	int hash=GetHash(classID,s);
+	if(hash<0) return Variant(0);
+	switch(hash)
+	{
+	case 0:
+		return Variant(&text_color);
+	case 1:
+		return Variant(text);
+	case 2:
+		return Variant(&font);
+	case 3:
+		return Variant(&color);
+	case 4:
+		return Variant(&root);
+	case 5:
+		return Variant(&parent);
+	case 6:
+		return Variant(&children);
+	case 7:
+		return Variant(childrenCount);
+	case 8:
+		return Variant(flags);
+	case 9:
+		return Variant(x);
+	case 10:
+		return Variant(y);
+	case 11:
+		return Variant(width);
+	case 12:
+		return Variant(height);
+	default: break;
+	}
+	return Variant(0);
+}
+Variant CQMLGUI::TextInput::Get(const char* s)
+{
+	int hash=GetHash(classID,s);
+	if(hash<0) return Variant(0);
+	switch(hash)
+	{
+	case 0:
+		return Variant(&text_color);
+	case 1:
+		return Variant(text);
+	case 2:
+		return Variant(&font);
+	case 3:
+		return Variant(&color);
+	case 4:
+		return Variant(&root);
+	case 5:
+		return Variant(&parent);
+	case 6:
+		return Variant(&children);
+	case 7:
+		return Variant(childrenCount);
+	case 8:
+		return Variant(flags);
+	case 9:
+		return Variant(x);
+	case 10:
+		return Variant(y);
+	case 11:
+		return Variant(width);
+	case 12:
+		return Variant(height);
+	default: break;
+	}
+	return Variant(0);
+}
+using namespace CQMLGUI;
+void Rectangle::Update()
 {
 	if(color_Update)color_Update(color_context);
 	else
@@ -110,6 +305,7 @@ using namespace CQMLGUI;void Rectangle::Update()
 		if(color.blue_Update)color.blue_Update(color.blue_context);
 	}
 	 Element::Update();
+DefaultUpdate();
 }
 void Text::Update()
 {
@@ -131,10 +327,12 @@ void Text::Update()
 		if(font.family_Update)font.family_Update(font.family_context);
 	}
 	 Rectangle::Update();
+DefaultUpdate();
 }
 void TextInput::Update()
 {
 	 Text::Update();
+DefaultUpdate();
 }
 void InitHashTabs(ClassHashTable * hashTabs)
 {

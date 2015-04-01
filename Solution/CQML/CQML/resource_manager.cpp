@@ -1,3 +1,5 @@
+#include "dll_export.h"
+
 #include "resource_manager.h"
 
 using namespace std;

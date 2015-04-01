@@ -143,6 +143,7 @@ using namespace std;
 #define MAKE_STRUCTURE2(MACRO, NAME) \
 	struct NAME : public CQMLObject { \
 		NAME();\
+		virtual Variant Get(const char*);\
 		MACRO(PROP_FACTORY_DECL_MVAR4, PROP_FACTORY_DECL_VAR4, PROP_FACTORY_DECL_FUNC3P, PROP_FACTORY_DECL_METH3P, PROP_FACTORY_DECL_METHV3P, NOTHING) \
 	}; \
 
@@ -150,6 +151,7 @@ using namespace std;
 #define MAKE_STRUCTURE3(MACRO, NAME, PARENT) \
 	struct NAME : public PARENT { \
 		NAME();\
+		virtual Variant Get(const char*);\
 		MACRO(PROP_FACTORY_DECL_MVAR4, PROP_FACTORY_DECL_VAR4, PROP_FACTORY_DECL_FUNC3P, PROP_FACTORY_DECL_METH3P, PROP_FACTORY_DECL_METHV3P, NOTHING) \
 	}; \
      

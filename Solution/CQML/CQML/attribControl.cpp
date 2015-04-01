@@ -1,3 +1,5 @@
+#include "dll_export.h"
+
 #include "attribControl.h"
 //#include "struct_definition_macros.h"
 #include "gui.h"
@@ -70,6 +72,20 @@ TableRecord* GetTableRecord(long classID, const char* name)
 	else
 	{
 		return 0;
+	}
+}
+
+int GetHash(long classID, const char* name)
+{
+	ClassHashTable * hashTab=&classHashTables[classID];
+	int index= h(name,hashTab->n,hashTab->m,hashTab->T1,hashTab->T2,hashTab->g);
+	if(strcmp(hashTab->keys[index],name)==0)
+	{
+		return index;
+	}
+	else
+	{
+		return -1;
 	}
 }
 

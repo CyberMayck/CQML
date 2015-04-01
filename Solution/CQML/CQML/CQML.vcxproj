@@ -89,7 +89,6 @@
     <ClCompile Include="context.cpp" />
     <ClCompile Include="cqml.cpp" />
     <ClCompile Include="CQMLObject.cpp" />
-    <ClCompile Include="dependance.cpp" />
     <ClCompile Include="gui.cpp" />
     <ClCompile Include="input.cpp" />
     <ClCompile Include="main.cpp" />
@@ -111,6 +110,7 @@
     <ClInclude Include="custom_classes.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </ClInclude>
+    <ClInclude Include="dll_export.h" />
     <ClInclude Include="draw_iface.h" />
     <ClInclude Include="gui.h" />
     <ClInclude Include="input.h" />

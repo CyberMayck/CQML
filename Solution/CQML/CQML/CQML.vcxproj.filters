@@ -30,9 +30,6 @@
     <ClCompile Include="attribControl.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="dependance.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="gui.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -64,31 +61,10 @@
     <ClInclude Include="custom_classes.h">
       <Filter>Resource Files</Filter>
     </ClInclude>
-    <ClInclude Include="gui.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="draw_iface.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="input.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="cqml.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="qml_includes.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="output2.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="context.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="struct_definition_macros.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="attribControl.h">
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="output0.h">
@@ -100,11 +76,35 @@
     <ClInclude Include="output0outer.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="variant.h">
-      <Filter>Source Files</Filter>
+    <ClInclude Include="cqml.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="attribControl.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="context.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="dll_export.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="draw_iface.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="qml_includes.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="resource_manager.h">
-      <Filter>Source Files</Filter>
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="input.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="gui.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="variant.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

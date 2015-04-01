@@ -130,12 +130,12 @@ void DrawRectangleFilled(int x,int y,int w,int h,float r, float g, float b)
 struct SDLResourceManager
 	: ResourceManagerIface
 {
-	virtual void* LoadFont(char * fontStr, int fontSize)
+	virtual void* LoadFont(const char * fontStr, int fontSize)
 	{
-		TTF_Font *fnt = TTF_OpenFont( (string(fontStr)+".otf").c_str(), fontSize );
+		TTF_Font *fnt = TTF_OpenFont( (string(fontStr)+".ttf").c_str(), fontSize );
 		return fnt;
 	}
-	virtual void* LoadImage(char *  path)
+	virtual void* LoadImage(const char *  path)
 	{
 		return 0;
 	}
@@ -175,20 +175,22 @@ struct SDLDrawer
 		SDL_Rect sdlRect;
 		sdlRect.x=x;
 		sdlRect.y=y;
-		sdlRect.w=w+10;
-		sdlRect.h=h+100;
+		sdlRect.w=w;
+		sdlRect.h=h;
 
 		SDL_Surface *sText;
 		SDL_Texture * strTex;
 		SDL_Color clrFg = {r*255,g*255,b*255,0};
 		
 		TTF_Font *fnt=(TTF_Font *)font;
-		sText = TTF_RenderText_Solid( fntCourier, text, clrFg );
+		if(!font)
+			return;
+		sText = TTF_RenderText_Solid( fnt, text, clrFg );
 		strTex=SDL_CreateTextureFromSurface(SDLRenderer, sText);
 		SDL_QueryTexture(strTex, 0, 0, &sdlRect.w, &sdlRect.h);
-		SDL_FreeSurface(sText);
 		SDL_RenderCopy(SDLRenderer, strTex, NULL, &sdlRect);
-
+		
+		printf("TTF_OpenFont: %s\n", TTF_GetError());
 		SDL_FreeSurface(sText);
 		SDL_RenderCopy(SDLRenderer, strTex, NULL, &sdlRect);
 	}
@@ -201,6 +203,13 @@ void InitSDLDrawer()
 //	drawer->DrawFilledRectangle=DrawRectangleFilled;
 	SetDrawIFace(drawer);
 }
+
+void InitSDLResourceManager()
+{
+	ResourceManagerIface * man= new SDLResourceManager();
+	SetResourceManager(man);
+}
+
 #endif
 
 //GUI_Element ** drawQueue;
@@ -323,6 +332,7 @@ void Redraw()
 		SDL_FreeSurface(sText);
 		SDL_RenderCopy(SDLRenderer, strTex, NULL, &sdlRect);
 		*/
+
 		SDL_Rect sdlRect;
 		sdlRect.x=10;
 		sdlRect.y=10;
@@ -366,8 +376,9 @@ int main()
 		return 0;
 #endif
 	InitQML();
-	_QML_Init();
 	InitSDLDrawer();
+	InitSDLResourceManager();
+	_QML_Init();
 	//mGUI_Element_Draw((GUI_Element*)root);
 
 

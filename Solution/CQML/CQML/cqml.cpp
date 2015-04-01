@@ -1,3 +1,5 @@
+#include "dll_export.h"
+
 #include "cqml.h"
 #include "gui.h"
 #include "input.h"

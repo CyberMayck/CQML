@@ -1,3 +1,5 @@
+#include "dll_export.h"
+
 #include "gui.h"
 #include "resource_manager.h"
 
@@ -419,6 +421,21 @@ void Rectangle::Draw()
 
 	//draw kids
 	CQMLGUI::Element::Draw();
+}
+
+void PreUpdate()
+{
+}
+void PostUpdate()
+{
+	resourceManager.LoadFonts();
+	resourceManager.LoadImages();
+}
+void PreDraw()
+{
+}
+void PostDraw()
+{
 }
 
 void mGUI_Element_InsertChild(Element *self,Element *child)

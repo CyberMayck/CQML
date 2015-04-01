@@ -23,7 +23,10 @@ struct Component
 	//CQMLGUI::Element ** members;
 };
 
-
+	void PreUpdate();
+	void PostUpdate();
+	void PreDraw();
+	void PostDraw();
 
 
 	void InitGUI();

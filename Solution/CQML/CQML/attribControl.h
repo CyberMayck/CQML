@@ -1,19 +1,9 @@
 #pragma once
 
+
 #include <string.h>
 #include <stdlib.h>
 
-typedef union value_type value_type;
-
-typedef struct AttributeCheck AttributeCheck;
-typedef struct AttributeHash AttributeHash;
-
-typedef struct ClassHashTable ClassHashTable;
-
-typedef struct ClassAttibuteTable ClassAttibuteTable;
-typedef struct Attribute Attibute;
-
-typedef struct TableRecord TableRecord;
 
 struct ClassAttibuteTable
 {
@@ -114,3 +104,5 @@ void InitAttribCnt(int classInd,int cnt, int parentInd);
 void AddAttribute(int classInd,long nameHash, int offset, char*typeName, int typeSize);
 void InitHashTab(ClassHashTable * tab, int n, int m);
 void QMLInitHashes();
+
+int GetHash(long classID, const char* name);

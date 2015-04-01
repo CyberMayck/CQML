@@ -38,6 +38,7 @@ static void Update_E1_width(CQMLGUI::QML_Context *);
 static void Update_E1_height(CQMLGUI::QML_Context *);
 static void Update_E1_font_family(CQMLGUI::QML_Context *);
 static void Update_E1_font_size(CQMLGUI::QML_Context *);
+static void Update_E1_text(CQMLGUI::QML_Context *);
 static void Update_E1_text_color_red(CQMLGUI::QML_Context *);
 static void Update_E1_text_color_green(CQMLGUI::QML_Context *);
 static void Update_E1_text_color_blue(CQMLGUI::QML_Context *);
@@ -84,6 +85,8 @@ CQMLGUI::Rootoutput0::Rootoutput0()
 	((Text*)_QML_element1)->font.family_Update  = Update_E1_font_family;
 	((Text*)_QML_element1)->font.size_context  = acQML_Context((CQMLGUI::Component*)this,(CQMLGUI::Element*)(_QML_element1));
 	((Text*)_QML_element1)->font.size_Update  = Update_E1_font_size;
+	((Text*)_QML_element1)->text_context  = acQML_Context((CQMLGUI::Component*)this,(CQMLGUI::Element*)_QML_element1);
+	((Text*)_QML_element1)->text_Update  = Update_E1_text;
 	((Text*)_QML_element1)->text_color.red_context  = acQML_Context((CQMLGUI::Component*)this,(CQMLGUI::Element*)(_QML_element1));
 	((Text*)_QML_element1)->text_color.red_Update  = Update_E1_text_color_red;
 	((Text*)_QML_element1)->text_color.green_context  = acQML_Context((CQMLGUI::Component*)this,(CQMLGUI::Element*)(_QML_element1));
@@ -143,13 +146,17 @@ static void Update_E1_text_color_red(CQMLGUI::QML_Context *context)
 {
 	((CQMLGUI::Text*)context->self)->text_color.red=1;
 }
+static void Update_E1_text(CQMLGUI::QML_Context *context)
+{
+	((CQMLGUI::Text*)context->self)->text="You win";
+}
 static void Update_E1_font_size(CQMLGUI::QML_Context *context)
 {
 	((CQMLGUI::Text*)context->self)->font.size=12;
 }
 static void Update_E1_font_family(CQMLGUI::QML_Context *context)
 {
-	((CQMLGUI::Text*)context->self)->font.family="C64.ttf";
+	((CQMLGUI::Text*)context->self)->font.family="LeagueGothic-CondensedRegular";
 }
 static void Update_E1_height(CQMLGUI::QML_Context *context)
 {
