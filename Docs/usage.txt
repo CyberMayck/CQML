@@ -1,0 +1,52 @@
+1. Using Parser:
+1.1	Command Line
+	parser application takes one parameter which is the name of root .cqml file
+	example:
+		parser.exe "src4.cqml"
+		
+1.2	Output files
+	parser aplication outputs following files:
+	parser_output.cpp	- source file
+	parser_output.h 	- header file containing headers of generated functions for communication with GUI
+	outputX.cpp 		- source file for a component
+	outputX.h			- header file for use in outputX.cpp
+	outputXouter.h		- header file used in other components
+		- where X is a number, there can be more such files - one for each parsed component file
+
+
+2. Using Library
+2.1	Compilation
+	Use DLL and lib files generated from building CQML_DLL project to compile test aplication
+
+2.2	Input handling
+
+2.3	Drawing Interface
+
+
+
+3. Adding new built-in Types:
+3.1	Registeration of primitive types:
+	Add new line into  #define REGISTRATION(MACRO2, MACRO2REF, MACRO3) \
+		REGPRIMITIVE(type_name)\
+	
+3.2	Creating new composite type:
+		create new macro
+	#define MACRO_NAME(MF, F, M, ME, MEV, INHERIT) \
+	
+	Register new type:
+	Add new line into macro  #define REGISTRATION(MACRO2, MACRO2REF, MACRO3) \
+	MACRO2(MACRO_NAME, type_name) \
+	
+		
+3.3	Create type which inherits from another composite type:
+	
+	#define MACRO_NAME(MF, F, M, ME, MEV, INHERIT) \
+		INHERIT(F, M, PARENT_MACRO_NAME) \
+	
+	
+	Register new type:
+	Add new line into macro  #define REGISTRATION(MACRO2, MACRO2REF, MACRO3)
+	MACRO3(MACRO_NAME, type_name, parent_type_name) \
+	
+	
+
