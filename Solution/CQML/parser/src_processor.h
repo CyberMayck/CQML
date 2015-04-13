@@ -15,6 +15,7 @@ class SourceToken
 {
 public:
 	virtual void Print(string&)=0;
+	virtual void PrintZeroUpdaters(string&);
 	virtual void Process(int , int , SourceStatementToken*, bool);
 };
 class SourceTokenContainer
@@ -65,6 +66,7 @@ public:
 	string GetId();
 	void Print(string&);
 	void Process(int , int , SourceStatementToken*, bool);
+	virtual void PrintZeroUpdaters(string& dest);
 };
 
 class SourceDotToken : public SourceToken
@@ -81,6 +83,7 @@ public:
 	void PushIdToken(SourceIdToken *);
 	void Print(string&);
 	void Process(int , int , SourceStatementToken*, bool);
+	virtual void PrintZeroUpdaters(string& dest);
 };
 class SourceExprToken: public SourceToken, public SourceTokenContainer
 {
@@ -92,6 +95,7 @@ public:
 	void PushToken(SourceToken *);
 	void Print(string&);
 	void Process(int , int , SourceStatementToken*, bool);
+	virtual void PrintZeroUpdaters(string& dest);
 };
 
 class SourceAssignmentToken : public SourceToken

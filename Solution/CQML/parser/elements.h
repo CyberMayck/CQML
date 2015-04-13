@@ -24,6 +24,13 @@ public:
 	std::string path;
 	int treeInd;
 };
+class GUIInclude
+{
+public:
+	GUIInclude();
+	std::string path;
+	int treeInd;
+};
 
 class GraphNode
 {

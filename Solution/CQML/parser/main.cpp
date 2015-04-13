@@ -36,6 +36,8 @@ std::vector<GraphNode*> graphNodes;
 std::unordered_map<std::string, bool> importsProcessed;
 std::vector<GUIImport> imports;
 
+std::vector<GUIInclude> includes;
+
 int importCnt=0;
 
 // path to fileIndex
@@ -143,7 +145,7 @@ void PrintNode(SrcNode* node)
 
 void printHandlerAssignment()
 {
-	fprintf(file_class_source, "//printHandlerAssignment()");
+	fprintf(file_class_source, "//printHandlerAssignment()\n");
 	int i;
 
 	int currentId;
@@ -161,6 +163,7 @@ void printHandlerAssignment()
 					continue;
 				}
 				fprintf(file_class_source, "\t_QML_element%d->Custom%s=_QML_element%d_%s;\n",i,handler->name,i,handler->name);
+				fprintf(file_class_source, "\t_QML_element%d->Custom%s_context=acQML_Context((CQMLGUI::Component*)this,(CQMLGUI::Element*)_QML_element%d);\n",i,handler->name,i);
 			}
 		}
 	}
@@ -186,7 +189,7 @@ void printHandlers()
 				{
 					continue;
 				}
-				fprintf(file_class_source, "static void _QML_element%d_%s(CQMLGUI::QML_Context * context, QMLEvent Event)\n{\n",i,handler->name);
+				fprintf(file_class_source, "static void _QML_element%d_%s(CQMLGUI::QML_Context * context, CQMLGUI::QMLEvent Event)\n{\n",i,handler->name);
 				
 				string hSrc;
 				handler->source->Print(hSrc);
@@ -318,7 +321,7 @@ void classDeclaration(const char* rootName, int treeInd)
 	}
 
 	// constructors
-	for(int i=0;i<elementCount;i++)
+	/*for(int i=0;i<elementCount;i++)
 	{
 		if(!elements[i].hasCustomClass)
 			continue;
@@ -329,8 +332,44 @@ void classDeclaration(const char* rootName, int treeInd)
 		
 
 		fprintf(file_class_source,"}\n");
-	}
+	}*/
+	for(int i=0;i<classes[treeInd].size();i++)
+	{
+		fprintf(file_class_source,"CQMLGUI::%s::%s()\n{\n",classes[treeInd][i]->className,classes[treeInd][i]->className);
+		
+		fprintf(file_class_source,"\tclassID=%d;\n",classes[treeInd][i]->classID);
+		
 
+		fprintf(file_class_source,"}\n");
+	}
+	
+	for(int i=0;i<classes[treeInd].size();i++)
+	{
+		fprintf(file_class_source,"Variant CQMLGUI::%s::Get(const char* s)\n{\n",classes[treeInd][i]->className.c_str());
+		
+		fprintf(file_class_source,"\tint hash=GetHash(classID,s);\n");
+		fprintf(file_class_source,"\tif(hash<0) return Variant(0);\n");
+		fprintf(file_class_source,"\tswitch(hash)\n\t{\n");
+		PerfectHashData * hashData = classes[treeInd][i]->hashData;
+		for(int j=0;j<hashData->m;j++) ///ok
+		{
+			PropertyAndType * prop= classes[treeInd][i]->CheckExistence(hashData->keys[j]);
+
+			fprintf(file_class_source,"\tcase %d:\n",j);
+			if(prop->IsPrimitive())
+				fprintf(file_class_source,"\t\treturn Variant(%s);\n",hashData->keys[j].c_str());
+			else
+				fprintf(file_class_source,"\t\treturn Variant(&%s);\n",hashData->keys[j].c_str());
+
+		}
+		
+		fprintf(file_class_source,"\tdefault: break;\n");
+		fprintf(file_class_source,"\t}\n");
+		
+		fprintf(file_class_source,"\treturn Variant(0);\n");
+
+		fprintf(file_class_source,"}\n");
+	}
 
 }
 
@@ -678,17 +717,34 @@ void makeMainSource()
 		fclose(file);
 	}
 
+	file=fopen("parser_output.h","w");
+	if(file)
+	{
+fprintf(file,"#include \"qml_includes.h\"\n");
+fprintf(file,"struct ClassHashTable;\n");
+fprintf(file,"void _QML_Init();\n");
+fprintf(file,"void _QML_Update();\n");
+fprintf(file,"void _QML_Draw();\n");
+
+fprintf(file,"void InitHashTabs(ClassHashTable * hashTabs);\n");
+		fclose(file);
+	}
+
 	file = fopen("parser_output.cpp","w");
 	fprintf(file,"#include \"output0outer.h\"\n\n#include \"qml_includes.h\"\n");
 	fprintf(file,"void _QML_Update();\n");
 	fprintf(file,"void _QML_ClassTabsInit();\n");
+	fprintf(file,"void _QML_Draw();\n");
 	fprintf(file,"CQMLGUI::Element* root;\n");
-	fprintf(file,"\nvoid _QML_Init()\n{\n\troot = (CQMLGUI::Element*) CQMLGUI::acGUI_Rootoutput0();\n\t_QML_Update();\n}\n");
-	fprintf(file,"\nvoid _QML_Update()\n{\n\troot->Update();\n}\n");
+
+	fprintf(file,"\nvoid _QML_Init()\n{\n\troot = (CQMLGUI::Element*) CQMLGUI::acGUI_Rootoutput0();\n\tCQMLGUI::SetRoot(root);\n\t_QML_Update();\n}\n");
+	//fprintf(file,"\nvoid _QML_Update()\n{\n\troot->Update();\n}\n");
+	fprintf(file,"\nvoid _QML_Update()\n{\n\tCQMLGUI::PreUpdate();\n\troot->Update();\n\tCQMLGUI::PostUpdate();\n}\n");
+	fprintf(file,"\nvoid _QML_Draw()\n{\n\tCQMLGUI::PreDraw();\n\troot->Update();\n\tCQMLGUI::PostDraw();\n}\n");
 
 	
 	fprintf(file,"// print default constructors;\n");
-	for(int i=0;i<defaultClasses.size();i++)
+	/*for(int i=0;i<defaultClasses.size();i++)
 	{
 		ClassContainer * cont =defaultClasses[i];
 		fprintf(file,"CQMLGUI::%s::%s()\n{\n",cont->className.c_str(),cont->className.c_str());
@@ -722,8 +778,41 @@ void makeMainSource()
 		
 		fprintf(file,"}\n");
 	}
+	*/
+	
+	/*
+	for(int i=0;i<defaultClasses.size();i++)
+	{
+		fprintf(file,"Variant CQMLGUI::%s::Get(const char* s)\n{\n",defaultClasses[i]->className.c_str());
+		
+		fprintf(file,"\tint hash=GetHash(classID,s);\n");
+		fprintf(file,"\tif(hash<0) return Variant(0);\n");
+		fprintf(file,"\tswitch(hash)\n\t{\n");
+		PerfectHashData * hashData = defaultClasses[i]->hashData;
+		for(int j=0;j<hashData->m;j++) ///ok
+		{
+			//fprintf(file,"\tcase %d:\n",j);
+			//fprintf(file,"\t\treturn Variant(%s);\n",hashData->keys[j].c_str());
+			PropertyAndType * prop=defaultClasses[i]->CheckExistence(hashData->keys[j]);
+
+			fprintf(file,"\tcase %d:\n",j);
+			if(prop->IsPrimitive())
+				fprintf(file,"\t\treturn Variant(%s);\n",hashData->keys[j].c_str());
+			else
+				fprintf(file,"\t\treturn Variant(&%s);\n",hashData->keys[j].c_str());
+		}
+		
+		fprintf(file,"\tdefault: break;\n");
+		fprintf(file,"\t}\n");
+		
+		fprintf(file,"\treturn Variant(0);\n");
+
+		fprintf(file,"}\n");
+	}
+	*/
 	
 	fprintf(file, "using namespace CQMLGUI;\n");
+	/*
 	for(int i=0;i<defaultClasses.size();i++)
 		{
 			ClassContainer * cont=defaultClasses[i];
@@ -774,7 +863,7 @@ void makeMainSource()
 				//fprintf(file_class_source, "void %s::Update()\n{\n",cont->className.c_str());
 			}
 		}
-
+*/
 	
 	PrintClassHashTabs(file,elementTreeCnt);
 	
@@ -1007,6 +1096,13 @@ void makeSource(std::string name, int treeInd)
 		if(imports[i].treeInd==treeInd)
 		{
 			fprintf(file_class_source,"#include \"%souter.h\"\n",importPathToName[imports[i].path].c_str());
+		}
+	}
+	for(int i=0;i<includes.size();i++)
+	{
+		if(includes[i].treeInd==treeInd)
+		{
+			fprintf(file_class_source,"#include %s\n",includes[i].path.c_str());
 		}
 	}
 
@@ -2009,6 +2105,13 @@ void processTreeImports(ParserList* elementTree, int importGInd)
 {
 	for(int i=0;i<elementTree->memberCount;i++)
 	{
+		if(elementTree->members[i]->type==TYPE_INCLUDE)
+		{
+			GUIInclude include;
+			include.path=std::string(((ParserInclude*)elementTree->members[i])->path);
+			include.treeInd=elementTreeCnt;
+			includes.push_back(include);
+		}
 		if(elementTree->members[i]->type==TYPE_IMPORT)
 		{
 			GUIImport import;
@@ -2057,7 +2160,7 @@ void processTree(ParserList* elementTree, int treeInd)
 	elementCount=0;
 	for(int i=0;i<elementTree->memberCount;i++)
 	{
-		if(elementTree->members[i]->type==TYPE_IMPORT)
+		if(elementTree->members[i]->type==TYPE_IMPORT || elementTree->members[i]->type==TYPE_INCLUDE)
 		{
 			continue;
 		}
@@ -2069,7 +2172,7 @@ void processTree(ParserList* elementTree, int treeInd)
 	id=0;
 	for(int i=0;i<elementTree->memberCount;i++)
 	{
-		if(elementTree->members[i]->type==TYPE_IMPORT)
+		if(elementTree->members[i]->type==TYPE_IMPORT || elementTree->members[i]->type==TYPE_INCLUDE)
 		{
 			continue;
 		}
@@ -2367,9 +2470,32 @@ bool processFile(const char * name)
 	return true;
 }
 
-int main()
+void PrintHelp()
 {
+	printf("first param is input filename");
+}
+
+int main(int argc, char ** argv)
+{
+
 	processBasicTypes();
+
+	const char * fileName;
+	if(argc<2)
+	{
+		printf("not enough parameters\nuse --help for more info\n");
+		return  0;
+	}
+	if(strcmp(argv[1],"--help")==0)
+	{
+		PrintHelp();
+		return 0;
+	}
+	else
+	{
+		fileName=argv[1];
+	}
+	
 
 	//return 0;
 	FILE *srcFile;
@@ -2420,7 +2546,8 @@ int main()
 		}
 	}
 
-
+	
+	MakeAllHashes();
 	// source generation
 	for(int i=0;i<elementTreeCnt;i++)
 	{
@@ -2429,7 +2556,6 @@ int main()
 
 		makeSource(std::string("output")+std::to_string(static_cast<long long>(i)),i);
 	}
-	MakeAllHashes();
 	makeMainSource();
 
 	//for(int i=0;)

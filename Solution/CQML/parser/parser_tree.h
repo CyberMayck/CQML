@@ -4,6 +4,7 @@
 #define TYPE_PROPERTY			(2)
 #define TYPE_HANDLER			(3)
 #define TYPE_IMPORT				(4)
+#define TYPE_INCLUDE			(5)
 
 #define NODE_TYPE_NORMAL		(0)
 #define NODE_TYPE_ID			(1)
@@ -62,6 +63,7 @@ extern "C"
 	int* createProperty(int *a, char * text, char * text2);
 	int* createList(int *elementPointer, char type, int *listPointer, char * d);
 	int* createImport( char * text, char * text2);
+	int* createInclude( char * text);
 	void makeParseTree(int *l);
 }
 #else
@@ -72,6 +74,7 @@ extern "C"
 	int* createAttribute(int *a, char b, char *c, char * d);
 	int* createAttribute2(int *a, char b, char *c2, char *c, char * d);
 	int* createImport( char * text, char * text2);
+	int* createInclude( char * text );
 	int* createHandler(int *a, char b, char *c, char * d);
 	int* MakeNode0ID(char * text);
 	int* MakeNode0(char * text);
@@ -130,6 +133,10 @@ struct ParserImport {
 	ParserListElement base;
 	char * path;
 	char * name;
+};
+struct ParserInclude{
+	ParserListElement base;
+	char * path;
 };
 
 struct SrcNode{

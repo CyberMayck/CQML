@@ -8,3 +8,7 @@ GUIImport::GUIImport()
 {
 	processed=false;
 }
+
+GUIInclude::GUIInclude()
+{
+}

@@ -191,6 +191,20 @@ void SourceStatementToken::Print(string& dest)
 		this->tokens[i]->Print(dest);
 	}
 }
+void SourceIdToken::PrintZeroUpdaters(string& dest)
+{
+	if(this->isElement)
+	{
+		//dest+="(*((CQMLGUI::Rootoutput"+INTTOSTR(this->fileId)+"*)context->root)->"+
+		//"_QML_element"+INTTOSTR(this->elementId)+")";
+	}
+	else if(this->isVar)
+	{
+		//dest+="_QVar"+INTTOSTR(this->variableId);
+		dest+="(*((CQMLGUI::Rootoutput"+INTTOSTR(this->fileId)+"*)context->root)->"+
+			"_QML_element"+INTTOSTR(this->elementId)+")."+this->str+"_Update=0;\n";
+	}
+}
 void SourceIdToken::Print(string& dest)
 {
 	//this->
@@ -207,6 +221,34 @@ void SourceIdToken::Print(string& dest)
 	}
 	else
 		dest+=str;
+}
+void SourceDotToken::PrintZeroUpdaters(string& dest)
+{
+	//this->
+	if(this->isVarReplaced)
+	{
+		dest+="(*((CQMLGUI::Rootoutput"+INTTOSTR(this->fileId)+"*)context->root)->"+
+			"_QML_element"+INTTOSTR(this->variableId)+")";
+		for(int i=0;i<this->isStatic.size();i++)
+		{
+			if(this->isStatic[i])
+			{
+				if(isStatic.size()-1==i)
+					dest+=string(".")+identifiers[identifiers.size()-isStatic.size()+i]->GetId()+"_Update=0;\n";
+				else
+					dest+=string(".")+identifiers[identifiers.size()-isStatic.size()+i]->GetId();
+			}
+			else
+			{
+				if(isStatic.size()-1==i)
+				dest+=string(".Get(\"")+identifiers[identifiers.size()-isStatic.size()+i]->GetId()+string("\").SetUpdater(0);\n");
+				else
+				dest+=string(".Get(\"")+identifiers[identifiers.size()-isStatic.size()+i]->GetId()+string("\")");
+			}
+		}
+		//dest+="_QVar"+INTTOSTR(this->variableId);
+		
+	}
 }
 void SourceDotToken::Print(string& dest)
 {
@@ -237,6 +279,13 @@ void SourceDotToken::Print(string& dest)
 		}
 	}
 }
+void SourceExprToken::PrintZeroUpdaters(string& dest)
+{
+	for(int i=0;i<tokens.size();i++)
+	{
+		this->tokens[i]->PrintZeroUpdaters(dest);
+	}
+}
 void SourceExprToken::Print(string& dest)
 {
 	for(int i=0;i<tokens.size();i++)
@@ -254,6 +303,11 @@ void SourceAssignmentToken::Print(string& dest)
 		dest+=this->ops[i-1].str;
 		this->nodes[i]->Print(dest);
 	}
+	if(nodes.size()>1)dest+=";\n";
+	for(int i=0;i<nodes.size()-1;i++)
+	{
+		this->nodes[i]->PrintZeroUpdaters(dest);
+	}
 	/*this->nodes[0]->Print(dest);
 
 	for(int i=1;i<nodes.size();i++)
@@ -262,6 +316,8 @@ void SourceAssignmentToken::Print(string& dest)
 		this->nodes[i]->Print(dest);
 	}*/
 }
+
+void SourceToken::PrintZeroUpdaters(string&){}
 
 int varId=0;
 int lastRightVarId=0;

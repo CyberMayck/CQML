@@ -308,6 +308,15 @@ int* createImport(char* path, char* name)
 	(*pointer).base.type=TYPE_IMPORT;
 	return (int*)pointer;
 }
+int* createInclude(char* path)
+{
+	ParserInclude * pointer;
+	pointer=(ParserInclude*)malloc(sizeof(ParserInclude));
+	(*pointer).path=path;
+	(*pointer).base.type=TYPE_INCLUDE;
+	return (int*)pointer;
+}
+
 
 int* createHandler(int* a, char b, char* name, SrcNode * code)
 {

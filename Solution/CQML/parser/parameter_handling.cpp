@@ -440,7 +440,7 @@ void PrintClassTabs(FILE * file, int classCnt)
 			pInd=-1;
 		else
 			pInd=c->classID;
-		fprintf(file,"InitAttribCnt(%d,%d,%d);\n",ind,defaultClasses[i]->props.size(),pInd);
+		//fprintf(file,"InitAttribCnt(%d,%d,%d);\n",ind,defaultClasses[i]->props.size(),pInd);
 		ind++;
 	}
 	for(int j=0;j<classCnt;j++)
@@ -453,7 +453,7 @@ void PrintClassTabs(FILE * file, int classCnt)
 				pInd=-1;
 			else
 				pInd=c->classID;
-			fprintf(file,"InitAttribCnt(%d,%d,%d);\n",ind,classes[j][i]->props.size(),pInd);
+			//fprintf(file,"InitAttribCnt(%d,%d,%d);\n",ind,classes[j][i]->props.size(),pInd);
 			ind++;
 		}
 	}

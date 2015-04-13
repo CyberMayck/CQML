@@ -1,36 +1,73 @@
+include "printSomething.h"
 Rectangle
 {
 	x : 0;
 	y : 0;
 	width : 500;
 	height : width;
-	Text
+	color.red : 1;
+	color.green : 1;
+	color.blue : 1;
+	ScaledImage
+	{
+		id : pacimg;
+		x : parent.height/2;
+		y : 5;
+		width : 200;
+		height : 300;
+		img.src : "img1.png";
+		topBorder : 20;
+		leftBorder : 20;
+		rightBorder : 20;
+		bottomBorder : 20;
+	};
+	TextInput
 	{
 		id : outputtxt;
 		x : 5;
 		y : 5;
 		width : parent.width/2-10;
 		height : parent.height/2-10;
-		font.family : "C64.ttf";
+		font.family : "Tahoma";
 		font.size : 12;
+		text : "You win";
 		text_color.red : 1;
 		text_color.green : 0;
 		text_color.blue : 1;
 	};
 	Rectangle
 	{
-		id : crap;
 		x : 5;
 		y : parent.height/2;
+		color.red : 0;
+		color.green : 1;
+		color.blue : 0;
+		border : 4;
+		borderColor.red : 1;
+		borderColor.green : 0;
+		borderColor.blue : 0;
 		width : parent.width/2-10;
 		height : parent.height/2-10;
-		MousePressed : 
+		MouseArea
 		{
-			outputtxt.text = "pressed";
-		};
-		MouseReleased : 
-		{
-			outputtxt.text = "released";
+			id : crap;
+			width : parent.width;
+			height : parent.height;
+			MousePressed : 
+			{
+				PrintNumber(13);
+				
+				pacimg.width=100;
+				pacimg.height=100;
+				
+				outputtxt.text = "pressed";
+			};
+			MouseReleased : 
+			{
+				pacimg.width=200;
+				pacimg.height=300;
+				outputtxt.text = "released";
+			};
 		};
 	};
 }
