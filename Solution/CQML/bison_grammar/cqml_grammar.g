@@ -7,7 +7,7 @@
 %token TYPEDEF EXTERN STATIC AUTO REGISTER PROPERTY
 %token CHAR SHORT INT LONG SIGNED UNSIGNED FLOAT DOUBLE CONST VOLATILE VOID
 %token STRUCT UNION ENUM ELLIPSIS
-%token IMPORT AS
+%token IMPORT AS INCLUDE
 
 %token CASE DEFAULT IF ELSE SWITCH WHILE DO FOR GOTO CONTINUE BREAK RETURN
 
@@ -44,6 +44,8 @@ import_list
 import
 	:	IMPORT STRING_LITERAL AS IDENTIFIER
 	{ $<data.val>$ = createImport( $<data.lexem>2, $<data.lexem>4); }
+	|	INCLUDE STRING_LITERAL
+	{ $<data.val>$ = createInclude( $<data.lexem>2); }
 	;
 	
 element
