@@ -21,34 +21,16 @@
     <ClCompile Include="parser_output.c">
       <Filter>Resource Files</Filter>
     </ClCompile>
-    <ClCompile Include="cqml.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="context.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="attribControl.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="gui.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="input.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="output0.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="CQMLObject.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="parser_output.cpp">
+      <Filter>Resource Files</Filter>
     </ClCompile>
-    <ClCompile Include="variant.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="resource_manager.cpp">
+    <ClCompile Include="printSomething.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -61,50 +43,11 @@
     <ClInclude Include="custom_classes.h">
       <Filter>Resource Files</Filter>
     </ClInclude>
-    <ClInclude Include="output2.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="struct_definition_macros.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="output0.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="CQMLObject.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="output0outer.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="cqml.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="attribControl.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="context.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="dll_export.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="draw_iface.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="qml_includes.h">
-      <Filter>Header Files</Filter>
+      <Filter>Resource Files</Filter>
     </ClInclude>
-    <ClInclude Include="resource_manager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="input.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="gui.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="variant.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="printSomething.h">
+      <Filter>Resource Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -52,7 +52,7 @@
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;SDL2.lib;SDL2main.lib;SDL2_ttf.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;SDL2.lib;SDL2main.lib;SDL2_ttf.lib;SDL2_image.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Console</SubSystem>
     </Link>
     <CustomBuildStep>
@@ -85,42 +85,30 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="attribControl.cpp" />
-    <ClCompile Include="context.cpp" />
-    <ClCompile Include="cqml.cpp" />
-    <ClCompile Include="CQMLObject.cpp" />
-    <ClCompile Include="gui.cpp" />
-    <ClCompile Include="input.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="output0.cpp" />
     <ClCompile Include="parser_output.c">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="resource_manager.cpp" />
-    <ClCompile Include="variant.cpp" />
+    <ClCompile Include="parser_output.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="printSomething.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="custombuild.bat" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="attribControl.h" />
-    <ClInclude Include="context.h" />
-    <ClInclude Include="cqml.h" />
-    <ClInclude Include="CQMLObject.h" />
     <ClInclude Include="custom_classes.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </ClInclude>
-    <ClInclude Include="dll_export.h" />
-    <ClInclude Include="draw_iface.h" />
-    <ClInclude Include="gui.h" />
-    <ClInclude Include="input.h" />
-    <ClInclude Include="output0.h" />
-    <ClInclude Include="output0outer.h" />
-    <ClInclude Include="output2.h" />
+    <ClInclude Include="printSomething.h" />
     <ClInclude Include="qml_includes.h" />
-    <ClInclude Include="resource_manager.h" />
-    <ClInclude Include="struct_definition_macros.h" />
-    <ClInclude Include="variant.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\CQML_DLL\CQML_DLL.vcxproj">
+      <Project>{2bd0c32d-81da-4a10-b062-fca1f11b5704}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

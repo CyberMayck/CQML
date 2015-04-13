@@ -16,15 +16,20 @@
 #include <SDL/SDL.h>
 #undef main
 #include <SDL/SDL_TTF.h>
+#include <SDL/SDL_image.h>
 #endif
 
 #include<stdio.h>
 #include<stdlib.h>
 #include<string.h>
 
-#include "cqml.h"
-#include "gui.h"
-#include "draw_iface.h"
+#include "../CQML_DLL/cqml.h"
+#include "../CQML_DLL/gui.h"
+#include "../CQML_DLL/draw_iface.h"
+#include "../CQML_DLL/qml_includes.h"
+#include "../CQML_DLL/resource_manager.h"
+#include "../CQML_DLL/resource_manager.h"
+#include "parser_output.h"
 
 
 
@@ -35,7 +40,6 @@ SDL_Renderer* SDLRenderer;
 TTF_Font *fntCourier;
 SDL_Texture *strTex;
 
-#include "resource_manager.h"
 
 struct SDL_Drawer
 	: DrawIFace
@@ -53,6 +57,12 @@ void SDLInit()
 	SDL_CreateWindowAndRenderer(800, 600,SDL_WINDOW_OPENGL,&SDLWindow,&SDLRenderer);
 
 	TTF_Init();
+	int flags=IMG_INIT_JPG|IMG_INIT_PNG|IMG_INIT_TIF;
+	int initted=IMG_Init(flags);
+	if(initted&flags != flags) {
+		printf("IMG_Init: Failed to init required jpg and png and tif support!\n");
+		printf("IMG_Init: %s\n", IMG_GetError());
+	}
 	//fntCourier = TTF_OpenFont( "c64.ttf", 12 );
 	//FILE* f= fopen("c64.ttf","r");
 
@@ -135,9 +145,26 @@ struct SDLResourceManager
 		TTF_Font *fnt = TTF_OpenFont( (string(fontStr)+".ttf").c_str(), fontSize );
 		return fnt;
 	}
-	virtual void* LoadImage(const char *  path)
+	virtual ImageData LoadImage(const char *  path)
 	{
-		return 0;
+		SDL_Surface *image;
+		string strPath=path;
+		//int i=strPath.length()-1;
+		//for(;i>=0;i--)
+		{
+		//	if(strPath[i]=='.');
+		}
+		image=IMG_Load(path);
+		if(!image)
+		{
+			printf("IMG_Load: %s\n", IMG_GetError());
+			// handle error
+		}
+		ImageData data;
+		data.img=image;
+		data.width=image->w;
+		data.height=image->h;
+		return data;
 	}
 };
 struct SDLDrawer
@@ -165,10 +192,29 @@ struct SDLDrawer
 		SDL_SetRenderDrawColor(SDLRenderer,r,g,b,255);
 		SDL_RenderFillRect(SDLRenderer, &sdlRect);
 	}
+	virtual void DrawFilledBorderedRectangle(int x,int y,int w,int h,float r, float g, float b, float border, float br, float bg, float bb)
+	{
+		SDL_Rect sdlRect;
+		sdlRect.x=x;
+		sdlRect.y=y;
+		sdlRect.w=w;
+		sdlRect.h=h;
+	
+		SDL_SetRenderDrawColor(SDLRenderer,br,bg,bb,255);
+		SDL_RenderFillRect(SDLRenderer, &sdlRect);
+		
+		sdlRect.x+=border;
+		sdlRect.y+=border;
+		sdlRect.w-=2*border;
+		sdlRect.h-=2*border;
+		SDL_SetRenderDrawColor(SDLRenderer,r,g,b,255);
+		SDL_RenderFillRect(SDLRenderer, &sdlRect);
+	}
 	virtual void DrawLine(int x1,int y1,int x2,int y2,float r, float g, float b){}
 	virtual void DrawPoint(int x,int y,float r, float g, float b){}
 	virtual void DrawArc(int x,int y,int w,int h, float angle1, float angle2, float r, float g, float b){}
 	virtual void DrawFilledArc(int x,int y,int w,int h, float angle1, float angle2, float r, float g, float b){}
+
 	virtual void DrawText(int x, int y, int w, int h, const char* text, void* font, float r, float g, float b)
 	{
 
@@ -190,9 +236,38 @@ struct SDLDrawer
 		SDL_QueryTexture(strTex, 0, 0, &sdlRect.w, &sdlRect.h);
 		SDL_RenderCopy(SDLRenderer, strTex, NULL, &sdlRect);
 		
-		printf("TTF_OpenFont: %s\n", TTF_GetError());
+		//printf("TTF_OpenFont: %s\n", TTF_GetError());
 		SDL_FreeSurface(sText);
 		SDL_RenderCopy(SDLRenderer, strTex, NULL, &sdlRect);
+	}
+	void DrawImage(int x, int y, int w, int h, void* image)
+	{
+		SDL_Rect sdlRect;
+		SDL_Surface * imgSurf = (SDL_Surface *)image;
+		SDL_Texture * imgTex=SDL_CreateTextureFromSurface(SDLRenderer, imgSurf);
+		sdlRect.x=x;
+		sdlRect.y=y;
+		sdlRect.w=w;
+		sdlRect.h=h;
+		
+		SDL_RenderCopy(SDLRenderer, imgTex, NULL, &sdlRect);
+	}
+	virtual void DrawImageSegment(int x, int y, int w, int h, void* image, int iX, int iY, int iW, int iH)
+	{
+		SDL_Rect sdlRect;
+		SDL_Rect sdlSrcRect;
+		SDL_Surface * imgSurf = (SDL_Surface *)image;
+		SDL_Texture * imgTex=SDL_CreateTextureFromSurface(SDLRenderer, imgSurf);
+		sdlRect.x=x;
+		sdlRect.y=y;
+		sdlRect.w=w;
+		sdlRect.h=h;
+		sdlSrcRect.x=iX;
+		sdlSrcRect.y=iY;
+		sdlSrcRect.w=iW;
+		sdlSrcRect.h=iH;
+		
+		SDL_RenderCopy(SDLRenderer, imgTex, &sdlSrcRect, &sdlRect);
 	}
 };
 
@@ -234,8 +309,8 @@ void PrintMeMyFriend(char * str)
 {
 	printf("Print: %s\n",str);
 }
-
-#include "parser_output.cpp"
+extern CQMLGUI::Element* root;
+//#include "parser_output.cpp"
 
 void GUIMainLoop()
 {
@@ -263,6 +338,7 @@ void GUIMainLoop()
 int InputHandling()
 {
 	SDL_Event sdlEvent;
+	CQMLGUI::QMLEvent qmlEvent;
 	//SDL_WaitEvent(&sdlEvent);
 	while (SDL_PollEvent(&sdlEvent)) {
 	switch (sdlEvent.type)
@@ -271,21 +347,59 @@ int InputHandling()
 			return 1;
 			break;
 		case SDL_KEYDOWN:
-			printf("pressed %c\n",sdlEvent.key.keysym.sym);
+			qmlEvent.EventType=QML_KEY_EVENT;
+			qmlEvent.keyEvent.action=KEY_PRESSED;
+			qmlEvent.keyEvent.key=sdlEvent.key.keysym.sym;
+			CQMLGUI::PushEvent(qmlEvent);
+			//printf("pressed %c\n",sdlEvent.key.keysym.sym);
+			break;
+		case SDL_KEYUP:
+			qmlEvent.EventType=QML_KEY_EVENT;
+			qmlEvent.keyEvent.action=KEY_RELEASED;
+			qmlEvent.keyEvent.key=sdlEvent.key.keysym.sym;
+			CQMLGUI::PushEvent(qmlEvent);
+			//printf("pressed %c\n",sdlEvent.key.keysym.sym);
 			break;
 		case SDL_MOUSEBUTTONDOWN:
-			printf("mouse click %d %d\n",sdlEvent.button.x,sdlEvent.button.y);
-			root->MousePressed(sdlEvent.button.x,sdlEvent.button.y,sdlEvent.button.button);
+			qmlEvent.EventType=QML_MOUSE_EVENT;
+			qmlEvent.mouseEvent.action=MOUSE_BUTTON_PRESSED;
+			qmlEvent.mouseEvent.button=sdlEvent.button.button;
+			qmlEvent.mouseEvent.x=sdlEvent.button.x;
+			qmlEvent.mouseEvent.y=sdlEvent.button.y;
+			CQMLGUI::PushEvent(qmlEvent);
+			//printf("mouse click %d %d\n",sdlEvent.button.x,sdlEvent.button.y);
+			//root->MousePressed(sdlEvent.button.x,sdlEvent.button.y,sdlEvent.button.button);
 			break;
 //			
 		case SDL_MOUSEBUTTONUP:
-			root->MouseReleased(sdlEvent.button.x,sdlEvent.button.y,sdlEvent.button.button);
+			qmlEvent.EventType=QML_MOUSE_EVENT;
+			qmlEvent.mouseEvent.action=MOUSE_BUTTON_RELEASED;
+			qmlEvent.mouseEvent.button=sdlEvent.button.button;
+			qmlEvent.mouseEvent.x=sdlEvent.button.x;
+			qmlEvent.mouseEvent.y=sdlEvent.button.y;
+			CQMLGUI::PushEvent(qmlEvent);
+
+			//root->MouseReleased(sdlEvent.button.x,sdlEvent.button.y,sdlEvent.button.button);
 			break;
 		case SDL_MOUSEMOTION:
-			root->MouseMoved(sdlEvent.motion.x,sdlEvent.motion.y,sdlEvent.motion.xrel,sdlEvent.motion.yrel);
+			qmlEvent.EventType=QML_MOUSE_EVENT;
+			qmlEvent.mouseEvent.action=MOUSE_MOVEMENT;
+			qmlEvent.mouseEvent.x=sdlEvent.motion.x;
+			qmlEvent.mouseEvent.y=sdlEvent.motion.y;
+			qmlEvent.mouseEvent.relativeX=sdlEvent.motion.xrel;
+			qmlEvent.mouseEvent.relativeY=sdlEvent.motion.yrel;
+			CQMLGUI::PushEvent(qmlEvent);
+			//root->MouseMoved(sdlEvent.motion.x,sdlEvent.motion.y,sdlEvent.motion.xrel,sdlEvent.motion.yrel);
 			break;
 		case SDL_MOUSEWHEEL:
-			root->MouseScrolled(sdlEvent.wheel.x,sdlEvent.wheel.y,sdlEvent.wheel.x,sdlEvent.wheel.y);
+			qmlEvent.EventType=QML_MOUSE_EVENT;
+			qmlEvent.mouseEvent.action=MOUSE_WHEEL_SCROLLED;
+			qmlEvent.mouseEvent.x=sdlEvent.wheel.x;
+			qmlEvent.mouseEvent.y=sdlEvent.wheel.y;
+			qmlEvent.mouseEvent.relativeX=sdlEvent.wheel.x;
+			qmlEvent.mouseEvent.relativeY=sdlEvent.wheel.y;
+			CQMLGUI::PushEvent(qmlEvent);
+			//root->MouseScrolled(sdlEvent.wheel.x,sdlEvent.wheel.y,sdlEvent.wheel.x,sdlEvent.wheel.y);
 			break;
 	}
 	}
@@ -375,6 +489,19 @@ int main()
 	if(SDLWindow==NULL || SDLRenderer==NULL)
 		return 0;
 #endif
+	SetInitHashTabs(&InitHashTabs);
+	//SetAnchor_Init(InitAnchor);
+	//SetColor_Init(InitColor);
+	//SetFont_Init(InitFont);
+	//SetElement_Init(InitElement);
+	//SetRectangle_Init(InitRectangle);
+	//SetText_Init(InitText);
+
+	//SetRectangle_Update(UpdateRectangle);
+	//SetText_Update(UpdateText);
+
+
+
 	InitQML();
 	InitSDLDrawer();
 	InitSDLResourceManager();
@@ -451,6 +578,7 @@ int main()
     SDL_DestroyRenderer(SDLRenderer);
     SDL_DestroyWindow(SDLWindow);
 
+	IMG_Quit();
     SDL_Quit();
 #endif
 

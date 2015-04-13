@@ -9,6 +9,7 @@ CQMLGUI::Element* root;
 void _QML_Init()
 {
 	root = (CQMLGUI::Element*) CQMLGUI::acGUI_Rootoutput0();
+	CQMLGUI::SetRoot(root);
 	_QML_Update();
 }
 
@@ -26,328 +27,14 @@ void _QML_Draw()
 	CQMLGUI::PostDraw();
 }
 // print default constructors;
-CQMLGUI::Color::Color()
-{
-	classID=0;
-	red=0;
-	red_Update=0;
-	green=0;
-	green_Update=0;
-	blue=0;
-	blue_Update=0;
-	Init();
-}
-CQMLGUI::Font::Font()
-{
-	classID=1;
-	capital=0;
-	capital_Update=0;
-	italic=0;
-	italic_Update=0;
-	bold=0;
-	bold_Update=0;
-	size=0;
-	size_Update=0;
-	family="";
-	family_Update=0;
-	Init();
-}
-CQMLGUI::Element::Element()
-{
-	classID=2;
-	root=0;
-	parent=0;
-	children=0;
-	childrenCount=0;
-	flags=0;
-	x=0;
-	x_Update=0;
-	y=0;
-	y_Update=0;
-	width=0;
-	width_Update=0;
-	height=0;
-	height_Update=0;
-	CustomMouseClicked=0;
-	CustomMousePressed=0;
-	CustomMouseReleased=0;
-	CustomMouseMoved=0;
-	CustomMouseEntered=0;
-	CustomMouseExited=0;
-	CustomMouseScrolled=0;
-	Init();
-}
-CQMLGUI::Rectangle::Rectangle()
-{
-	classID=3;
-	color_Update=0;
-	Init();
-}
-CQMLGUI::Anchor::Anchor()
-{
-	classID=4;
-	top=0;
-	top_Update=0;
-	bottom=0;
-	bottom_Update=0;
-	left=0;
-	left_Update=0;
-	right=0;
-	right_Update=0;
-	Init();
-}
-CQMLGUI::Text::Text()
-{
-	classID=5;
-	text_color_Update=0;
-	text="";
-	text_Update=0;
-	font_Update=0;
-	Init();
-}
-CQMLGUI::TextInput::TextInput()
-{
-	classID=6;
-	Init();
-}
-Variant CQMLGUI::Color::Get(const char* s)
-{
-	int hash=GetHash(classID,s);
-	if(hash<0) return Variant(0);
-	switch(hash)
-	{
-	case 0:
-		return Variant(red);
-	case 1:
-		return Variant(green);
-	case 2:
-		return Variant(blue);
-	default: break;
-	}
-	return Variant(0);
-}
-Variant CQMLGUI::Font::Get(const char* s)
-{
-	int hash=GetHash(classID,s);
-	if(hash<0) return Variant(0);
-	switch(hash)
-	{
-	case 0:
-		return Variant(capital);
-	case 1:
-		return Variant(italic);
-	case 2:
-		return Variant(bold);
-	case 3:
-		return Variant(size);
-	case 4:
-		return Variant(family);
-	default: break;
-	}
-	return Variant(0);
-}
-Variant CQMLGUI::Element::Get(const char* s)
-{
-	int hash=GetHash(classID,s);
-	if(hash<0) return Variant(0);
-	switch(hash)
-	{
-	case 0:
-		return Variant(&root);
-	case 1:
-		return Variant(&parent);
-	case 2:
-		return Variant(&children);
-	case 3:
-		return Variant(childrenCount);
-	case 4:
-		return Variant(flags);
-	case 5:
-		return Variant(x);
-	case 6:
-		return Variant(y);
-	case 7:
-		return Variant(width);
-	case 8:
-		return Variant(height);
-	default: break;
-	}
-	return Variant(0);
-}
-Variant CQMLGUI::Rectangle::Get(const char* s)
-{
-	int hash=GetHash(classID,s);
-	if(hash<0) return Variant(0);
-	switch(hash)
-	{
-	case 0:
-		return Variant(&color);
-	case 1:
-		return Variant(&root);
-	case 2:
-		return Variant(&parent);
-	case 3:
-		return Variant(&children);
-	case 4:
-		return Variant(childrenCount);
-	case 5:
-		return Variant(flags);
-	case 6:
-		return Variant(x);
-	case 7:
-		return Variant(y);
-	case 8:
-		return Variant(width);
-	case 9:
-		return Variant(height);
-	default: break;
-	}
-	return Variant(0);
-}
-Variant CQMLGUI::Anchor::Get(const char* s)
-{
-	int hash=GetHash(classID,s);
-	if(hash<0) return Variant(0);
-	switch(hash)
-	{
-	case 0:
-		return Variant(&top);
-	case 1:
-		return Variant(&bottom);
-	case 2:
-		return Variant(&left);
-	case 3:
-		return Variant(&right);
-	default: break;
-	}
-	return Variant(0);
-}
-Variant CQMLGUI::Text::Get(const char* s)
-{
-	int hash=GetHash(classID,s);
-	if(hash<0) return Variant(0);
-	switch(hash)
-	{
-	case 0:
-		return Variant(&text_color);
-	case 1:
-		return Variant(text);
-	case 2:
-		return Variant(&font);
-	case 3:
-		return Variant(&color);
-	case 4:
-		return Variant(&root);
-	case 5:
-		return Variant(&parent);
-	case 6:
-		return Variant(&children);
-	case 7:
-		return Variant(childrenCount);
-	case 8:
-		return Variant(flags);
-	case 9:
-		return Variant(x);
-	case 10:
-		return Variant(y);
-	case 11:
-		return Variant(width);
-	case 12:
-		return Variant(height);
-	default: break;
-	}
-	return Variant(0);
-}
-Variant CQMLGUI::TextInput::Get(const char* s)
-{
-	int hash=GetHash(classID,s);
-	if(hash<0) return Variant(0);
-	switch(hash)
-	{
-	case 0:
-		return Variant(&text_color);
-	case 1:
-		return Variant(text);
-	case 2:
-		return Variant(&font);
-	case 3:
-		return Variant(&color);
-	case 4:
-		return Variant(&root);
-	case 5:
-		return Variant(&parent);
-	case 6:
-		return Variant(&children);
-	case 7:
-		return Variant(childrenCount);
-	case 8:
-		return Variant(flags);
-	case 9:
-		return Variant(x);
-	case 10:
-		return Variant(y);
-	case 11:
-		return Variant(width);
-	case 12:
-		return Variant(height);
-	default: break;
-	}
-	return Variant(0);
-}
 using namespace CQMLGUI;
-void Rectangle::Update()
-{
-	if(color_Update)color_Update(color_context);
-	else
-	{
-		if(color.red_Update)color.red_Update(color.red_context);
-		if(color.green_Update)color.green_Update(color.green_context);
-		if(color.blue_Update)color.blue_Update(color.blue_context);
-	}
-	 Element::Update();
-DefaultUpdate();
-}
-void Text::Update()
-{
-	if(text_color_Update)text_color_Update(text_color_context);
-	else
-	{
-		if(text_color.red_Update)text_color.red_Update(text_color.red_context);
-		if(text_color.green_Update)text_color.green_Update(text_color.green_context);
-		if(text_color.blue_Update)text_color.blue_Update(text_color.blue_context);
-	}
-	if(text_Update)text_Update(text_context);
-	if(font_Update)font_Update(font_context);
-	else
-	{
-		if(font.capital_Update)font.capital_Update(font.capital_context);
-		if(font.italic_Update)font.italic_Update(font.italic_context);
-		if(font.bold_Update)font.bold_Update(font.bold_context);
-		if(font.size_Update)font.size_Update(font.size_context);
-		if(font.family_Update)font.family_Update(font.family_context);
-	}
-	 Rectangle::Update();
-DefaultUpdate();
-}
-void TextInput::Update()
-{
-	 Text::Update();
-DefaultUpdate();
-}
 void InitHashTabs(ClassHashTable * hashTabs)
 {
 ClassHashTable * data;
-InitClassesSize(hashTabs, 7);
+InitClassesSize(hashTabs, 11);
 
 
  //PrintClassTabs()
-InitAttribCnt(0,3,-1);
-InitAttribCnt(1,5,-1);
-InitAttribCnt(2,9,-1);
-InitAttribCnt(3,1,2);
-InitAttribCnt(4,4,-1);
-InitAttribCnt(5,3,3);
-InitAttribCnt(6,0,5);
 
 data=&hashTabs[0];
 InitHashTab(data,9,3);
@@ -420,6 +107,20 @@ data->g[14]=0;
 
 
 data=&hashTabs[2];
+InitHashTab(data,3,1);
+data->keys[0]=(char *)malloc(sizeof(char) * 4);
+strcpy(data->keys[0],"src");
+
+data->T1[0]=0;
+
+data->T2[0]=1;
+
+data->g[0]=0;
+data->g[1]=0;
+data->g[2]=0;
+
+
+data=&hashTabs[3];
 InitHashTab(data,27,9);
 data->keys[0]=(char *)malloc(sizeof(char) * 5);
 strcpy(data->keys[0],"root");
@@ -440,25 +141,427 @@ strcpy(data->keys[7],"width");
 data->keys[8]=(char *)malloc(sizeof(char) * 7);
 strcpy(data->keys[8],"height");
 
-data->T1[0]=6;
-data->T1[1]=17;
-data->T1[2]=25;
-data->T1[3]=2;
-data->T1[4]=2;
-data->T1[5]=15;
-data->T1[6]=21;
-data->T1[7]=11;
-data->T1[8]=5;
+data->T1[0]=22;
+data->T1[1]=13;
+data->T1[2]=14;
+data->T1[3]=14;
+data->T1[4]=16;
+data->T1[5]=21;
+data->T1[6]=12;
+data->T1[7]=0;
+data->T1[8]=0;
 
-data->T2[0]=13;
-data->T2[1]=1;
-data->T2[2]=12;
-data->T2[3]=24;
-data->T2[4]=12;
-data->T2[5]=20;
+data->T2[0]=5;
+data->T2[1]=22;
+data->T2[2]=18;
+data->T2[3]=6;
+data->T2[4]=14;
+data->T2[5]=24;
+data->T2[6]=11;
+data->T2[7]=14;
+data->T2[8]=1;
+
+data->g[0]=0;
+data->g[1]=0;
+data->g[2]=0;
+data->g[3]=0;
+data->g[4]=3;
+data->g[5]=0;
+data->g[6]=0;
+data->g[7]=0;
+data->g[8]=0;
+data->g[9]=0;
+data->g[10]=0;
+data->g[11]=0;
+data->g[12]=2;
+data->g[13]=8;
+data->g[14]=0;
+data->g[15]=0;
+data->g[16]=6;
+data->g[17]=0;
+data->g[18]=0;
+data->g[19]=1;
+data->g[20]=0;
+data->g[21]=5;
+data->g[22]=0;
+data->g[23]=1;
+data->g[24]=0;
+data->g[25]=0;
+data->g[26]=4;
+
+
+data=&hashTabs[4];
+InitHashTab(data,36,12);
+data->keys[0]=(char *)malloc(sizeof(char) * 12);
+strcpy(data->keys[0],"borderColor");
+data->keys[1]=(char *)malloc(sizeof(char) * 7);
+strcpy(data->keys[1],"border");
+data->keys[2]=(char *)malloc(sizeof(char) * 6);
+strcpy(data->keys[2],"color");
+data->keys[3]=(char *)malloc(sizeof(char) * 5);
+strcpy(data->keys[3],"root");
+data->keys[4]=(char *)malloc(sizeof(char) * 7);
+strcpy(data->keys[4],"parent");
+data->keys[5]=(char *)malloc(sizeof(char) * 9);
+strcpy(data->keys[5],"children");
+data->keys[6]=(char *)malloc(sizeof(char) * 14);
+strcpy(data->keys[6],"childrenCount");
+data->keys[7]=(char *)malloc(sizeof(char) * 6);
+strcpy(data->keys[7],"flags");
+data->keys[8]=(char *)malloc(sizeof(char) * 2);
+strcpy(data->keys[8],"x");
+data->keys[9]=(char *)malloc(sizeof(char) * 2);
+strcpy(data->keys[9],"y");
+data->keys[10]=(char *)malloc(sizeof(char) * 6);
+strcpy(data->keys[10],"width");
+data->keys[11]=(char *)malloc(sizeof(char) * 7);
+strcpy(data->keys[11],"height");
+
+data->T1[0]=2;
+data->T1[1]=29;
+data->T1[2]=26;
+data->T1[3]=33;
+data->T1[4]=9;
+data->T1[5]=31;
+data->T1[6]=24;
+data->T1[7]=9;
+data->T1[8]=29;
+data->T1[9]=17;
+data->T1[10]=32;
+data->T1[11]=6;
+
+data->T2[0]=19;
+data->T2[1]=10;
+data->T2[2]=30;
+data->T2[3]=17;
+data->T2[4]=11;
+data->T2[5]=30;
+data->T2[6]=30;
+data->T2[7]=2;
+data->T2[8]=30;
+data->T2[9]=17;
+data->T2[10]=28;
+data->T2[11]=33;
+
+data->g[0]=0;
+data->g[1]=0;
+data->g[2]=0;
+data->g[3]=0;
+data->g[4]=0;
+data->g[5]=0;
+data->g[6]=10;
+data->g[7]=0;
+data->g[8]=0;
+data->g[9]=9;
+data->g[10]=6;
+data->g[11]=0;
+data->g[12]=4;
+data->g[13]=0;
+data->g[14]=0;
+data->g[15]=0;
+data->g[16]=0;
+data->g[17]=5;
+data->g[18]=0;
+data->g[19]=5;
+data->g[20]=0;
+data->g[21]=0;
+data->g[22]=0;
+data->g[23]=7;
+data->g[24]=4;
+data->g[25]=0;
+data->g[26]=0;
+data->g[27]=1;
+data->g[28]=0;
+data->g[29]=0;
+data->g[30]=0;
+data->g[31]=9;
+data->g[32]=7;
+data->g[33]=0;
+data->g[34]=0;
+data->g[35]=0;
+
+
+data=&hashTabs[5];
+InitHashTab(data,27,9);
+data->keys[0]=(char *)malloc(sizeof(char) * 5);
+strcpy(data->keys[0],"root");
+data->keys[1]=(char *)malloc(sizeof(char) * 7);
+strcpy(data->keys[1],"parent");
+data->keys[2]=(char *)malloc(sizeof(char) * 9);
+strcpy(data->keys[2],"children");
+data->keys[3]=(char *)malloc(sizeof(char) * 14);
+strcpy(data->keys[3],"childrenCount");
+data->keys[4]=(char *)malloc(sizeof(char) * 6);
+strcpy(data->keys[4],"flags");
+data->keys[5]=(char *)malloc(sizeof(char) * 2);
+strcpy(data->keys[5],"x");
+data->keys[6]=(char *)malloc(sizeof(char) * 2);
+strcpy(data->keys[6],"y");
+data->keys[7]=(char *)malloc(sizeof(char) * 6);
+strcpy(data->keys[7],"width");
+data->keys[8]=(char *)malloc(sizeof(char) * 7);
+strcpy(data->keys[8],"height");
+
+data->T1[0]=21;
+data->T1[1]=10;
+data->T1[2]=8;
+data->T1[3]=26;
+data->T1[4]=3;
+data->T1[5]=8;
+data->T1[6]=26;
+data->T1[7]=12;
+data->T1[8]=7;
+
+data->T2[0]=15;
+data->T2[1]=6;
+data->T2[2]=6;
+data->T2[3]=8;
+data->T2[4]=22;
+data->T2[5]=10;
 data->T2[6]=16;
-data->T2[7]=10;
-data->T2[8]=23;
+data->T2[7]=16;
+data->T2[8]=1;
+
+data->g[0]=0;
+data->g[1]=0;
+data->g[2]=0;
+data->g[3]=0;
+data->g[4]=0;
+data->g[5]=0;
+data->g[6]=6;
+data->g[7]=0;
+data->g[8]=0;
+data->g[9]=3;
+data->g[10]=0;
+data->g[11]=0;
+data->g[12]=4;
+data->g[13]=0;
+data->g[14]=4;
+data->g[15]=0;
+data->g[16]=0;
+data->g[17]=8;
+data->g[18]=2;
+data->g[19]=0;
+data->g[20]=0;
+data->g[21]=4;
+data->g[22]=8;
+data->g[23]=0;
+data->g[24]=0;
+data->g[25]=0;
+data->g[26]=0;
+
+
+data=&hashTabs[6];
+InitHashTab(data,12,4);
+data->keys[0]=(char *)malloc(sizeof(char) * 4);
+strcpy(data->keys[0],"top");
+data->keys[1]=(char *)malloc(sizeof(char) * 7);
+strcpy(data->keys[1],"bottom");
+data->keys[2]=(char *)malloc(sizeof(char) * 5);
+strcpy(data->keys[2],"left");
+data->keys[3]=(char *)malloc(sizeof(char) * 6);
+strcpy(data->keys[3],"right");
+
+data->T1[0]=5;
+data->T1[1]=1;
+data->T1[2]=5;
+data->T1[3]=2;
+
+data->T2[0]=5;
+data->T2[1]=2;
+data->T2[2]=0;
+data->T2[3]=10;
+
+data->g[0]=0;
+data->g[1]=0;
+data->g[2]=1;
+data->g[3]=0;
+data->g[4]=3;
+data->g[5]=0;
+data->g[6]=2;
+data->g[7]=0;
+data->g[8]=0;
+data->g[9]=0;
+data->g[10]=0;
+data->g[11]=0;
+
+
+data=&hashTabs[7];
+InitHashTab(data,45,15);
+data->keys[0]=(char *)malloc(sizeof(char) * 11);
+strcpy(data->keys[0],"text_color");
+data->keys[1]=(char *)malloc(sizeof(char) * 5);
+strcpy(data->keys[1],"text");
+data->keys[2]=(char *)malloc(sizeof(char) * 5);
+strcpy(data->keys[2],"font");
+data->keys[3]=(char *)malloc(sizeof(char) * 12);
+strcpy(data->keys[3],"borderColor");
+data->keys[4]=(char *)malloc(sizeof(char) * 7);
+strcpy(data->keys[4],"border");
+data->keys[5]=(char *)malloc(sizeof(char) * 6);
+strcpy(data->keys[5],"color");
+data->keys[6]=(char *)malloc(sizeof(char) * 5);
+strcpy(data->keys[6],"root");
+data->keys[7]=(char *)malloc(sizeof(char) * 7);
+strcpy(data->keys[7],"parent");
+data->keys[8]=(char *)malloc(sizeof(char) * 9);
+strcpy(data->keys[8],"children");
+data->keys[9]=(char *)malloc(sizeof(char) * 14);
+strcpy(data->keys[9],"childrenCount");
+data->keys[10]=(char *)malloc(sizeof(char) * 6);
+strcpy(data->keys[10],"flags");
+data->keys[11]=(char *)malloc(sizeof(char) * 2);
+strcpy(data->keys[11],"x");
+data->keys[12]=(char *)malloc(sizeof(char) * 2);
+strcpy(data->keys[12],"y");
+data->keys[13]=(char *)malloc(sizeof(char) * 6);
+strcpy(data->keys[13],"width");
+data->keys[14]=(char *)malloc(sizeof(char) * 7);
+strcpy(data->keys[14],"height");
+
+data->T1[0]=0;
+data->T1[1]=42;
+data->T1[2]=40;
+data->T1[3]=39;
+data->T1[4]=38;
+data->T1[5]=10;
+data->T1[6]=2;
+data->T1[7]=31;
+data->T1[8]=14;
+data->T1[9]=6;
+data->T1[10]=33;
+data->T1[11]=3;
+data->T1[12]=1;
+data->T1[13]=-842150451;
+data->T1[14]=-842150451;
+
+data->T2[0]=11;
+data->T2[1]=35;
+data->T2[2]=14;
+data->T2[3]=17;
+data->T2[4]=3;
+data->T2[5]=36;
+data->T2[6]=5;
+data->T2[7]=11;
+data->T2[8]=40;
+data->T2[9]=36;
+data->T2[10]=24;
+data->T2[11]=4;
+data->T2[12]=9;
+data->T2[13]=-842150451;
+data->T2[14]=-842150451;
+
+data->g[0]=0;
+data->g[1]=0;
+data->g[2]=0;
+data->g[3]=10;
+data->g[4]=0;
+data->g[5]=0;
+data->g[6]=0;
+data->g[7]=0;
+data->g[8]=0;
+data->g[9]=0;
+data->g[10]=13;
+data->g[11]=0;
+data->g[12]=0;
+data->g[13]=8;
+data->g[14]=0;
+data->g[15]=11;
+data->g[16]=0;
+data->g[17]=0;
+data->g[18]=9;
+data->g[19]=0;
+data->g[20]=0;
+data->g[21]=6;
+data->g[22]=0;
+data->g[23]=0;
+data->g[24]=8;
+data->g[25]=0;
+data->g[26]=12;
+data->g[27]=0;
+data->g[28]=13;
+data->g[29]=8;
+data->g[30]=10;
+data->g[31]=1;
+data->g[32]=0;
+data->g[33]=0;
+data->g[34]=0;
+data->g[35]=0;
+data->g[36]=6;
+data->g[37]=0;
+data->g[38]=0;
+data->g[39]=0;
+data->g[40]=0;
+data->g[41]=2;
+data->g[42]=0;
+data->g[43]=0;
+data->g[44]=0;
+
+
+data=&hashTabs[8];
+InitHashTab(data,45,15);
+data->keys[0]=(char *)malloc(sizeof(char) * 11);
+strcpy(data->keys[0],"text_color");
+data->keys[1]=(char *)malloc(sizeof(char) * 5);
+strcpy(data->keys[1],"text");
+data->keys[2]=(char *)malloc(sizeof(char) * 5);
+strcpy(data->keys[2],"font");
+data->keys[3]=(char *)malloc(sizeof(char) * 12);
+strcpy(data->keys[3],"borderColor");
+data->keys[4]=(char *)malloc(sizeof(char) * 7);
+strcpy(data->keys[4],"border");
+data->keys[5]=(char *)malloc(sizeof(char) * 6);
+strcpy(data->keys[5],"color");
+data->keys[6]=(char *)malloc(sizeof(char) * 5);
+strcpy(data->keys[6],"root");
+data->keys[7]=(char *)malloc(sizeof(char) * 7);
+strcpy(data->keys[7],"parent");
+data->keys[8]=(char *)malloc(sizeof(char) * 9);
+strcpy(data->keys[8],"children");
+data->keys[9]=(char *)malloc(sizeof(char) * 14);
+strcpy(data->keys[9],"childrenCount");
+data->keys[10]=(char *)malloc(sizeof(char) * 6);
+strcpy(data->keys[10],"flags");
+data->keys[11]=(char *)malloc(sizeof(char) * 2);
+strcpy(data->keys[11],"x");
+data->keys[12]=(char *)malloc(sizeof(char) * 2);
+strcpy(data->keys[12],"y");
+data->keys[13]=(char *)malloc(sizeof(char) * 6);
+strcpy(data->keys[13],"width");
+data->keys[14]=(char *)malloc(sizeof(char) * 7);
+strcpy(data->keys[14],"height");
+
+data->T1[0]=8;
+data->T1[1]=3;
+data->T1[2]=15;
+data->T1[3]=37;
+data->T1[4]=38;
+data->T1[5]=33;
+data->T1[6]=32;
+data->T1[7]=0;
+data->T1[8]=43;
+data->T1[9]=44;
+data->T1[10]=35;
+data->T1[11]=35;
+data->T1[12]=4;
+data->T1[13]=-842150451;
+data->T1[14]=-842150451;
+
+data->T2[0]=19;
+data->T2[1]=38;
+data->T2[2]=8;
+data->T2[3]=17;
+data->T2[4]=43;
+data->T2[5]=28;
+data->T2[6]=36;
+data->T2[7]=2;
+data->T2[8]=19;
+data->T2[9]=11;
+data->T2[10]=36;
+data->T2[11]=29;
+data->T2[12]=11;
+data->T2[13]=-842150451;
+data->T2[14]=-842150451;
 
 data->g[0]=0;
 data->g[1]=0;
@@ -472,27 +575,45 @@ data->g[8]=0;
 data->g[9]=0;
 data->g[10]=0;
 data->g[11]=0;
-data->g[12]=5;
+data->g[12]=8;
 data->g[13]=0;
 data->g[14]=0;
 data->g[15]=0;
-data->g[16]=4;
-data->g[17]=7;
-data->g[18]=8;
-data->g[19]=8;
+data->g[16]=0;
+data->g[17]=0;
+data->g[18]=0;
+data->g[19]=6;
 data->g[20]=0;
-data->g[21]=6;
-data->g[22]=3;
-data->g[23]=0;
-data->g[24]=6;
+data->g[21]=10;
+data->g[22]=0;
+data->g[23]=12;
+data->g[24]=0;
 data->g[25]=0;
 data->g[26]=2;
+data->g[27]=5;
+data->g[28]=9;
+data->g[29]=0;
+data->g[30]=11;
+data->g[31]=0;
+data->g[32]=0;
+data->g[33]=10;
+data->g[34]=0;
+data->g[35]=0;
+data->g[36]=14;
+data->g[37]=0;
+data->g[38]=0;
+data->g[39]=0;
+data->g[40]=13;
+data->g[41]=7;
+data->g[42]=14;
+data->g[43]=0;
+data->g[44]=3;
 
 
-data=&hashTabs[3];
+data=&hashTabs[9];
 InitHashTab(data,31,10);
-data->keys[0]=(char *)malloc(sizeof(char) * 6);
-strcpy(data->keys[0],"color");
+data->keys[0]=(char *)malloc(sizeof(char) * 4);
+strcpy(data->keys[0],"img");
 data->keys[1]=(char *)malloc(sizeof(char) * 5);
 strcpy(data->keys[1],"root");
 data->keys[2]=(char *)malloc(sizeof(char) * 7);
@@ -512,290 +633,164 @@ strcpy(data->keys[8],"width");
 data->keys[9]=(char *)malloc(sizeof(char) * 7);
 strcpy(data->keys[9],"height");
 
-data->T1[0]=26;
-data->T1[1]=19;
-data->T1[2]=1;
-data->T1[3]=13;
-data->T1[4]=22;
-data->T1[5]=7;
-data->T1[6]=1;
-data->T1[7]=20;
-data->T1[8]=20;
-data->T1[9]=14;
+data->T1[0]=9;
+data->T1[1]=28;
+data->T1[2]=7;
+data->T1[3]=29;
+data->T1[4]=19;
+data->T1[5]=5;
+data->T1[6]=11;
+data->T1[7]=4;
+data->T1[8]=27;
+data->T1[9]=23;
 
-data->T2[0]=10;
-data->T2[1]=17;
-data->T2[2]=0;
-data->T2[3]=20;
-data->T2[4]=3;
+data->T2[0]=20;
+data->T2[1]=29;
+data->T2[2]=7;
+data->T2[3]=28;
+data->T2[4]=28;
 data->T2[5]=10;
-data->T2[6]=12;
+data->T2[6]=14;
 data->T2[7]=18;
-data->T2[8]=18;
-data->T2[9]=26;
+data->T2[8]=1;
+data->T2[9]=24;
 
 data->g[0]=0;
 data->g[1]=0;
-data->g[2]=0;
-data->g[3]=0;
-data->g[4]=0;
-data->g[5]=0;
-data->g[6]=0;
-data->g[7]=0;
-data->g[8]=0;
-data->g[9]=0;
-data->g[10]=0;
-data->g[11]=0;
-data->g[12]=3;
-data->g[13]=0;
-data->g[14]=0;
-data->g[15]=7;
-data->g[16]=0;
-data->g[17]=2;
-data->g[18]=0;
-data->g[19]=0;
-data->g[20]=1;
-data->g[21]=0;
-data->g[22]=5;
-data->g[23]=0;
-data->g[24]=0;
-data->g[25]=0;
-data->g[26]=4;
-data->g[27]=4;
-data->g[28]=0;
-data->g[29]=4;
-data->g[30]=0;
-
-
-data=&hashTabs[4];
-InitHashTab(data,12,4);
-data->keys[0]=(char *)malloc(sizeof(char) * 4);
-strcpy(data->keys[0],"top");
-data->keys[1]=(char *)malloc(sizeof(char) * 7);
-strcpy(data->keys[1],"bottom");
-data->keys[2]=(char *)malloc(sizeof(char) * 5);
-strcpy(data->keys[2],"left");
-data->keys[3]=(char *)malloc(sizeof(char) * 6);
-strcpy(data->keys[3],"right");
-
-data->T1[0]=0;
-data->T1[1]=1;
-data->T1[2]=6;
-data->T1[3]=2;
-
-data->T2[0]=3;
-data->T2[1]=4;
-data->T2[2]=6;
-data->T2[3]=0;
-
-data->g[0]=0;
-data->g[1]=0;
-data->g[2]=0;
+data->g[2]=4;
 data->g[3]=0;
 data->g[4]=3;
 data->g[5]=0;
 data->g[6]=0;
 data->g[7]=0;
-data->g[8]=1;
-data->g[9]=1;
-data->g[10]=0;
-data->g[11]=0;
-
-
-data=&hashTabs[5];
-InitHashTab(data,39,13);
-data->keys[0]=(char *)malloc(sizeof(char) * 11);
-strcpy(data->keys[0],"text_color");
-data->keys[1]=(char *)malloc(sizeof(char) * 5);
-strcpy(data->keys[1],"text");
-data->keys[2]=(char *)malloc(sizeof(char) * 5);
-strcpy(data->keys[2],"font");
-data->keys[3]=(char *)malloc(sizeof(char) * 6);
-strcpy(data->keys[3],"color");
-data->keys[4]=(char *)malloc(sizeof(char) * 5);
-strcpy(data->keys[4],"root");
-data->keys[5]=(char *)malloc(sizeof(char) * 7);
-strcpy(data->keys[5],"parent");
-data->keys[6]=(char *)malloc(sizeof(char) * 9);
-strcpy(data->keys[6],"children");
-data->keys[7]=(char *)malloc(sizeof(char) * 14);
-strcpy(data->keys[7],"childrenCount");
-data->keys[8]=(char *)malloc(sizeof(char) * 6);
-strcpy(data->keys[8],"flags");
-data->keys[9]=(char *)malloc(sizeof(char) * 2);
-strcpy(data->keys[9],"x");
-data->keys[10]=(char *)malloc(sizeof(char) * 2);
-strcpy(data->keys[10],"y");
-data->keys[11]=(char *)malloc(sizeof(char) * 6);
-strcpy(data->keys[11],"width");
-data->keys[12]=(char *)malloc(sizeof(char) * 7);
-strcpy(data->keys[12],"height");
-
-data->T1[0]=16;
-data->T1[1]=21;
-data->T1[2]=5;
-data->T1[3]=9;
-data->T1[4]=14;
-data->T1[5]=17;
-data->T1[6]=37;
-data->T1[7]=6;
-data->T1[8]=32;
-data->T1[9]=13;
-data->T1[10]=25;
-data->T1[11]=18;
-data->T1[12]=33;
-
-data->T2[0]=23;
-data->T2[1]=2;
-data->T2[2]=22;
-data->T2[3]=30;
-data->T2[4]=23;
-data->T2[5]=35;
-data->T2[6]=28;
-data->T2[7]=18;
-data->T2[8]=4;
-data->T2[9]=19;
-data->T2[10]=27;
-data->T2[11]=32;
-data->T2[12]=8;
-
-data->g[0]=0;
-data->g[1]=0;
-data->g[2]=0;
-data->g[3]=0;
-data->g[4]=0;
-data->g[5]=0;
-data->g[6]=5;
-data->g[7]=0;
 data->g[8]=0;
-data->g[9]=0;
-data->g[10]=0;
-data->g[11]=3;
-data->g[12]=0;
-data->g[13]=12;
-data->g[14]=0;
-data->g[15]=0;
-data->g[16]=12;
-data->g[17]=0;
-data->g[18]=6;
-data->g[19]=2;
-data->g[20]=1;
-data->g[21]=8;
-data->g[22]=0;
-data->g[23]=7;
-data->g[24]=7;
-data->g[25]=10;
-data->g[26]=0;
-data->g[27]=0;
-data->g[28]=0;
-data->g[29]=0;
-data->g[30]=9;
-data->g[31]=0;
-data->g[32]=0;
-data->g[33]=0;
-data->g[34]=0;
-data->g[35]=0;
-data->g[36]=0;
-data->g[37]=0;
-data->g[38]=0;
-
-
-data=&hashTabs[6];
-InitHashTab(data,39,13);
-data->keys[0]=(char *)malloc(sizeof(char) * 11);
-strcpy(data->keys[0],"text_color");
-data->keys[1]=(char *)malloc(sizeof(char) * 5);
-strcpy(data->keys[1],"text");
-data->keys[2]=(char *)malloc(sizeof(char) * 5);
-strcpy(data->keys[2],"font");
-data->keys[3]=(char *)malloc(sizeof(char) * 6);
-strcpy(data->keys[3],"color");
-data->keys[4]=(char *)malloc(sizeof(char) * 5);
-strcpy(data->keys[4],"root");
-data->keys[5]=(char *)malloc(sizeof(char) * 7);
-strcpy(data->keys[5],"parent");
-data->keys[6]=(char *)malloc(sizeof(char) * 9);
-strcpy(data->keys[6],"children");
-data->keys[7]=(char *)malloc(sizeof(char) * 14);
-strcpy(data->keys[7],"childrenCount");
-data->keys[8]=(char *)malloc(sizeof(char) * 6);
-strcpy(data->keys[8],"flags");
-data->keys[9]=(char *)malloc(sizeof(char) * 2);
-strcpy(data->keys[9],"x");
-data->keys[10]=(char *)malloc(sizeof(char) * 2);
-strcpy(data->keys[10],"y");
-data->keys[11]=(char *)malloc(sizeof(char) * 6);
-strcpy(data->keys[11],"width");
-data->keys[12]=(char *)malloc(sizeof(char) * 7);
-strcpy(data->keys[12],"height");
-
-data->T1[0]=12;
-data->T1[1]=31;
-data->T1[2]=20;
-data->T1[3]=36;
-data->T1[4]=9;
-data->T1[5]=35;
-data->T1[6]=34;
-data->T1[7]=13;
-data->T1[8]=10;
-data->T1[9]=26;
-data->T1[10]=26;
-data->T1[11]=25;
-data->T1[12]=9;
-
-data->T2[0]=34;
-data->T2[1]=13;
-data->T2[2]=37;
-data->T2[3]=35;
-data->T2[4]=31;
-data->T2[5]=0;
-data->T2[6]=9;
-data->T2[7]=33;
-data->T2[8]=2;
-data->T2[9]=0;
-data->T2[10]=0;
-data->T2[11]=36;
-data->T2[12]=16;
-
-data->g[0]=0;
-data->g[1]=0;
-data->g[2]=0;
-data->g[3]=0;
-data->g[4]=0;
-data->g[5]=0;
-data->g[6]=0;
-data->g[7]=0;
-data->g[8]=7;
-data->g[9]=10;
+data->g[9]=8;
 data->g[10]=0;
 data->g[11]=0;
-data->g[12]=12;
+data->g[12]=0;
 data->g[13]=0;
 data->g[14]=0;
-data->g[15]=2;
+data->g[15]=0;
 data->g[16]=0;
-data->g[17]=9;
+data->g[17]=0;
 data->g[18]=0;
 data->g[19]=0;
 data->g[20]=0;
-data->g[21]=0;
+data->g[21]=8;
 data->g[22]=0;
-data->g[23]=3;
+data->g[23]=2;
 data->g[24]=0;
 data->g[25]=0;
-data->g[26]=0;
+data->g[26]=6;
 data->g[27]=0;
+data->g[28]=5;
+data->g[29]=1;
+data->g[30]=0;
+
+
+data=&hashTabs[10];
+InitHashTab(data,42,14);
+data->keys[0]=(char *)malloc(sizeof(char) * 11);
+strcpy(data->keys[0],"leftBorder");
+data->keys[1]=(char *)malloc(sizeof(char) * 13);
+strcpy(data->keys[1],"bottomBorder");
+data->keys[2]=(char *)malloc(sizeof(char) * 12);
+strcpy(data->keys[2],"rightBorder");
+data->keys[3]=(char *)malloc(sizeof(char) * 10);
+strcpy(data->keys[3],"topBorder");
+data->keys[4]=(char *)malloc(sizeof(char) * 4);
+strcpy(data->keys[4],"img");
+data->keys[5]=(char *)malloc(sizeof(char) * 5);
+strcpy(data->keys[5],"root");
+data->keys[6]=(char *)malloc(sizeof(char) * 7);
+strcpy(data->keys[6],"parent");
+data->keys[7]=(char *)malloc(sizeof(char) * 9);
+strcpy(data->keys[7],"children");
+data->keys[8]=(char *)malloc(sizeof(char) * 14);
+strcpy(data->keys[8],"childrenCount");
+data->keys[9]=(char *)malloc(sizeof(char) * 6);
+strcpy(data->keys[9],"flags");
+data->keys[10]=(char *)malloc(sizeof(char) * 2);
+strcpy(data->keys[10],"x");
+data->keys[11]=(char *)malloc(sizeof(char) * 2);
+strcpy(data->keys[11],"y");
+data->keys[12]=(char *)malloc(sizeof(char) * 6);
+strcpy(data->keys[12],"width");
+data->keys[13]=(char *)malloc(sizeof(char) * 7);
+strcpy(data->keys[13],"height");
+
+data->T1[0]=30;
+data->T1[1]=38;
+data->T1[2]=33;
+data->T1[3]=5;
+data->T1[4]=20;
+data->T1[5]=27;
+data->T1[6]=10;
+data->T1[7]=17;
+data->T1[8]=27;
+data->T1[9]=2;
+data->T1[10]=36;
+data->T1[11]=32;
+data->T1[12]=17;
+data->T1[13]=-842150451;
+
+data->T2[0]=14;
+data->T2[1]=24;
+data->T2[2]=25;
+data->T2[3]=24;
+data->T2[4]=18;
+data->T2[5]=7;
+data->T2[6]=35;
+data->T2[7]=28;
+data->T2[8]=27;
+data->T2[9]=30;
+data->T2[10]=23;
+data->T2[11]=40;
+data->T2[12]=38;
+data->T2[13]=-842150451;
+
+data->g[0]=0;
+data->g[1]=0;
+data->g[2]=0;
+data->g[3]=0;
+data->g[4]=0;
+data->g[5]=0;
+data->g[6]=8;
+data->g[7]=0;
+data->g[8]=0;
+data->g[9]=0;
+data->g[10]=8;
+data->g[11]=3;
+data->g[12]=0;
+data->g[13]=0;
+data->g[14]=0;
+data->g[15]=0;
+data->g[16]=0;
+data->g[17]=0;
+data->g[18]=11;
+data->g[19]=0;
+data->g[20]=0;
+data->g[21]=0;
+data->g[22]=6;
+data->g[23]=1;
+data->g[24]=0;
+data->g[25]=3;
+data->g[26]=0;
+data->g[27]=7;
 data->g[28]=0;
-data->g[29]=11;
-data->g[30]=4;
-data->g[31]=5;
-data->g[32]=0;
-data->g[33]=3;
-data->g[34]=0;
+data->g[29]=0;
+data->g[30]=10;
+data->g[31]=0;
+data->g[32]=4;
+data->g[33]=10;
+data->g[34]=6;
 data->g[35]=0;
-data->g[36]=9;
-data->g[37]=10;
-data->g[38]=0;
+data->g[36]=0;
+data->g[37]=9;
+data->g[38]=12;
+data->g[39]=0;
+data->g[40]=0;
+data->g[41]=0;
 
 
 }

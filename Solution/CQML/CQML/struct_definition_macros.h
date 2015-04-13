@@ -8,6 +8,9 @@
 #endif
 
 #ifndef CQML_PARSER
+
+#include "dll_export.h"
+
 #include <iostream>
 using namespace std;
 
@@ -20,9 +23,9 @@ using namespace std;
     #define PROP_FACTORY_FROM_STRING4(t, n, d, c) if(strcmp(name, #n) == 0) { string_to_##t(value, &self->n); return 1; }
     #define PROP_FACTORY_DUMP_VAR4(t, n, d, c) t##_to_string(self->n, buffer, buffer_size); printf("%s = %s [%s]\n", #n, buffer, c);
 
-	#define PROP_FACTORY_DECL_FUNC3P(t, n, d, ...) t (*n)(__VA_ARGS__); QML_Context n##_context;
-	#define PROP_FACTORY_DECL_METH3P(t, n, d, ...) virtual t n(__VA_ARGS__);
-	#define PROP_FACTORY_DECL_METHV3P(t, n, d, ...) virtual t n(__VA_ARGS__);
+	#define PROP_FACTORY_DECL_FUNC3P(t, n, d, ...) t (*n)(__VA_ARGS__); QML_Context * n##_context;
+	#define PROP_FACTORY_DECL_METH3P(t, n, d, ...) CQML_API virtual t n(__VA_ARGS__);
+	#define PROP_FACTORY_DECL_METHV3P(t, n, d, ...) CQML_API virtual t n(__VA_ARGS__);
      
     /* helper functions */
    /* int string_to_int(const char * str, int * outInt) {
@@ -55,7 +58,11 @@ using namespace std;
 	F(int, bold, 0, "bold") \
 	F(int, size, 0, "size") \
 	F(string, family, "", "family")
+
+
 	
+#define STRUCT_IMG(MF, F, M, ME, MEV, INHERIT) \
+	F(string, src, "", "source")
 
 #define STRUCT_ELEMENT(MF, F, M, ME, MEV, INHERIT) \
 	MF(Element*, root, 0, "id of the class") \
@@ -76,13 +83,10 @@ using namespace std;
 	MEV(int, MouseClicked, 0, int, int, int) \
 	MEV(int, MouseMoved, 0, int, int, int, int) \
 	ME(int, MouseScrolled, 0, int, int, int, int) \
-	M(void, CustomMouseClicked, 0, QML_Context*, QMLEvent) \
-	M(void, CustomMousePressed, 0, QML_Context*, QMLEvent) \
-	M(void, CustomMouseReleased, 0, QML_Context*, QMLEvent) \
-	M(void, CustomMouseMoved, 0, QML_Context*, QMLEvent) \
-	M(void, CustomMouseEntered, 0, QML_Context*, QMLEvent) \
-	M(void, CustomMouseExited, 0, QML_Context*, QMLEvent) \
-	M(void, CustomMouseScrolled, 0, QML_Context*, QMLEvent)
+	MEV(int, KeyPressed, 0, int) \
+	MEV(int, KeyReleased, 0, int) \
+	M(void, CustomKeyPressed, 0, QML_Context*, QMLEvent) \
+	M(void, CustomKeyReleased, 0, QML_Context*, QMLEvent) \
 
 
 
@@ -92,13 +96,27 @@ using namespace std;
 	INHERIT(F, M, STRUCT_ELEMENT) \
 	MEV(void, Draw, 0) \
 	MEV(void, Update, 0) \
+	F(Color, borderColor, 0, "borderColor") \
+	F(float, border, 0, "border") \
+	F(Color, color, 0, "color")
+
+#define STRUCT_MOUSE_AREA(MF, F, M, ME, MEV, INHERIT) \
+	INHERIT(F, M, STRUCT_ELEMENT) \
+	MEV(void, Draw, 0) \
+	MEV(void, Update, 0) \
 	MEV(int, MousePressed, 0, int, int, int) \
 	MEV(int, MouseReleased, 0, int, int, int) \
 	MEV(int, MouseClicked, 0, int, int, int) \
 	MEV(int, MouseMoved, 0, int, int, int, int) \
 	MEV(int, MouseScrolled, 0, int, int, int, int) \
-	F(Color, color, 0, "color")
-
+	M(void, CustomMouseClicked, 0, QML_Context*, QMLEvent) \
+	M(void, CustomMousePressed, 0, QML_Context*, QMLEvent) \
+	M(void, CustomMouseReleased, 0, QML_Context*, QMLEvent) \
+	M(void, CustomMouseMoved, 0, QML_Context*, QMLEvent) \
+	M(void, CustomMouseEntered, 0, QML_Context*, QMLEvent) \
+	M(void, CustomMouseExited, 0, QML_Context*, QMLEvent) \
+	M(void, CustomInputChanged, 0, QML_Context*, QMLEvent) \
+	M(void, CustomMouseScrolled, 0, QML_Context*, QMLEvent)
 
 #define STRUCT_TEXT(MF, F, M, ME, MEV, INHERIT)\
 	INHERIT(F, M, STRUCT_RECTANGLE)\
@@ -116,6 +134,25 @@ using namespace std;
 	MEV(void, DefaultUpdate, 0) \
 	MEV(void, Init, 0) \
 	MEV(void, Draw, 0) 
+
+#define STRUCT_IMAGE(MF, F, M, ME, MEV, INHERIT)\
+	INHERIT(F, M, STRUCT_ELEMENT)\
+	MEV(void, Draw, 0) \
+	MEV(void, DefaultUpdate, 0) \
+	MEV(void, Update, 0) \
+	MEV(void, Init, 0) \
+	F(Img, img, 0, "")
+	
+#define STRUCT_SCALED_IMAGE(MF, F, M, ME, MEV, INHERIT)\
+	INHERIT(F, M, STRUCT_IMAGE)\
+	MEV(void, Update, 0) \
+	MEV(void, DefaultUpdate, 0) \
+	MEV(void, Init, 0) \
+	MEV(void, Draw, 0) \
+	F(int, leftBorder, 0, "x coordinate of left border") \
+	F(int, bottomBorder, 0, "y coordinate of bottom border") \
+	F(int, rightBorder, 0, "x coordinate of right border") \
+	F(int, topBorder, 0, "y coordinate of top border") \
 
 
 #define STRUCT_ANCHOR(MF, F, M, ME, MEV, INHERIT) \
@@ -139,19 +176,73 @@ using namespace std;
 #define INHERITANCE(F, M, MACRO) \
 	MACRO(F, M, INHERITANCE)
 
+#define MAKE_CONSTRUCT2(MACRO, NAME) \
+	void (*NAME##_Init)(NAME*);\
+	NAME##::##NAME(){\
+	NAME##_Init(this);\
+	} \
+	void Set##NAME##_Init(void (*fptr)(NAME*)){\
+	NAME##_Init=fptr;\
+	} \
+
+#define MAKE_CONSTRUCT3(MACRO, NAME, PARENT) \
+	void (*NAME##_Init)(NAME*);\
+	NAME##::##NAME(){\
+	NAME##_Init(this);\
+	} \
+	void Set##NAME##_Init(void (*fptr)(NAME*)){\
+	NAME##_Init=fptr;\
+	} \
+	
+	
+#define MAKE_UPDATE2(MACRO, NAME) \
+	void (*NAME##_Update)(NAME*);\
+	void NAME##::Update(){\
+	NAME##_Update(this);\
+	} \
+	void Set##NAME##_Update(void (*fptr)(NAME*)){\
+	NAME##_Update=fptr;\
+	} \
+
+#define MAKE_UPDATE3(MACRO, NAME, PARENT) \
+	void (*NAME##_Update)(NAME*);\
+	void NAME##::Update(){\
+	NAME##_Update(this);\
+	} \
+	void Set##NAME##_Update(void (*fptr)(NAME*)){\
+	NAME##_Update=fptr;\
+	} \
+	
+#define MAKE_GETTER2(MACRO, NAME) \
+	Variant (*NAME##_Getter)(NAME*, const char*);\
+	Variant NAME##::Get(const char* s){\
+	return NAME##_Getter(this,s);\
+	} \
+	void Set##NAME##_Getter(Variant (*fptr)(NAME*, const char*)){\
+	NAME##_Getter=fptr;\
+	} \
+	
+#define MAKE_GETTER3(MACRO, NAME, PARENT) \
+	Variant (*NAME##_Getter)(NAME*, const char*);\
+	Variant NAME##::Get(const char* s){\
+	return NAME##_Getter(this,s);\
+	} \
+	void Set##NAME##_Getter(Variant (*fptr)(NAME*, const char*)){\
+	NAME##_Getter=fptr;\
+	} \
 	
 #define MAKE_STRUCTURE2(MACRO, NAME) \
 	struct NAME : public CQMLObject { \
-		NAME();\
-		virtual Variant Get(const char*);\
+		CQML_API NAME();\
+		CQML_API virtual Variant Get(const char*);\
 		MACRO(PROP_FACTORY_DECL_MVAR4, PROP_FACTORY_DECL_VAR4, PROP_FACTORY_DECL_FUNC3P, PROP_FACTORY_DECL_METH3P, PROP_FACTORY_DECL_METHV3P, NOTHING) \
 	}; \
 
 
 #define MAKE_STRUCTURE3(MACRO, NAME, PARENT) \
 	struct NAME : public PARENT { \
-		NAME();\
-		virtual Variant Get(const char*);\
+		CQML_API NAME();\
+		CQML_API virtual Variant Get(const char*);\
 		MACRO(PROP_FACTORY_DECL_MVAR4, PROP_FACTORY_DECL_VAR4, PROP_FACTORY_DECL_FUNC3P, PROP_FACTORY_DECL_METH3P, PROP_FACTORY_DECL_METHV3P, NOTHING) \
 	}; \
      
@@ -160,6 +251,8 @@ using namespace std;
 
 #define PROP_FACTORY_PARSER_DECL4(t, n, d, c) parserDeclare(#t,#n,#d);
 #define PROPDEFAULT_FACTORY_PARSER_DECL4(t, n, d, c) parserDeclareDefault(#t,#n,#d);
+#define NOTHING2(t, n)
+#define NOTHING3(t, n, d)
 #define NOTHING4(t, n, d, c)
 #define PROP_FACTORY_PARSER_DECL_METH3P(t, n, d, ...)
    
@@ -186,55 +279,47 @@ using namespace std;
 	REGPRIMITIVE(string)\
 	MACRO2(STRUCT_COLOR, Color) \
 	MACRO2(STRUCT_FONT, Font) \
+	MACRO2(STRUCT_IMG, Img) \
 	MACRO2REF(STRUCT_ELEMENT, Element) \
 	MACRO3(STRUCT_RECTANGLE, Rectangle, Element) \
+	MACRO3(STRUCT_MOUSE_AREA, MouseArea, Element) \
 	MACRO2(STRUCT_ANCHOR, Anchor) \
 	MACRO3(STRUCT_TEXT, Text, Rectangle) \
-	MACRO3(STRUCT_TEXT_INPUT, TextInput, Text)
+	MACRO3(STRUCT_TEXT_INPUT, TextInput, Text) \
+	MACRO3(STRUCT_IMAGE, Image, Element) \
+	MACRO3(STRUCT_SCALED_IMAGE, ScaledImage, Image) \
 
 
 #ifdef CQML_PARSER
 void DefaultDeclaration()
 {
 	REGISTRATION(PARSER_DECLARE2,PARSER_DECLARE2_REF,PARSER_DECLARE3)
-    /* user code - register structure for parser */
-	//PARSER_DECLARE2(STRUCT_COLOR, GUI_Color)
-	//PARSER_DECLARE2(STRUCT_ELEMENT, GUI_Element)
-	//PARSER_DECLARE3(STRUCT_RECTANGLE, GUI_Rectangle, GUI_Element)
+
 }
 #endif
 
 #ifndef CQML_PARSER
-	
+
 namespace CQMLGUI
 {
-#include "context.h"
-	//struct Element : public CQMLObject { 
-	//	Element();
-	//	PROP_FACTORY_DECL_VAR4(Element*, root, 0, "id of the class");
-	/////	PROP_FACTORY_DECL_VAR4(Element*, parent, 0, "id of the class");
-	//PROP_FACTORY_DECL_VAR4(Element**, children, 0, "id of the class");
-	//PROP_FACTORY_DECL_VAR4(int, childrenCount, 0, "id of the class");
-
-	
-	//PROP_FACTORY_DECL_METH3P(int, Left, 0)
-	//PROP_FACTORY_DECL_METHV3P(void, Draw, 0)
-
-	//	STRUCT_ELEMENT(PROP_FACTORY_DECL_VAR4, PROP_FACTORY_DECL_FUNC3P, PROP_FACTORY_DECL_METH3P, PROP_FACTORY_DECL_METHV3P, NOTHING) \
-	//};
-	//MAKE_STRUCTURE2(STRUCT_COLOR, Color)
-	//MAKE_STRUCTURE2(STRUCT_ELEMENT, Element)
+	#include "context.h"
 	REGISTRATION(MAKE_STRUCTURE2, MAKE_STRUCTURE2, MAKE_STRUCTURE3)
 
+};
+#ifdef CQML_DLL
 
-    /* user code - register structures for GUI */
-	//MAKE_STRUCTURE2(STRUCT_COLOR, GUI_Color)
-	//MAKE_STRUCTURE2(STRUCT_ELEMENT, GUI_Element)
-	//MAKE_STRUCTURE3(STRUCT_RECTANGLE, GUI_Rectangle, GUI_Element)
+#include "variant.h"
+namespace CQMLGUI
+{
+	//REGISTRATION(MAKE_CONSTRUCT2, MAKE_CONSTRUCT2, MAKE_CONSTRUCT3)
 
-// end namspace 
+	//REGISTRATION(NOTHING2, NOTHING2, MAKE_UPDATE3)
+
+	//REGISTRATION(MAKE_GETTER2, MAKE_GETTER2, MAKE_GETTER3)
 };
 #endif
+#endif
+
 
 #ifdef MEH
 
