@@ -1,11 +1,15 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual C++ Express 2010
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CQML", "CQML\CQML.vcxproj", "{B9F47C88-D70D-4C1A-85E4-3D43FAD0078C}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "parser", "parser\parser.vcxproj", "{BE64E5C9-8BE2-457F-B3A3-02FE101CA383}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "bison_grammar", "bison_grammar\bison_grammar.vcxproj", "{57098BBD-4E90-4AC8-90EF-F1B7E9CAD6BB}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CQML_DLL", "CQML_DLL\CQML_DLL.vcxproj", "{2BD0C32D-81DA-4A10-B062-FCA1F11B5704}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CQML_lib_preprocessor", "CQML_lib_preprocessor\CQML_lib_preprocessor.vcxproj", "{389EBC20-6D1D-4CE4-BE24-908347322138}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -25,6 +29,14 @@ Global
 		{57098BBD-4E90-4AC8-90EF-F1B7E9CAD6BB}.Debug|Win32.Build.0 = Debug|Win32
 		{57098BBD-4E90-4AC8-90EF-F1B7E9CAD6BB}.Release|Win32.ActiveCfg = Release|Win32
 		{57098BBD-4E90-4AC8-90EF-F1B7E9CAD6BB}.Release|Win32.Build.0 = Release|Win32
+		{2BD0C32D-81DA-4A10-B062-FCA1F11B5704}.Debug|Win32.ActiveCfg = Debug|Win32
+		{2BD0C32D-81DA-4A10-B062-FCA1F11B5704}.Debug|Win32.Build.0 = Debug|Win32
+		{2BD0C32D-81DA-4A10-B062-FCA1F11B5704}.Release|Win32.ActiveCfg = Release|Win32
+		{2BD0C32D-81DA-4A10-B062-FCA1F11B5704}.Release|Win32.Build.0 = Release|Win32
+		{389EBC20-6D1D-4CE4-BE24-908347322138}.Debug|Win32.ActiveCfg = Debug|Win32
+		{389EBC20-6D1D-4CE4-BE24-908347322138}.Debug|Win32.Build.0 = Debug|Win32
+		{389EBC20-6D1D-4CE4-BE24-908347322138}.Release|Win32.ActiveCfg = Release|Win32
+		{389EBC20-6D1D-4CE4-BE24-908347322138}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
