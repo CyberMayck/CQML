@@ -74,6 +74,7 @@ using namespace std;
 	F(int, y, 0, "y coordinate in pixels") \
 	F(int, width, 0, "width in pixels") \
 	F(int, height, 0, "height in pixels")\
+	MF(int, focus, 0, "focused")\
 	ME(int, Top, 0)\
 	ME(int, Left, 0)\
 	MEV(void, Draw, 0) \
@@ -85,8 +86,8 @@ using namespace std;
 	ME(int, MouseScrolled, 0, int, int, int, int) \
 	MEV(int, KeyPressed, 0, int) \
 	MEV(int, KeyReleased, 0, int) \
-	M(void, CustomKeyPressed, 0, QML_Context*, QMLEvent) \
-	M(void, CustomKeyReleased, 0, QML_Context*, QMLEvent) \
+	M(void, CustomKeyPressed, 0, QML_Context*, QMLKeyboardEvent EVENT) \
+	M(void, CustomKeyReleased, 0, QML_Context*, QMLKeyboardEvent EVENT) \
 
 
 
@@ -102,21 +103,19 @@ using namespace std;
 
 #define STRUCT_MOUSE_AREA(MF, F, M, ME, MEV, INHERIT) \
 	INHERIT(F, M, STRUCT_ELEMENT) \
-	MEV(void, Draw, 0) \
 	MEV(void, Update, 0) \
 	MEV(int, MousePressed, 0, int, int, int) \
 	MEV(int, MouseReleased, 0, int, int, int) \
 	MEV(int, MouseClicked, 0, int, int, int) \
 	MEV(int, MouseMoved, 0, int, int, int, int) \
 	MEV(int, MouseScrolled, 0, int, int, int, int) \
-	M(void, CustomMouseClicked, 0, QML_Context*, QMLEvent) \
-	M(void, CustomMousePressed, 0, QML_Context*, QMLEvent) \
-	M(void, CustomMouseReleased, 0, QML_Context*, QMLEvent) \
-	M(void, CustomMouseMoved, 0, QML_Context*, QMLEvent) \
-	M(void, CustomMouseEntered, 0, QML_Context*, QMLEvent) \
-	M(void, CustomMouseExited, 0, QML_Context*, QMLEvent) \
-	M(void, CustomInputChanged, 0, QML_Context*, QMLEvent) \
-	M(void, CustomMouseScrolled, 0, QML_Context*, QMLEvent)
+	M(void, CustomMouseClicked, 0, QML_Context*, QMLMouseEvent EVENT) \
+	M(void, CustomMousePressed, 0, QML_Context*, QMLMouseEvent EVENT) \
+	M(void, CustomMouseReleased, 0, QML_Context*, QMLMouseEvent EVENT) \
+	M(void, CustomMouseMoved, 0, QML_Context*, QMLMouseEvent EVENT) \
+	M(void, CustomMouseEntered, 0, QML_Context*, QMLMouseEvent EVENT) \
+	M(void, CustomMouseExited, 0, QML_Context*, QMLMouseEvent EVENT) \
+	M(void, CustomMouseScrolled, 0, QML_Context*, QMLMouseEvent EVENT)
 
 #define STRUCT_TEXT(MF, F, M, ME, MEV, INHERIT)\
 	INHERIT(F, M, STRUCT_RECTANGLE)\
@@ -133,6 +132,10 @@ using namespace std;
 	MEV(void, Update, 0) \
 	MEV(void, DefaultUpdate, 0) \
 	MEV(void, Init, 0) \
+	MEV(int, MouseClicked, 0, int, int, int) \
+	MEV(int, KeyPressed, 0, int) \
+	MEV(int, KeyReleased, 0, int) \
+	M(void, InputChange, 0, QML_Context*, QMLKeyboardEvent EVENT) \
 	MEV(void, Draw, 0) 
 
 #define STRUCT_IMAGE(MF, F, M, ME, MEV, INHERIT)\

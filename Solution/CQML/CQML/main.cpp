@@ -23,6 +23,7 @@
 #include<stdlib.h>
 #include<string.h>
 
+
 #include "../CQML_DLL/cqml.h"
 #include "../CQML_DLL/gui.h"
 #include "../CQML_DLL/draw_iface.h"
@@ -50,16 +51,15 @@ struct SDL_Drawer
 
 
 
-void SDLInit()
+void SDLInit(int w, int h)
 {
 	SDL_Init(SDL_INIT_EVERYTHING);
 	//SDL_CreateWindow("CQML SDL TEST", 5, 5, 800, 600,SDL_WINDOW_OPENGL);
-	SDL_CreateWindowAndRenderer(800, 600,SDL_WINDOW_OPENGL,&SDLWindow,&SDLRenderer);
 
 	TTF_Init();
 	int flags=IMG_INIT_JPG|IMG_INIT_PNG|IMG_INIT_TIF;
 	int initted=IMG_Init(flags);
-	if(initted&flags != flags) {
+	if((initted&flags) != flags) {
 		printf("IMG_Init: Failed to init required jpg and png and tif support!\n");
 		printf("IMG_Init: %s\n", IMG_GetError());
 	}
@@ -143,6 +143,7 @@ struct SDLResourceManager
 	virtual void* LoadFont(const char * fontStr, int fontSize)
 	{
 		TTF_Font *fnt = TTF_OpenFont( (string(fontStr)+".ttf").c_str(), fontSize );
+		//printf("TTF_OpenFont: %s\n", TTF_GetError());
 		return fnt;
 	}
 	virtual ImageData LoadImage(const char *  path)
@@ -239,6 +240,7 @@ struct SDLDrawer
 		//printf("TTF_OpenFont: %s\n", TTF_GetError());
 		SDL_FreeSurface(sText);
 		SDL_RenderCopy(SDLRenderer, strTex, NULL, &sdlRect);
+		SDL_DestroyTexture(strTex);
 	}
 	void DrawImage(int x, int y, int w, int h, void* image)
 	{
@@ -251,6 +253,7 @@ struct SDLDrawer
 		sdlRect.h=h;
 		
 		SDL_RenderCopy(SDLRenderer, imgTex, NULL, &sdlRect);
+		SDL_DestroyTexture(imgTex);
 	}
 	virtual void DrawImageSegment(int x, int y, int w, int h, void* image, int iX, int iY, int iW, int iH)
 	{
@@ -258,6 +261,7 @@ struct SDLDrawer
 		SDL_Rect sdlSrcRect;
 		SDL_Surface * imgSurf = (SDL_Surface *)image;
 		SDL_Texture * imgTex=SDL_CreateTextureFromSurface(SDLRenderer, imgSurf);
+		//std::cout << SDL_GetError() << endl;;
 		sdlRect.x=x;
 		sdlRect.y=y;
 		sdlRect.w=w;
@@ -268,6 +272,7 @@ struct SDLDrawer
 		sdlSrcRect.h=iH;
 		
 		SDL_RenderCopy(SDLRenderer, imgTex, &sdlSrcRect, &sdlRect);
+		SDL_DestroyTexture(imgTex);
 	}
 };
 
@@ -309,8 +314,7 @@ void PrintMeMyFriend(char * str)
 {
 	printf("Print: %s\n",str);
 }
-extern CQMLGUI::Element* root;
-//#include "parser_output.cpp"
+
 
 void GUIMainLoop()
 {
@@ -331,6 +335,7 @@ void GUIMainLoop()
 		fps=1/timey;
 		prevTime=t;
 		t=clock();
+	printf("%d fps\n",fps);
 
 	}
 }
@@ -339,7 +344,7 @@ int InputHandling()
 {
 	SDL_Event sdlEvent;
 	CQMLGUI::QMLEvent qmlEvent;
-	//SDL_WaitEvent(&sdlEvent);
+
 	while (SDL_PollEvent(&sdlEvent)) {
 	switch (sdlEvent.type)
 	{
@@ -351,14 +356,14 @@ int InputHandling()
 			qmlEvent.keyEvent.action=KEY_PRESSED;
 			qmlEvent.keyEvent.key=sdlEvent.key.keysym.sym;
 			CQMLGUI::PushEvent(qmlEvent);
-			//printf("pressed %c\n",sdlEvent.key.keysym.sym);
+
 			break;
 		case SDL_KEYUP:
 			qmlEvent.EventType=QML_KEY_EVENT;
 			qmlEvent.keyEvent.action=KEY_RELEASED;
 			qmlEvent.keyEvent.key=sdlEvent.key.keysym.sym;
 			CQMLGUI::PushEvent(qmlEvent);
-			//printf("pressed %c\n",sdlEvent.key.keysym.sym);
+
 			break;
 		case SDL_MOUSEBUTTONDOWN:
 			qmlEvent.EventType=QML_MOUSE_EVENT;
@@ -367,10 +372,8 @@ int InputHandling()
 			qmlEvent.mouseEvent.x=sdlEvent.button.x;
 			qmlEvent.mouseEvent.y=sdlEvent.button.y;
 			CQMLGUI::PushEvent(qmlEvent);
-			//printf("mouse click %d %d\n",sdlEvent.button.x,sdlEvent.button.y);
-			//root->MousePressed(sdlEvent.button.x,sdlEvent.button.y,sdlEvent.button.button);
+			
 			break;
-//			
 		case SDL_MOUSEBUTTONUP:
 			qmlEvent.EventType=QML_MOUSE_EVENT;
 			qmlEvent.mouseEvent.action=MOUSE_BUTTON_RELEASED;
@@ -379,7 +382,6 @@ int InputHandling()
 			qmlEvent.mouseEvent.y=sdlEvent.button.y;
 			CQMLGUI::PushEvent(qmlEvent);
 
-			//root->MouseReleased(sdlEvent.button.x,sdlEvent.button.y,sdlEvent.button.button);
 			break;
 		case SDL_MOUSEMOTION:
 			qmlEvent.EventType=QML_MOUSE_EVENT;
@@ -389,7 +391,7 @@ int InputHandling()
 			qmlEvent.mouseEvent.relativeX=sdlEvent.motion.xrel;
 			qmlEvent.mouseEvent.relativeY=sdlEvent.motion.yrel;
 			CQMLGUI::PushEvent(qmlEvent);
-			//root->MouseMoved(sdlEvent.motion.x,sdlEvent.motion.y,sdlEvent.motion.xrel,sdlEvent.motion.yrel);
+
 			break;
 		case SDL_MOUSEWHEEL:
 			qmlEvent.EventType=QML_MOUSE_EVENT;
@@ -399,7 +401,7 @@ int InputHandling()
 			qmlEvent.mouseEvent.relativeX=sdlEvent.wheel.x;
 			qmlEvent.mouseEvent.relativeY=sdlEvent.wheel.y;
 			CQMLGUI::PushEvent(qmlEvent);
-			//root->MouseScrolled(sdlEvent.wheel.x,sdlEvent.wheel.y,sdlEvent.wheel.x,sdlEvent.wheel.y);
+			
 			break;
 	}
 	}
@@ -408,44 +410,17 @@ int InputHandling()
 
 void Update()
 {
-	int i;
 	_QML_Update();
-	for(i=0;i<allElementCount;i++)
-	{
-		//allElements[i]->Update(allElements[i]);
-	}
+
 }
-
-
-// parser output stuff
 
 void Redraw()
 {
-	/*int i;
-	for(i=0;i<allElementCount;i++)
-	{
-		allElements[i]->Draw(allElements[i]);
-	}*/
-
-	/*SDL_Surface *sText;
-	SDL_Color clrFg = {255,255,255,0};
-	SDL_Rect sdlRect = {700,0,100,100};
-	char fpsStr[100];*/
 
 		SDL_SetRenderDrawColor(SDLRenderer,0,0,0,255);
 		SDL_RenderClear(SDLRenderer);
 
-		root->Draw();
-		//CQMLGUI::mGUI_Element_Draw((CQMLGUI::Element*)root);
-
-		/*
-		sprintf(fpsStr,"%d",fps);
-
-		sText = TTF_RenderText_Solid( fntCourier, fpsStr, clrFg );
-		strTex=SDL_CreateTextureFromSurface(SDLRenderer, sText);
-		SDL_FreeSurface(sText);
-		SDL_RenderCopy(SDLRenderer, strTex, NULL, &sdlRect);
-		*/
+		_QML_Draw();
 
 		SDL_Rect sdlRect;
 		sdlRect.x=10;
@@ -455,21 +430,6 @@ void Redraw()
 
 		SDL_Surface *sText;
 		SDL_Color clrFg = {1*255,1*255,0*255,0};
-		
-		/*TTF_Font *fnt;
-		//fntCourier = TTF_OpenFont( "C64.ttf", 12 );
-		printf("TTF_OpenFont: %s\n", TTF_GetError());
-		fnt = TTF_OpenFont( "LeagueGothic-CondensedRegular.otf", 100 );
-		printf("TTF_OpenFont: %s\n", TTF_GetError());
-		const char *text = "200";
-		sText = TTF_RenderText_Solid( fnt, text, clrFg );
-		printf("TTF_OpenFont: %s\n", TTF_GetError());
-		strTex=SDL_CreateTextureFromSurface(SDLRenderer, sText);
-
-
-		printf("TTF_OpenFont: %s\n", TTF_GetError());
-		SDL_FreeSurface(sText);
-		SDL_RenderCopy(SDLRenderer, strTex, NULL, &sdlRect);*/
 
 
 
@@ -482,70 +442,30 @@ int main()
 #ifdef USECAIRO
 	CairoInit();
 #endif
+	
+	SDLInit(0,0);
+
+	_QML_Init();
+	InitSDLDrawer();
+	InitSDLResourceManager();
+	_QML_Start();
+
+	int w;
+	int h;
+	CQMLGUI::GetQMLWindow(w,h);
+
 #ifdef USESDL
 	SDL_Event sdlEvent;
-	SDLInit();
+	SDL_CreateWindowAndRenderer(w, h,SDL_WINDOW_OPENGL,&SDLWindow,&SDLRenderer);
+
 	//SDL_RenderFillRect(SDLRenderer,NULL);
 	if(SDLWindow==NULL || SDLRenderer==NULL)
 		return 0;
 #endif
-	SetInitHashTabs(&InitHashTabs);
-	//SetAnchor_Init(InitAnchor);
-	//SetColor_Init(InitColor);
-	//SetFont_Init(InitFont);
-	//SetElement_Init(InitElement);
-	//SetRectangle_Init(InitRectangle);
-	//SetText_Init(InitText);
-
-	//SetRectangle_Update(UpdateRectangle);
-	//SetText_Update(UpdateText);
-
-
-
-	InitQML();
-	InitSDLDrawer();
-	InitSDLResourceManager();
-	_QML_Init();
-	//mGUI_Element_Draw((GUI_Element*)root);
-
-
-
-	/*
-
-
-
-	
-	SDL_Rect sdlRect;
-		sdlRect.x=10;
-		sdlRect.y=10;
-		sdlRect.w=100;
-		sdlRect.h=100;
-
-		SDL_Surface *sText;
-		SDL_Color clrFg = {1*255,1*255,0*255,0};
-		
-		TTF_Font *fnt;
-		//fntCourier = TTF_OpenFont( "C64.ttf", 12 );
-		printf("TTF_OpenFont: %s\n", TTF_GetError());
-		fnt = TTF_OpenFont( "LeagueGothic-CondensedRegular.otf", 100 );
-		printf("TTF_OpenFont: %s\n", TTF_GetError());
-		const char *text = "200";
-		sText = TTF_RenderText_Solid( fnt, text, clrFg );
-		printf("TTF_OpenFont: %s\n", TTF_GetError());
-		strTex=SDL_CreateTextureFromSurface(SDLRenderer, sText);
-
-
-		printf("TTF_OpenFont: %s\n", TTF_GetError());
-		SDL_FreeSurface(sText);
-		SDL_RenderCopy(SDLRenderer, strTex, NULL, &sdlRect);
-		SDL_RenderPresent(SDLRenderer);
-		while (true)continue;
-
-	return 0;*/
 
 	GUIMainLoop();
 #ifdef USESDL
-	while(quit==0)
+	/*while(quit==0)
 	{
 		SDL_WaitEvent(&sdlEvent);
 		switch (sdlEvent.type)
@@ -572,7 +492,7 @@ int main()
 		root->Draw();
 		//CQMLGUI::mGUI_Element_Draw((CQMLGUI::Element*)root);
 		SDL_RenderPresent(SDLRenderer);
-	}
+	}*/
 	//SDL_Delay(3000);
 	
     SDL_DestroyRenderer(SDLRenderer);
@@ -586,6 +506,7 @@ int main()
 	CairoEnd();
 #endif
 
-
+	//_CrtDumpMemoryLeaks();
+	//getchar();
 	return 0;
 }
