@@ -37,6 +37,7 @@ void InternalResourceManager::LoadImages()
 			images[txt]=img;
 		}
 	}
+	imageLoadQueue.clear();
 }
 void InternalResourceManager::LoadFonts()
 {
@@ -54,6 +55,8 @@ void InternalResourceManager::LoadFonts()
 			fonts[hashStr]=font;
 		}
 	}
+	fontLoadQueue.clear();
+	fontSizeLoadQueue.clear();
 }
 
 int InternalResourceManager::TryLoadFont(string txt, int size)
