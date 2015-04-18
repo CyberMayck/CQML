@@ -12,7 +12,7 @@ CQMLGUI::Element * lastPressed;
 
 namespace CQMLGUI
 {
-
+	extern CQMLGUI::Element* root;
 	Element* acElement()
 	{
 		Element * a;
@@ -84,6 +84,12 @@ namespace CQMLGUI
 		return;
 	}
 
+	void GetQMLWindow(int &w,int &h)
+	{
+		w=root->width;
+		h=root->height;
+	}
+
 	void Element::Draw()
 	{
 		int i;
@@ -117,18 +123,23 @@ namespace CQMLGUI
 		}
 		if(processed==0 && CustomKeyPressed!=0)
 		{
-			CustomKeyPressed(CustomKeyPressed_context, MakeEvent());
+			QMLKeyboardEvent e;
+			e.action=KEY_PRESSED;
+			e.key=key;
+			CustomKeyPressed(CustomKeyPressed_context, e);
 		}
 		return processed;
 	}
 	int TextInput::KeyPressed(int key)
 	{
-		//if(focus)
+		if(focus)
 		{
+			
 			if(key>=32 && key<=126)
 				text=text+static_cast<char>(key);
 			if(key==8 && text.length()>0)
 				text=text.substr(0,text.length()-1);
+				
 		}
 		return 1;
 	}
@@ -146,7 +157,10 @@ namespace CQMLGUI
 		}
 		if(processed==0 && CustomKeyReleased!=0)
 		{
-			CustomKeyReleased(CustomKeyReleased_context, MakeEvent());
+			QMLKeyboardEvent e;
+			e.action=KEY_RELEASED;
+			e.key=key;
+			CustomKeyReleased(CustomKeyReleased_context, e);
 		}
 		return processed;
 	}
@@ -195,15 +209,43 @@ namespace CQMLGUI
 		return processed;
 	}
 
+	void ChangeFocus(Element * e)
+	{
+		if(focused!=0) focused->focus=0;
+		focused=e;
+		focused->focus=1;
+	}
+
+	int TextInput::MouseClicked(int x, int y,int button)
+	{
+		int x1,y1,w,h;
+	
+		//int processed=Element::MouseClicked(x,y,button);
+		//if(processed!=0)
+		//	return processed;
+
+		x1=Left();
+		y1=Top();
+		w=width;
+		h=height;
+	
+		if(x1<x && x<x1+w && y1<y && y<y1+h)
+		{
+			ChangeFocus(this);
+			return 1;
+		}
+
+		return 0;
+	}
 
 	int MouseArea::MouseClicked(int x, int y,int button)
 	{
 		int x1,y1,w,h;
 		Rectangle* me;
 	
-		int processed=Element::MouseClicked(x,y,button);
-		if(processed!=0)
-			return processed;
+		//int processed=Element::MouseClicked(x,y,button);
+		//if(processed!=0)
+		//	return processed;
 		me=(Rectangle* )this;
 		x1=Left();
 		y1=Top();
@@ -213,7 +255,13 @@ namespace CQMLGUI
 		if(x1<x && x<x1+w && y1<y && y<y1+h)
 		{
 			if(CustomMouseClicked!=0)
-				CustomMouseClicked(this->CustomMouseClicked_context, MakeEvent());
+			{
+				QMLMouseEvent e;
+				e.x=x;
+				e.y=y;
+				e.button=button;
+				CustomMouseClicked(this->CustomMouseClicked_context, e);
+			}
 
 			return 1;
 		}
@@ -225,6 +273,7 @@ namespace CQMLGUI
 	void InitGUI()
 	{
 		lastPressed=0;
+		focused=0;
 	}
 
 	int MouseArea::MousePressed(int x, int y, int button)
@@ -245,7 +294,13 @@ namespace CQMLGUI
 		{
 			lastPressed=this;
 			if(CustomMousePressed!=0)
-				CustomMousePressed(this->CustomMousePressed_context, MakeEvent());
+			{
+				QMLMouseEvent e;
+				e.x=x;
+				e.y=y;
+				e.button=button;
+				CustomMousePressed(this->CustomMousePressed_context, e);
+			}
 
 			return 1;
 		}
@@ -270,10 +325,22 @@ namespace CQMLGUI
 		if(x1<x && x<x1+w && y1<y && y<y1+h)
 		{
 			if(CustomMouseReleased!=0)
-				CustomMouseReleased(this->CustomMousePressed_context, MakeEvent());
+			{
+				QMLMouseEvent e;
+				e.x=x;
+				e.y=y;
+				e.button=button;
+				CustomMouseReleased(this->CustomMousePressed_context, e);
+			}
 
 			if(lastPressed==this && CustomMouseClicked!=0)
-				CustomMouseClicked(this->CustomMouseClicked_context, MakeEvent());
+			{
+				QMLMouseEvent e;
+				e.x=x;
+				e.y=y;
+				e.button=button;
+				CustomMouseClicked(this->CustomMouseClicked_context, e);
+			}
 
 			return 1;
 		}
@@ -304,10 +371,24 @@ namespace CQMLGUI
 			if(CustomMouseEntered!=0)
 			{
 				if(!(x1<xold && xold<x1+w && y1<yold && yold<y1+h))
-					CustomMouseEntered(this->CustomMouseEntered_context, MakeEvent());
+				{
+					QMLMouseEvent e;
+					e.x=x;
+					e.y=y;
+					e.relativeX=relx;
+					e.relativeY=rely;
+					CustomMouseEntered(this->CustomMouseEntered_context, e);
+				}
 			}
 			if(CustomMouseMoved!=0)
-				CustomMouseMoved(this->CustomMouseMoved_context, MakeEvent());
+			{
+				QMLMouseEvent e;
+				e.x=x;
+				e.y=y;
+				e.relativeX=relx;
+				e.relativeY=rely;
+				CustomMouseMoved(this->CustomMouseMoved_context, e);
+			}
 
 		}
 		else
@@ -315,7 +396,14 @@ namespace CQMLGUI
 			if(CustomMouseExited!=0)
 			{
 				if(x1<xold && xold<x1+w && y1<yold && yold<y1+h)
-					CustomMouseExited(this->CustomMouseExited_context, MakeEvent());
+				{
+					QMLMouseEvent e;
+					e.x=x;
+					e.y=y;
+					e.relativeX=relx;
+					e.relativeY=rely;
+					CustomMouseExited(this->CustomMouseExited_context, e);
+				}
 			}
 		}
 
@@ -338,7 +426,14 @@ namespace CQMLGUI
 		if(x1<x && x<x1+w && y1<y && y<y1+h)
 		{
 			if(CustomMouseScrolled!=0)
-				CustomMouseScrolled(this->CustomMouseScrolled_context, MakeEvent());
+			{
+				QMLMouseEvent e;
+				e.x=x;
+				e.y=y;
+				e.relativeX=relx;
+				e.relativeY=rely;
+				CustomMouseScrolled(this->CustomMouseScrolled_context, e);
+			}
 			return 1;
 		}
 

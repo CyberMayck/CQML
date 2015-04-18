@@ -3,4 +3,4 @@
 
 #include "dll_export.h"
 
-CQML_API void InitQML();
+CQML_API void _QML_Init();
