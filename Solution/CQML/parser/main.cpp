@@ -162,8 +162,22 @@ void printHandlerAssignment()
 				{
 					continue;
 				}
-				fprintf(file_class_source, "\t_QML_element%d->Custom%s=_QML_element%d_%s;\n",i,handler->name,i,handler->name);
-				fprintf(file_class_source, "\t_QML_element%d->Custom%s_context=acQML_Context((CQMLGUI::Component*)this,(CQMLGUI::Element*)_QML_element%d);\n",i,handler->name,i);
+				if(!handler->isProperty)
+				{
+					fprintf(file_class_source, "\t_QML_element%d->Custom%s=_QML_element%d_%s;\n",i,handler->name,i,handler->name);
+					fprintf(file_class_source, "\t_QML_element%d->Custom%s_context=acQML_Context((CQMLGUI::Component*)this,(CQMLGUI::Element*)_QML_element%d);\n",i,handler->name,i);
+				}
+				else
+				{
+					PropertyAndType * prop=	elements[i].classContainer->CheckExistence(handler->name);
+					if(prop!=0)
+					{
+							fprintf(file_class_source, "\t((%s*)_QML_element%d)->%s_context",prop->cont->className.c_str(),i,handler->name);
+							fprintf(file_class_source, "  = acQML_Context((CQMLGUI::Component*)this,(CQMLGUI::Element*)_QML_element%d);\n",i);
+							fprintf(file_class_source, "\t((%s*)_QML_element%d)->%s_Update",prop->cont->className.c_str(),i,handler->name);
+							fprintf(file_class_source, "  = Update_E%d_%s;\n",i,handler->name);
+					}
+				}
 			}
 		}
 	}
@@ -176,7 +190,7 @@ void printHandlers()
 	int currentId;
 	currentId=id;
 
-	fprintf(file_class_source, "\n//printHandlers()\n");
+	fprintf(file_class_source, "\n//printHandlers()\nusing namespace CQMLGUI;\n");
 
 	for(int k=compInd-1;k>=0;k--)
 	{
@@ -189,13 +203,61 @@ void printHandlers()
 				{
 					continue;
 				}
-				fprintf(file_class_source, "static void _QML_element%d_%s(CQMLGUI::QML_Context * context, CQMLGUI::QMLEvent Event)\n{\n",i,handler->name);
+
+				HandlerAndType * ht=  elements[i].classContainer->CheckHExistence(string("Custom")+handler->name);
+				if(ht!=0)
+				{
+					string str="";
+					for(int l=1;l<ht->paramNames.size();l++)
+					{
+						str+=ht->paramTypes[l]+string(" ")+ht->paramNames[l];
+						if(l!=ht->paramNames.size()-1)
+						{
+							str+=", ";
+						}
+					}
+					//fprintf(file_class_source, "static %s _QML_element%d_%s(CQMLGUI::QML_Context * context, CQMLGUI::QMLEvent Event)\n{\n",i,handler->name,str.c_str());
+					fprintf(file_class_source, "static %s _QML_element%d_%s(CQMLGUI::QML_Context * context, %s)\n{\n",ht->returnType.c_str(),i,handler->name,str.c_str());
 				
-				string hSrc;
-				handler->source->Print(hSrc);
-				//PrintNodeToFile(file_class_source,handler->code);
-				fprintf(file_class_source, "%s\n",hSrc.c_str());
-				fprintf(file_class_source, "\n}\n");
+					string hSrc;
+					handler->source->Print(hSrc);
+					//PrintNodeToFile(file_class_source,handler->code);
+					fprintf(file_class_source, "%s\n",hSrc.c_str());
+					fprintf(file_class_source, "\n}\n");
+				}
+				else
+				{
+					if(handler->isProperty)
+					{ ///duh
+						PropertyAndType * prop=	elements[i].classContainer->CheckExistence(handler->name);
+						if(prop!=0)
+						{
+							fprintf(file_class_source, "static void Update_E%d_%s(CQMLGUI::QML_Context *);\n",i,handler->name);
+							fprintf(file_class_source, "static %s Handler_E%d_%s(CQMLGUI::QML_Context *);\n",prop->type.c_str(),i,handler->name);
+						
+							fprintf(file_class_source, "static void Update_E%d_%s(CQMLGUI::QML_Context *context)\n",i,handler->name);
+							fprintf(file_class_source, "{\n");
+
+
+						
+							fprintf(file_class_source,"\t((CQMLGUI::%s*)context->self)->%s=",prop->cont->className.c_str(),handler->name);
+							fprintf(file_class_source, "Handler_E%d_%s(context)",i,handler->name);
+							fprintf(file_class_source, ";\n");
+						
+							fprintf(file_class_source, "}\n");
+
+
+							fprintf(file_class_source, "static %s Handler_E%d_%s(CQMLGUI::QML_Context *context)\n",prop->type.c_str(),i,handler->name);
+							fprintf(file_class_source, "{\n");
+							string str="";
+							handler->source->Print(str);
+						
+							fprintf(file_class_source, "%s",str.c_str());
+							fprintf(file_class_source, "\n}\n");
+
+						}
+					}
+				}
 			}
 		}
 	}
@@ -239,7 +301,9 @@ void printAttributes()
 				}
 				else
 				{
-					assert(false);
+					//assert(false);
+					printf("nonexistent attribute: %s \nin %s\n",att->name,elements[i].name);
+					exit(-1);
 				}
 				
 				//PrintNodeToFile(file_class_source,att->expression);
@@ -255,6 +319,7 @@ void printAttributes()
 void classDeclaration(const char* rootName, int treeInd)
 {
 	int customClassCount=0;
+
 	//fprintf(file_class_header,"typedef struct GUI_Root%s GUI_Root%s;\n\n",rootName,rootName);
 	fprintf(file_class_header,"struct Root%s;\n\n",rootName);
 
@@ -284,7 +349,7 @@ void classDeclaration(const char* rootName, int treeInd)
 		fprintf(file_class_header,"struct %s\n",elements[i].name);
 	//	fprintf(file_class_header,"\t: %s\n{\n\t%s();",elements[i].origClassName,elements[i].name);
 		fprintf(file_class_header,"\t: %s\n{\n",elements[i].origClassName,elements[i].name);
-		fprintf(file_class_header,"\t%s();\n",elements[i].name);
+		//fprintf(file_class_header,"\t%s();\n",elements[i].name);
 
 		for(int j=0;j<elements[i].propertiesCount;j++)
 		{
@@ -382,7 +447,8 @@ void rootElementDeclaration(const char * rootName)
 		fprintf(file_class_header, "\t%s* _QML_element%d;\n",elements[i].classContainer->className.c_str(),i);
 	}
 	fprintf(file_class_header,"};\n");
-	fprintf(file_class_header,"Root%s* acGUI_Root%s();\n",rootName,rootName);
+	//fprintf(file_class_header,"Root%s* acGUI_Root%s();\n",rootName,rootName);
+	fprintf(file_class_header,"%s* acGUI_Root%s();\n",elements[0].name,rootName);
 	fprintf(file_class_header,"Root%s cGUI_Root%s();\n",rootName,rootName);
 }
 
@@ -396,7 +462,8 @@ void rootElementAllocation(const char * rootName, int treeInd)
 	
 	fprintf(file_class_source, "\n //rootElementAllocation() \n");
 
-		fprintf(file_class_source,"CQMLGUI::Root%s* CQMLGUI::acGUI_Root%s()\n{\n",rootName,rootName);
+	fprintf(file_class_source,"CQMLGUI::%s* CQMLGUI::acGUI_Root%s()\n{\n",elements[0].name,rootName);
+		//fprintf(file_class_source,"CQMLGUI::Root%s* CQMLGUI::acGUI_Root%s()\n{\n",rootName,rootName);
 		fprintf(file_class_source,"\tCQMLGUI::Root%s * pointer;\n\tpointer=new CQMLGUI::Root%s();\n",rootName,rootName);
 
 		////fprintf(file_class_source,"pointer->original=cGUI_Root();\n",elements[i].origClassName);
@@ -405,7 +472,8 @@ void rootElementAllocation(const char * rootName, int treeInd)
 		//fprintf(file_class_source, "mGUI_Element_InsertChild((GUI_Element*)pointer, (GUI_Element*)pointer->_QML_element0);\n");
 		//fprintf(file_class_source,"return pointer;\n");
 
-		fprintf(file_class_source,"\treturn (CQMLGUI::Root%s*)pointer->_QML_element0;\n",rootName);
+		//fprintf(file_class_source,"\treturn (CQMLGUI::Root%s*)pointer->_QML_element0;\n",rootName);
+		fprintf(file_class_source,"\treturn pointer->_QML_element0;\n",rootName);
 			
 
 		fprintf(file_class_source,"}\n");
@@ -428,7 +496,8 @@ void rootElementConstructor(const char * rootName, int treeInd)
 		if(isImportName)
 		{
 			const char *nam= importPathToName[imports[importToKeyMaps[treeInd][std::string(elements[i].name)]].path].c_str();
-			fprintf(file_class_source, "\t_QML_element%d = (CQMLGUI::Element*)CQMLGUI::acGUI_Root%s();\n",i,nam);
+			//fprintf(file_class_source, "\t_QML_element%d = (CQMLGUI::Element*)CQMLGUI::acGUI_Root%s();\n",i,nam);
+			fprintf(file_class_source, "\t_QML_element%d = CQMLGUI::acGUI_Root%s();\n",i,nam);
 		}
 		else
 			fprintf(file_class_source, "\t_QML_element%d = CQMLGUI::ac%s();\n",i,elements[i].name);
@@ -530,16 +599,28 @@ void printAttributeUpdatersHeaders()
 						if(att->name2==0)
 						{
 							fprintf(file_class_source, "static void Update_E%d_%s(CQMLGUI::QML_Context *);\n",i,att->name);
+							if(att->handler!=0) fprintf(file_class_source, "static %s Handler_E%d_%s(CQMLGUI::QML_Context *);\n",prop->type.c_str(),i,att->name);
 						}
 						else
 						{
-							fprintf(file_class_source, "static void Update_E%d_%s_%s(CQMLGUI::QML_Context *);\n",i,att->name,att->name2);
+							PropertyAndType * prop2=0;
+							if(defaultClassMap.count(prop->type)>0)
+							{
+								prop2=defaultClasses[defaultClassMap[prop->type]]->CheckExistence(std::string(att->name2));
+							}
+							if(prop2!=0)
+							{
+								fprintf(file_class_source, "static void Update_E%d_%s_%s(CQMLGUI::QML_Context *);\n",i,att->name,att->name2);
+								if(att->handler!=0) fprintf(file_class_source, "static %s Handler_E%d_%s_%s(CQMLGUI::QML_Context *);\n",prop2->type.c_str(),i,att->name,att->name2);
+							}
 						}
 					}
 				}
 				else
 				{
-					assert(false);
+					printf("nonexistent attribute: %s \nin %s\n",att->name,elements[i].name);
+					exit(-1);
+					//assert(false);
 				}
 			}
 		}
@@ -592,7 +673,10 @@ void printAttributeUpdaters()
 				}
 				else
 				{
-					assert(false);
+					//perror("nonexistent attribute \n");
+					printf("nonexistent attribute: %s \nin %s\n",att->name,elements[i].name);
+					exit(-1);
+					//assert(false);
 				}
 			}
 		}
@@ -722,7 +806,7 @@ void makeMainSource()
 	{
 fprintf(file,"#include \"qml_includes.h\"\n");
 fprintf(file,"struct ClassHashTable;\n");
-fprintf(file,"void _QML_Init();\n");
+fprintf(file,"void _QML_Start();\n");
 fprintf(file,"void _QML_Update();\n");
 fprintf(file,"void _QML_Draw();\n");
 
@@ -737,10 +821,10 @@ fprintf(file,"void InitHashTabs(ClassHashTable * hashTabs);\n");
 	fprintf(file,"void _QML_Draw();\n");
 	fprintf(file,"CQMLGUI::Element* root;\n");
 
-	fprintf(file,"\nvoid _QML_Init()\n{\n\troot = (CQMLGUI::Element*) CQMLGUI::acGUI_Rootoutput0();\n\tCQMLGUI::SetRoot(root);\n\t_QML_Update();\n}\n");
+	fprintf(file,"\nvoid _QML_Start()\n{\n\tSetInitHashTabs(&InitHashTabs);\n\tQMLInitHashes();\n\troot = (CQMLGUI::Element*) CQMLGUI::acGUI_Rootoutput0();\n\tCQMLGUI::SetRoot(root);\n\t_QML_Update();\n}\n");
 	//fprintf(file,"\nvoid _QML_Update()\n{\n\troot->Update();\n}\n");
 	fprintf(file,"\nvoid _QML_Update()\n{\n\tCQMLGUI::PreUpdate();\n\troot->Update();\n\tCQMLGUI::PostUpdate();\n}\n");
-	fprintf(file,"\nvoid _QML_Draw()\n{\n\tCQMLGUI::PreDraw();\n\troot->Update();\n\tCQMLGUI::PostDraw();\n}\n");
+	fprintf(file,"\nvoid _QML_Draw()\n{\n\tCQMLGUI::PreDraw();\n\troot->Draw();\n\tCQMLGUI::PostDraw();\n}\n");
 
 	
 	fprintf(file,"// print default constructors;\n");
@@ -935,7 +1019,10 @@ void printElementUpdaters()
 				}
 				else
 				{
-					assert(false);
+					//perror("nonexistent attribute \n");
+					printf("nonexistent attribute: %s \nin %s\n",att->name,elements[i].name);
+					exit(-1);
+					//assert(false);
 				}
 				
 			}
@@ -950,8 +1037,8 @@ void printElementUpdaters()
 
 void printAttributesBodies()
 {
-	fprintf(file_class_source, "\n //printAttributesBodies() \n");
-						
+	fprintf(file_class_source, "\n //printAttributesBodies()\n");
+
 	int i;
 	//ParserAttribute* att;
 	int currentId;
@@ -984,40 +1071,94 @@ void printAttributesBodies()
 						fprintf(file_class_source, "{\n");
 						// add dynamic check //todo
 
-						att->handler->CheckerPrint(file_class_source);
-
+						//att->handler->CheckerPrint(file_class_source);
+						
 						fprintf(file_class_source,"\t((CQMLGUI::%s*)context->self)->%s=",prop->cont->className.c_str(),att->name);
-						string str="";
-						att->source->Print(str);
+						if(att->source!=0)
+						{
+							string str="";
+							att->source->Print(str);
 						//PrintNodeToFile(file_class_source,att->expression);
 						
-						fprintf(file_class_source, "%s",str.c_str());
+							fprintf(file_class_source, "%s",str.c_str());
+						}
+						else
+						{
+							fprintf(file_class_source, "Handler_E%d_%s(context)",i,att->name);
+						}
 						fprintf(file_class_source, ";\n");
 						
 						fprintf(file_class_source, "}\n");
+
+						if(att->handler!=0)
+						{
+							fprintf(file_class_source, "static %s Handler_E%d_%s(CQMLGUI::QML_Context *context)\n",prop->type.c_str(),i,att->name);
+							fprintf(file_class_source, "{\n");
+							string str="";
+							att->handler->Print(str);
+						
+							fprintf(file_class_source, "%s",str.c_str());
+							fprintf(file_class_source, "\n}\n");
+						}
 					}
 					else
 					{
 						fprintf(file_class_source, "static void Update_E%d_%s_%s(CQMLGUI::QML_Context *context)\n",i,att->name,att->name2);
 						fprintf(file_class_source, "{\n");
 						// add dynamic check
-						att->handler->CheckerPrint(file_class_source);
+						//att->handler->CheckerPrint(file_class_source);
 
 						fprintf(file_class_source,"\t((CQMLGUI::%s*)context->self)->%s.%s=",prop->cont->className.c_str(),att->name,att->name2);
+						if(att->source!=0)
+						{
+							string str="";
+							att->source->Print(str);
+							//PrintNodeToFile(file_class_source,att->expression);
 						
-						string str="";
-						att->source->Print(str);
-						//PrintNodeToFile(file_class_source,att->expression);
-						
-						fprintf(file_class_source, "%s",str.c_str());
+							fprintf(file_class_source, "%s",str.c_str());
+						}
+						else
+						{
+							fprintf(file_class_source, "Handler_E%d_%s_%s(context)",i,att->name,att->name2);
+						}
 						
 						fprintf(file_class_source, ";\n");
 						fprintf(file_class_source, "}\n");
+						
+						if(att->handler!=0)
+						{
+							PropertyAndType * prop2=0;
+							if(defaultClassMap.count(prop->type)>0)
+							{
+								prop2=defaultClasses[defaultClassMap[prop->type]]->CheckExistence(std::string(att->name2));
+							}
+							//PropertyAndType * prop2= prop->cont->CheckExistence(std::string(att->name2));
+							if(prop2!=0)
+							{
+
+								fprintf(file_class_source, "static %s Handler_E%d_%s_%s(CQMLGUI::QML_Context *context)\n",prop2->type.c_str(),i,att->name,att->name2);
+								fprintf(file_class_source, "{\n");
+								string str="";
+								att->handler->Print(str);
+						
+								fprintf(file_class_source, "%s",str.c_str());
+								fprintf(file_class_source, "\n}\n");
+							}
+							else
+							{
+
+								printf("nonexistent attribute: %s.%s \nin %s\n",att->name,att->name2,elements[i].name);
+								exit(-1);
+							}
+						}
 					}
 				}
 				else
 				{
-					assert(false);
+					//printf("nonexistent attribute: %s \n",att->name);
+					printf("nonexistent attribute: %s \nin %s\n",att->name,elements[i].name);
+					exit(-1);
+					//assert(false);
 				}
 				
 			}
@@ -1089,7 +1230,7 @@ void makeSource(std::string name, int treeInd)
 	//file_class_header= fopen("custom_classes.h","w");
 	//file_class_source= fopen("custom_classes.cpp","w");
 	
-	fprintf(file_class_header,"#include \"qml_includes.h\"\nnamespace CQMLGUI{");
+	fprintf(file_class_header,"#include \"qml_includes.h\"\nnamespace CQMLGUI{\n");
 	fprintf(file_class_source,"#include \"%s\"\n\n#include \"qml_includes.h\"\n",name1.c_str());
 	for(int i=0;i<importCnt;i++)
 	{
@@ -1118,8 +1259,10 @@ void makeSource(std::string name, int treeInd)
 	//fprintf(file,"GUI_Root%s* acGUI_Root%s();\n",name.c_str(),name.c_str());
 	
 	fprintf(file,"namespace CQMLGUI{\n");
-	fprintf(file,"struct Root%s;\n\n",name.c_str());
-	fprintf(file,"Root%s* acGUI_Root%s();\n",name.c_str(),name.c_str());
+	fprintf(file,"struct %s;\n\n",elements[0].name);
+	//fprintf(file,"struct Root%s;\n\n",name.c_str());
+	fprintf(file,"%s* acGUI_Root%s();\n",elements[0].name,name.c_str());
+	//fprintf(file,"Root%s* acGUI_Root%s();\n",name.c_str(),name.c_str());
 	//here
 
 	rootElementDeclaration(name.c_str());
@@ -1188,6 +1331,10 @@ GUIElement * recursionConstructGUIStructures(ParserGUIElement * element)
 			{
 				attribCnt++;
 			}
+			else if(element->list->members[i]->type==TYPE_ATTRIBUTE_HANDLER)
+			{
+				attribCnt++;
+			}
 			else if(element->list->members[i]->type==TYPE_HANDLER)
 			{
 				handlerCnt++;
@@ -1240,7 +1387,19 @@ GUIElement * recursionConstructGUIStructures(ParserGUIElement * element)
 				instance->attributes[attribCnt].name2=((ParserAttribute *)element->list->members[i])->name2;
 				instance->attributes[attribCnt].expression=((ParserAttribute *)element->list->members[i])->expression;
 				instance->attributes[attribCnt].source=ExprToHandler(((ParserAttribute *)element->list->members[i])->expression);
-				instance->attributes[attribCnt].handler=new GUIElementHandler();
+				instance->attributes[attribCnt].handler=0;//new GUIElementHandler();
+				attribCnt++;
+			}
+			else if(element->list->members[i]->type==TYPE_ATTRIBUTE_HANDLER)
+			{
+				instance->attributes[attribCnt]=GUIElementAttribute();
+				instance->attributes[attribCnt].name=((ParserAttribute *)element->list->members[i])->name;
+				instance->attributes[attribCnt].name2=((ParserAttribute *)element->list->members[i])->name2;
+				instance->attributes[attribCnt].expression=((ParserAttribute *)element->list->members[i])->expression;
+				instance->attributes[attribCnt].source=0;//ExprToHandler(((ParserAttribute *)element->list->members[i])->expression);
+				
+				instance->attributes[attribCnt].handler=SourceToHandler(((ParserAttribute *)element->list->members[i])->expression);
+				//instance->attributes[attribCnt].handler=SourceToHandler(((ParserHandler *)element->list->members[i])->code);
 				attribCnt++;
 			}
 			else if(element->list->members[i]->type==TYPE_HANDLER)
@@ -1266,7 +1425,36 @@ GUIElement * recursionConstructGUIStructures(ParserGUIElement * element)
 					instance->attributes[attribCnt].expression=prop->attribute->expression;
 					instance->attributes[attribCnt].source=ExprToHandler(prop->attribute->expression);
 
-					instance->attributes[attribCnt].handler=new GUIElementHandler();
+					instance->attributes[attribCnt].handler=0;//new GUIElementHandler();
+
+					attribCnt++;
+				}
+				propertyCnt++;
+			}
+			else if(element->list->members[i]->type==TYPE_PROPERTY_HANDLER)
+			{
+				ParserProperty * prop=(ParserProperty *)element->list->members[i];
+				instance->properties[propertyCnt]=GUIElementProperty();
+				instance->properties[propertyCnt].name=prop->attName;
+				instance->properties[propertyCnt].typeName=prop->typeName;
+				
+				if(prop->attribute!=0)
+				{
+					instance->attributes[attribCnt]=GUIElementAttribute();
+					instance->attributes[attribCnt].name=prop->attribute->name;
+					instance->attributes[attribCnt].name2=0;
+					instance->attributes[attribCnt].expression=prop->attribute->expression;
+					
+					if(prop->attribute->base.type==TYPE_ATTRIBUTE)
+					{
+						instance->attributes[attribCnt].source=ExprToHandler(prop->attribute->expression);
+						instance->attributes[attribCnt].handler=0;
+					}
+					else
+					{
+						instance->attributes[attribCnt].source=0;
+						instance->attributes[attribCnt].handler=SourceToHandler(prop->attribute->expression);
+					}
 
 					attribCnt++;
 				}
@@ -1860,8 +2048,10 @@ bool processSrcDots(SrcNode * node, int treeInd,int currentElementId, int graphI
 		}
 		else
 		{
-			assert(false);
-			//unknown att error
+			//assert(false);
+			//perror("unknown att error\n");
+			printf("nonexistent attribute: %s \nin %s\n",nam.c_str(),elements[i].name);
+			exit(-1);
 		}
 			//completeStr= std::string("((GUI_")+prop->cont->className+std::string("*)")+completeStr+std::string(")->")+identifiers[i];
 			//attribs+="."+identifiers[i];
@@ -1966,7 +2156,9 @@ bool processSrcDots(SrcNode * node, int treeInd,int currentElementId, int graphI
 				}
 				else
 				{
-					assert(false);
+					//assert(false);
+					perror("unknown att error\n");
+					exit(-1);
 					//unknown att error
 				}
 			}
@@ -2005,7 +2197,9 @@ bool processSrcDots(SrcNode * node, int treeInd,int currentElementId, int graphI
 				}
 				else
 				{
-					assert(false);
+					//assert(false);
+			perror("unknown att error\n");
+			exit(-1);
 					//unkown att error
 				}
 			}
@@ -2197,8 +2391,8 @@ void processTree(ParserList* elementTree, int treeInd)
 				// should check for duplicities !!!
 				if(idMaps[treeInd].count(idName)>0)
 				{
-					assert(false);
-					perror("same id multiple times");
+					//assert(false);
+					printf("same id multiple times: %s\n",att->name);
 					exit(-1);
 				}
 				idMaps[treeInd][idName]=i;
@@ -2298,7 +2492,7 @@ void processTree(ParserList* elementTree, int treeInd)
 			///here
 			if(t==0)
 			{
-					assert(false);
+					//assert(false);
 				perror("nonexistent atribute");
 				exit(-1);
 			}
@@ -2310,8 +2504,8 @@ void processTree(ParserList* elementTree, int treeInd)
 				t=defaultClasses[defaultClassMap[t->type]]->CheckExistence(std::string(att->name2));
 				if(t==0)
 				{
-						assert(false);
-					perror("nonexistent atribute");
+						//assert(false);
+					printf("nonexistent attribute: %s \nin %s\n",att->name2,t->type.c_str());
 					exit(-1);
 				}
 			}
@@ -2337,7 +2531,10 @@ void processTree(ParserList* elementTree, int treeInd)
 			}
 			att->graphInd=graphInd;
 			
-			att->source->Process(treeInd,i);
+			if(att->source!=0)
+				att->source->Process(treeInd,i);
+			else
+				att->handler->Process(treeInd,i);
 			//processSrcReferences(att->expression,treeInd,i,false,false,graphInd,att->handler);
 		}
 
@@ -2345,20 +2542,20 @@ void processTree(ParserList* elementTree, int treeInd)
 		{
 			GUIElementHandler * handler=&elements[i].handlers[j];
 
-			PropertyAndType* t= elements[i].classContainer->CheckExistence(std::string("Custom")+std::string(handler->name));
+			PropertyAndType* t= elements[i].classContainer->CheckExistence(std::string(handler->name));
 			HandlerAndType* h= elements[i].classContainer->CheckHExistence(std::string("Custom")+std::string(handler->name));
 			///here
 			if(t==0 && h==0)
 			{
-					assert(false);
-				perror("nonexistent atribute");
+					//assert(false);
+				printf("nonexistent attribute or handler: %s \nin %s\n",handler->name,elements[i].name);
 				exit(-1);
 			}
 
 			if(t!=0 && h!=0)
 			{
-					assert(false);
-				perror("handler and property has same name");
+					//assert(false);
+				perror("handler and property has same name\n");
 				exit(-1);
 			}
 
@@ -2432,8 +2629,14 @@ void outputFile()
 
 bool processFile(const char * name)
 {
+	printf("\n");
 	FILE *srcFile;
 	srcFile = fopen(name,"r");
+	if(!srcFile)
+	{
+		printf("failed to open file...\n");
+		return false;
+	}
 	
     yyrestart(srcFile);
 	if(yyparse())
@@ -2509,7 +2712,11 @@ int main(int argc, char ** argv)
 	identifiersIds=(int*)malloc(sizeof(int)*identifiersMax);
 
 	// parse tree creation and import files detection
-	processFile("src4.cqml");
+	if(!processFile(fileName))
+	{
+		printf("Failed to process file: %s\nexiting...\n",fileName);
+		return 0;
+	}
 
 	int importInd=0;
 	while(importInd<importCnt)
@@ -2520,7 +2727,11 @@ int main(int argc, char ** argv)
 		}
 		else
 		{
-			processFile(imports.at(importInd).path.c_str());
+			if(!processFile(imports.at(importInd).path.c_str()))
+			{
+				printf("Failed to process file: %s\nexiting...\n",imports.at(importInd).path.c_str());
+				return 0;
+			}
 			importsProcessed[imports.at(importInd).path]=true;
 		}
 		importInd++;

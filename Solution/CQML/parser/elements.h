@@ -77,8 +77,9 @@ public:
 	char * name2;
 	SrcNode * expression;
 	SourceHandler * source;
+	SourceHandler * handler;
 
-	GUIElementHandler * handler;
+	//GUIElementHandler * handler;
 	int graphInd;
 };
 

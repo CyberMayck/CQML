@@ -257,13 +257,14 @@ void parserDeclareFunc(const char* type, const char* name, const char* value, co
 	vector<string> arguments;
 
 	int prevInd=0;
-	int n_args=0;
+	int n_args=1;
 	for(int i=0,j=sArgs.length();i<j;i++)
 	{
 		if(sArgs[i]==',')
 		{
 			arguments.push_back(sArgs.substr(prevInd,i-prevInd));
 			prevInd=i+1;
+			n_args++;
 		}
 	}
 	arguments.push_back(sArgs.substr(prevInd,sArgs.length()-prevInd));
