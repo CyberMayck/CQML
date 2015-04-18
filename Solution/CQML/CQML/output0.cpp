@@ -1,48 +1,106 @@
 #include "output0.h"
 
 #include "qml_includes.h"
+#include "output1outer.h"
 #include "printSomething.h"
 //classDeclaration
+CQMLGUI::ScaledImageCustom0* CQMLGUI::acScaledImageCustom0()
+{
+	CQMLGUI::ScaledImageCustom0 * pointer;
+	pointer=new CQMLGUI::ScaledImageCustom0();
+	return pointer;
+}
 static void _QML_Update(CQMLGUI::Element *s);
 
 
 //printHandlers()
-static void _QML_element4_MouseReleased(CQMLGUI::QML_Context * context, CQMLGUI::QMLEvent Event)
+using namespace CQMLGUI;
+static void _QML_element4_MouseReleased(CQMLGUI::QML_Context * context,  QMLMouseEvent EVENT)
 {
-{(*((CQMLGUI::Rootoutput0*)context->root)->_QML_element1).width=200;
-(*((CQMLGUI::Rootoutput0*)context->root)->_QML_element1).width_Update=0;
-;
-(*((CQMLGUI::Rootoutput0*)context->root)->_QML_element1).height=300;
-(*((CQMLGUI::Rootoutput0*)context->root)->_QML_element1).height_Update=0;
-;
-(*((CQMLGUI::Rootoutput0*)context->root)->_QML_element2).text="released";
+{(*((CQMLGUI::Rootoutput0*)context->root)->_QML_element2).text= "released" ;
 (*((CQMLGUI::Rootoutput0*)context->root)->_QML_element2).text_Update=0;
 ;
 }
 
 }
-static void _QML_element4_MousePressed(CQMLGUI::QML_Context * context, CQMLGUI::QMLEvent Event)
+static void _QML_element4_MousePressed(CQMLGUI::QML_Context * context,  QMLMouseEvent EVENT)
 {
-{PrintNumber(13);
-(*((CQMLGUI::Rootoutput0*)context->root)->_QML_element1).width=100;
+{PrintNumber( 13 );
+if(meta== 100 ){(*((CQMLGUI::Rootoutput0*)context->root)->_QML_element1).width= 100 ;
 (*((CQMLGUI::Rootoutput0*)context->root)->_QML_element1).width_Update=0;
 ;
-(*((CQMLGUI::Rootoutput0*)context->root)->_QML_element1).height=100;
+(*((CQMLGUI::Rootoutput0*)context->root)->_QML_element1).height= 100 ;
 (*((CQMLGUI::Rootoutput0*)context->root)->_QML_element1).height_Update=0;
 ;
-(*((CQMLGUI::Rootoutput0*)context->root)->_QML_element2).text="pressed";
+meta= 200 ;
+;
+} else {(*((CQMLGUI::Rootoutput0*)context->root)->_QML_element1).width= 200 ;
+(*((CQMLGUI::Rootoutput0*)context->root)->_QML_element1).width_Update=0;
+;
+(*((CQMLGUI::Rootoutput0*)context->root)->_QML_element1).height= 200 ;
+(*((CQMLGUI::Rootoutput0*)context->root)->_QML_element1).height_Update=0;
+;
+meta= 100 ;
+;
+}(*((CQMLGUI::Rootoutput0*)context->root)->_QML_element2).text= "pressed" ;
 (*((CQMLGUI::Rootoutput0*)context->root)->_QML_element2).text_Update=0;
 ;
 }
 
+}
+static void _QML_element1_KeyPressed(CQMLGUI::QML_Context * context,  QMLKeyboardEvent EVENT)
+{
+{WindowLimit((*((CQMLGUI::Rootoutput0*)context->root)->_QML_element0).width,(*((CQMLGUI::Rootoutput0*)context->root)->_QML_element0).height);
+if(EVENT.key== 'w' ){(*((CQMLGUI::Rootoutput0*)context->root)->_QML_element1).status= 3 ;
+(*((CQMLGUI::Rootoutput0*)context->root)->_QML_element1).status_Update=0;
+;
+}if(EVENT.key== 's' ){(*((CQMLGUI::Rootoutput0*)context->root)->_QML_element1).status= 1 ;
+(*((CQMLGUI::Rootoutput0*)context->root)->_QML_element1).status_Update=0;
+;
+}if(EVENT.key== 'd' ){(*((CQMLGUI::Rootoutput0*)context->root)->_QML_element1).status= 0 ;
+(*((CQMLGUI::Rootoutput0*)context->root)->_QML_element1).status_Update=0;
+;
+}if(EVENT.key== 'a' ){(*((CQMLGUI::Rootoutput0*)context->root)->_QML_element1).status= 2 ;
+(*((CQMLGUI::Rootoutput0*)context->root)->_QML_element1).status_Update=0;
+;
+}}
+
+}
+static void Update_E1_y(CQMLGUI::QML_Context *);
+static int Handler_E1_y(CQMLGUI::QML_Context *);
+static void Update_E1_y(CQMLGUI::QML_Context *context)
+{
+	((CQMLGUI::Element*)context->self)->y=Handler_E1_y(context);
+}
+static int Handler_E1_y(CQMLGUI::QML_Context *context)
+{
+{if((*((CQMLGUI::Rootoutput0*)context->root)->_QML_element1).status== 5 ){ return  25 ;
+}if(CanMove((*((CQMLGUI::Rootoutput0*)context->root)->_QML_element1).x,(*((CQMLGUI::Rootoutput0*)context->root)->_QML_element1).y,(*((CQMLGUI::Rootoutput0*)context->root)->_QML_element1).status)){if((*((CQMLGUI::Rootoutput0*)context->root)->_QML_element1).status== 1 ){ return (*((CQMLGUI::Rootoutput0*)context->root)->_QML_element1).y+ 1 ;
+}if((*((CQMLGUI::Rootoutput0*)context->root)->_QML_element1).status== 3 ){ return (*((CQMLGUI::Rootoutput0*)context->root)->_QML_element1).y- 1 ;
+}} return (*((CQMLGUI::Rootoutput0*)context->root)->_QML_element1).y;
+}
+}
+static void Update_E1_x(CQMLGUI::QML_Context *);
+static int Handler_E1_x(CQMLGUI::QML_Context *);
+static void Update_E1_x(CQMLGUI::QML_Context *context)
+{
+	((CQMLGUI::Element*)context->self)->x=Handler_E1_x(context);
+}
+static int Handler_E1_x(CQMLGUI::QML_Context *context)
+{
+{if((*((CQMLGUI::Rootoutput0*)context->root)->_QML_element1).status== 5 ){ return  25 ;
+}if(CanMove((*((CQMLGUI::Rootoutput0*)context->root)->_QML_element1).x,(*((CQMLGUI::Rootoutput0*)context->root)->_QML_element1).y,(*((CQMLGUI::Rootoutput0*)context->root)->_QML_element1).status)){if((*((CQMLGUI::Rootoutput0*)context->root)->_QML_element1).status== 0 ){ return (*((CQMLGUI::Rootoutput0*)context->root)->_QML_element1).x+ 1 ;
+}if((*((CQMLGUI::Rootoutput0*)context->root)->_QML_element1).status== 2 ){ return (*((CQMLGUI::Rootoutput0*)context->root)->_QML_element1).x- 1 ;
+}} return (*((CQMLGUI::Rootoutput0*)context->root)->_QML_element1).x;
+}
 }
 
  //rootElementAllocation() 
-CQMLGUI::Rootoutput0* CQMLGUI::acGUI_Rootoutput0()
+CQMLGUI::Element* CQMLGUI::acGUI_Rootoutput0()
 {
 	CQMLGUI::Rootoutput0 * pointer;
 	pointer=new CQMLGUI::Rootoutput0();
-	return (CQMLGUI::Rootoutput0*)pointer->_QML_element0;
+	return pointer->_QML_element0;
 }
 
  //printAttributeUpdatersHeaders() 
@@ -50,14 +108,11 @@ static void Update_E0_x(CQMLGUI::QML_Context *);
 static void Update_E0_y(CQMLGUI::QML_Context *);
 static void Update_E0_width(CQMLGUI::QML_Context *);
 static void Update_E0_height(CQMLGUI::QML_Context *);
-static void Update_E0_color_red(CQMLGUI::QML_Context *);
-static void Update_E0_color_green(CQMLGUI::QML_Context *);
-static void Update_E0_color_blue(CQMLGUI::QML_Context *);
-static void Update_E1_x(CQMLGUI::QML_Context *);
-static void Update_E1_y(CQMLGUI::QML_Context *);
+static void Update_E1_status(CQMLGUI::QML_Context *);
 static void Update_E1_width(CQMLGUI::QML_Context *);
 static void Update_E1_height(CQMLGUI::QML_Context *);
 static void Update_E1_img_src(CQMLGUI::QML_Context *);
+static string Handler_E1_img_src(CQMLGUI::QML_Context *);
 static void Update_E1_topBorder(CQMLGUI::QML_Context *);
 static void Update_E1_leftBorder(CQMLGUI::QML_Context *);
 static void Update_E1_rightBorder(CQMLGUI::QML_Context *);
@@ -96,11 +151,11 @@ static void Update_E4(CQMLGUI::Element *self);
  //rootElementConstructor() 
 CQMLGUI::Rootoutput0::Rootoutput0()
 {
-	_QML_element0 = CQMLGUI::acRectangle();
+	_QML_element0 = CQMLGUI::acElement();
 	_QML_element0->root=(CQMLGUI::Element*)this;
-	_QML_element1 = CQMLGUI::acScaledImage();
+	_QML_element1 = CQMLGUI::acScaledImageCustom0();
 	_QML_element1->root=(CQMLGUI::Element*)this;
-	_QML_element2 = CQMLGUI::acTextInput();
+	_QML_element2 = CQMLGUI::acText();
 	_QML_element2->root=(CQMLGUI::Element*)this;
 	_QML_element3 = CQMLGUI::acRectangle();
 	_QML_element3->root=(CQMLGUI::Element*)this;
@@ -120,16 +175,8 @@ CQMLGUI::Rootoutput0::Rootoutput0()
 	((Element*)_QML_element0)->width_Update  = Update_E0_width;
 	((Element*)_QML_element0)->height_context  = acQML_Context((CQMLGUI::Component*)this,(CQMLGUI::Element*)_QML_element0);
 	((Element*)_QML_element0)->height_Update  = Update_E0_height;
-	((Rectangle*)_QML_element0)->color.red_context  = acQML_Context((CQMLGUI::Component*)this,(CQMLGUI::Element*)(_QML_element0));
-	((Rectangle*)_QML_element0)->color.red_Update  = Update_E0_color_red;
-	((Rectangle*)_QML_element0)->color.green_context  = acQML_Context((CQMLGUI::Component*)this,(CQMLGUI::Element*)(_QML_element0));
-	((Rectangle*)_QML_element0)->color.green_Update  = Update_E0_color_green;
-	((Rectangle*)_QML_element0)->color.blue_context  = acQML_Context((CQMLGUI::Component*)this,(CQMLGUI::Element*)(_QML_element0));
-	((Rectangle*)_QML_element0)->color.blue_Update  = Update_E0_color_blue;
-	((Element*)_QML_element1)->x_context  = acQML_Context((CQMLGUI::Component*)this,(CQMLGUI::Element*)_QML_element1);
-	((Element*)_QML_element1)->x_Update  = Update_E1_x;
-	((Element*)_QML_element1)->y_context  = acQML_Context((CQMLGUI::Component*)this,(CQMLGUI::Element*)_QML_element1);
-	((Element*)_QML_element1)->y_Update  = Update_E1_y;
+	((ScaledImageCustom0*)_QML_element1)->status_context  = acQML_Context((CQMLGUI::Component*)this,(CQMLGUI::Element*)_QML_element1);
+	((ScaledImageCustom0*)_QML_element1)->status_Update  = Update_E1_status;
 	((Element*)_QML_element1)->width_context  = acQML_Context((CQMLGUI::Component*)this,(CQMLGUI::Element*)_QML_element1);
 	((Element*)_QML_element1)->width_Update  = Update_E1_width;
 	((Element*)_QML_element1)->height_context  = acQML_Context((CQMLGUI::Component*)this,(CQMLGUI::Element*)_QML_element1);
@@ -195,6 +242,12 @@ CQMLGUI::Rootoutput0::Rootoutput0()
 	_QML_element4->CustomMouseReleased_context=acQML_Context((CQMLGUI::Component*)this,(CQMLGUI::Element*)_QML_element4);
 	_QML_element4->CustomMousePressed=_QML_element4_MousePressed;
 	_QML_element4->CustomMousePressed_context=acQML_Context((CQMLGUI::Component*)this,(CQMLGUI::Element*)_QML_element4);
+	_QML_element1->CustomKeyPressed=_QML_element1_KeyPressed;
+	_QML_element1->CustomKeyPressed_context=acQML_Context((CQMLGUI::Component*)this,(CQMLGUI::Element*)_QML_element1);
+	((Element*)_QML_element1)->y_context  = acQML_Context((CQMLGUI::Component*)this,(CQMLGUI::Element*)_QML_element1);
+	((Element*)_QML_element1)->y_Update  = Update_E1_y;
+	((Element*)_QML_element1)->x_context  = acQML_Context((CQMLGUI::Component*)this,(CQMLGUI::Element*)_QML_element1);
+	((Element*)_QML_element1)->x_Update  = Update_E1_x;
 
  //printElementUpdaterAssignments() 
 	_QML_Update((CQMLGUI::Element *)_QML_element0);
@@ -209,7 +262,7 @@ static void _QML_Update(CQMLGUI::Element *s)
 
 }
 
- //printAttributesBodies() 
+ //printAttributesBodies()
 static void Update_E4_height(CQMLGUI::QML_Context *context)
 {
 	((CQMLGUI::Element*)context->self)->height=(*((CQMLGUI::Rootoutput0*)context->root)->_QML_element3).height;
@@ -220,135 +273,127 @@ static void Update_E4_width(CQMLGUI::QML_Context *context)
 }
 static void Update_E3_height(CQMLGUI::QML_Context *context)
 {
-	((CQMLGUI::Element*)context->self)->height=(*((CQMLGUI::Rootoutput0*)context->root)->_QML_element0).height/2-10;
+	((CQMLGUI::Element*)context->self)->height= 40 ;
 }
 static void Update_E3_width(CQMLGUI::QML_Context *context)
 {
-	((CQMLGUI::Element*)context->self)->width=(*((CQMLGUI::Rootoutput0*)context->root)->_QML_element0).width/2-10;
+	((CQMLGUI::Element*)context->self)->width= 40 ;
 }
 static void Update_E3_borderColor_blue(CQMLGUI::QML_Context *context)
 {
-	((CQMLGUI::Rectangle*)context->self)->borderColor.blue=0;
+	((CQMLGUI::Rectangle*)context->self)->borderColor.blue= 0 ;
 }
 static void Update_E3_borderColor_green(CQMLGUI::QML_Context *context)
 {
-	((CQMLGUI::Rectangle*)context->self)->borderColor.green=0;
+	((CQMLGUI::Rectangle*)context->self)->borderColor.green= 0 ;
 }
 static void Update_E3_borderColor_red(CQMLGUI::QML_Context *context)
 {
-	((CQMLGUI::Rectangle*)context->self)->borderColor.red=0;
+	((CQMLGUI::Rectangle*)context->self)->borderColor.red= 1 ;
 }
 static void Update_E3_border(CQMLGUI::QML_Context *context)
 {
-	((CQMLGUI::Rectangle*)context->self)->border=4;
+	((CQMLGUI::Rectangle*)context->self)->border= 4 ;
 }
 static void Update_E3_color_blue(CQMLGUI::QML_Context *context)
 {
-	((CQMLGUI::Rectangle*)context->self)->color.blue=0;
+	((CQMLGUI::Rectangle*)context->self)->color.blue= 0 ;
 }
 static void Update_E3_color_green(CQMLGUI::QML_Context *context)
 {
-	((CQMLGUI::Rectangle*)context->self)->color.green=1;
+	((CQMLGUI::Rectangle*)context->self)->color.green= 1 ;
 }
 static void Update_E3_color_red(CQMLGUI::QML_Context *context)
 {
-	((CQMLGUI::Rectangle*)context->self)->color.red=0;
+	((CQMLGUI::Rectangle*)context->self)->color.red= 0 ;
 }
 static void Update_E3_y(CQMLGUI::QML_Context *context)
 {
-	((CQMLGUI::Element*)context->self)->y=(*((CQMLGUI::Rootoutput0*)context->root)->_QML_element0).height/2;
+	((CQMLGUI::Element*)context->self)->y=(*((CQMLGUI::Rootoutput0*)context->root)->_QML_element0).height- 45 ;
 }
 static void Update_E3_x(CQMLGUI::QML_Context *context)
 {
-	((CQMLGUI::Element*)context->self)->x=5;
+	((CQMLGUI::Element*)context->self)->x= 5 ;
 }
 static void Update_E2_text_color_blue(CQMLGUI::QML_Context *context)
 {
-	((CQMLGUI::Text*)context->self)->text_color.blue=1;
+	((CQMLGUI::Text*)context->self)->text_color.blue= 1 ;
 }
 static void Update_E2_text_color_green(CQMLGUI::QML_Context *context)
 {
-	((CQMLGUI::Text*)context->self)->text_color.green=0;
+	((CQMLGUI::Text*)context->self)->text_color.green= 0 ;
 }
 static void Update_E2_text_color_red(CQMLGUI::QML_Context *context)
 {
-	((CQMLGUI::Text*)context->self)->text_color.red=1;
+	((CQMLGUI::Text*)context->self)->text_color.red= 1 ;
 }
 static void Update_E2_text(CQMLGUI::QML_Context *context)
 {
-	((CQMLGUI::Text*)context->self)->text="You win";
+	((CQMLGUI::Text*)context->self)->text= "You win" ;
 }
 static void Update_E2_font_size(CQMLGUI::QML_Context *context)
 {
-	((CQMLGUI::Text*)context->self)->font.size=12;
+	((CQMLGUI::Text*)context->self)->font.size= 12 ;
 }
 static void Update_E2_font_family(CQMLGUI::QML_Context *context)
 {
-	((CQMLGUI::Text*)context->self)->font.family="Tahoma";
+	((CQMLGUI::Text*)context->self)->font.family= "Tahoma" ;
 }
 static void Update_E2_height(CQMLGUI::QML_Context *context)
 {
-	((CQMLGUI::Element*)context->self)->height=(*((CQMLGUI::Rootoutput0*)context->root)->_QML_element0).height/2-10;
+	((CQMLGUI::Element*)context->self)->height=(*((CQMLGUI::Rootoutput0*)context->root)->_QML_element0).height/ 2 - 10 ;
 }
 static void Update_E2_width(CQMLGUI::QML_Context *context)
 {
-	((CQMLGUI::Element*)context->self)->width=(*((CQMLGUI::Rootoutput0*)context->root)->_QML_element0).width/2-10;
+	((CQMLGUI::Element*)context->self)->width=(*((CQMLGUI::Rootoutput0*)context->root)->_QML_element0).width/ 2 - 10 ;
 }
 static void Update_E2_y(CQMLGUI::QML_Context *context)
 {
-	((CQMLGUI::Element*)context->self)->y=5;
+	((CQMLGUI::Element*)context->self)->y= 5 ;
 }
 static void Update_E2_x(CQMLGUI::QML_Context *context)
 {
-	((CQMLGUI::Element*)context->self)->x=5;
+	((CQMLGUI::Element*)context->self)->x= 5 ;
 }
 static void Update_E1_bottomBorder(CQMLGUI::QML_Context *context)
 {
-	((CQMLGUI::ScaledImage*)context->self)->bottomBorder=20;
+	((CQMLGUI::ScaledImage*)context->self)->bottomBorder= 10 ;
 }
 static void Update_E1_rightBorder(CQMLGUI::QML_Context *context)
 {
-	((CQMLGUI::ScaledImage*)context->self)->rightBorder=20;
+	((CQMLGUI::ScaledImage*)context->self)->rightBorder= 10 ;
 }
 static void Update_E1_leftBorder(CQMLGUI::QML_Context *context)
 {
-	((CQMLGUI::ScaledImage*)context->self)->leftBorder=20;
+	((CQMLGUI::ScaledImage*)context->self)->leftBorder= 10 ;
 }
 static void Update_E1_topBorder(CQMLGUI::QML_Context *context)
 {
-	((CQMLGUI::ScaledImage*)context->self)->topBorder=20;
+	((CQMLGUI::ScaledImage*)context->self)->topBorder= 10 ;
 }
 static void Update_E1_img_src(CQMLGUI::QML_Context *context)
 {
-	((CQMLGUI::Image*)context->self)->img.src="img1.png";
+	((CQMLGUI::Image*)context->self)->img.src=Handler_E1_img_src(context);
+}
+static string Handler_E1_img_src(CQMLGUI::QML_Context *context)
+{
+{if((*((CQMLGUI::Rootoutput0*)context->root)->_QML_element1).status== 0 ||(*((CQMLGUI::Rootoutput0*)context->root)->_QML_element1).status== 5 ) return  "img1.png" ;
+ else if((*((CQMLGUI::Rootoutput0*)context->root)->_QML_element1).status== 1 ) return  "img2.png" ;
+ else if((*((CQMLGUI::Rootoutput0*)context->root)->_QML_element1).status== 2 ) return  "img3.png" ;
+ else  return  "img4.png" ;
+}
 }
 static void Update_E1_height(CQMLGUI::QML_Context *context)
 {
-	((CQMLGUI::Element*)context->self)->height=300;
+	((CQMLGUI::Element*)context->self)->height= 100 ;
 }
 static void Update_E1_width(CQMLGUI::QML_Context *context)
 {
-	((CQMLGUI::Element*)context->self)->width=200;
+	((CQMLGUI::Element*)context->self)->width= 100 ;
 }
-static void Update_E1_y(CQMLGUI::QML_Context *context)
+static void Update_E1_status(CQMLGUI::QML_Context *context)
 {
-	((CQMLGUI::Element*)context->self)->y=5;
-}
-static void Update_E1_x(CQMLGUI::QML_Context *context)
-{
-	((CQMLGUI::Element*)context->self)->x=(*((CQMLGUI::Rootoutput0*)context->root)->_QML_element0).height/2;
-}
-static void Update_E0_color_blue(CQMLGUI::QML_Context *context)
-{
-	((CQMLGUI::Rectangle*)context->self)->color.blue=1;
-}
-static void Update_E0_color_green(CQMLGUI::QML_Context *context)
-{
-	((CQMLGUI::Rectangle*)context->self)->color.green=1;
-}
-static void Update_E0_color_red(CQMLGUI::QML_Context *context)
-{
-	((CQMLGUI::Rectangle*)context->self)->color.red=1;
+	((CQMLGUI::ScaledImageCustom0*)context->self)->status= 5 ;
 }
 static void Update_E0_height(CQMLGUI::QML_Context *context)
 {
@@ -356,16 +401,21 @@ static void Update_E0_height(CQMLGUI::QML_Context *context)
 }
 static void Update_E0_width(CQMLGUI::QML_Context *context)
 {
-	((CQMLGUI::Element*)context->self)->width=500;
+	((CQMLGUI::Element*)context->self)->width= 500 ;
 }
 static void Update_E0_y(CQMLGUI::QML_Context *context)
 {
-	((CQMLGUI::Element*)context->self)->y=0;
+	((CQMLGUI::Element*)context->self)->y= 0 ;
 }
 static void Update_E0_x(CQMLGUI::QML_Context *context)
 {
-	((CQMLGUI::Element*)context->self)->x=0;
+	((CQMLGUI::Element*)context->self)->x= 0 ;
 }
 
  //printElementUpdaters() 
 using namespace CQMLGUI;
+void ScaledImageCustom0::Update()
+{
+	if(status_Update)status_Update(status_context);
+	 ScaledImage::Update();
+}
