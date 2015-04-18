@@ -31,6 +31,7 @@ struct Component
 	CQML_API void PreDraw();
 	CQML_API void PostDraw();
 
+	CQML_API void GetQMLWindow(int &w,int &h);
 
 	CQML_API void InitGUI();
 

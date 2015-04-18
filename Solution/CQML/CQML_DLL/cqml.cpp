@@ -9,11 +9,11 @@
 using namespace CQMLGUI;
 
 void InitGUI();
-void InitQML()
+void _QML_Init()
 {
 	QMLInitInput();
 	CQMLGUI::InitGUI();
-	QMLInitHashes();
+	//QMLInitHashes();
 }
 
  DrawIFace * drawer;
