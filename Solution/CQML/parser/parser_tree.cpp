@@ -1,6 +1,27 @@
 #include "parser_tree.h"
 
 
+SrcNode* MakeNode0KW(char * text)
+{
+	SrcNode* pointer=(SrcNode*)malloc(sizeof(SrcNode));
+	(*pointer).childrenCount=0;
+	(*pointer).children=0;
+
+	int len=strlen(text);
+	//if(len>2)
+	{
+		char * txt=(char * )malloc((len+3)*sizeof(char));
+		strcpy(&txt[1],text);
+		txt[0]=' ';
+		txt[len+1]=' ';
+		txt[len+2]='\0';
+		free(text);
+		text=txt;
+	}
+	(*pointer).text=text;
+	(*pointer).type=NODE_TYPE_LEAF;
+	return pointer;
+}
 
 SrcNode* MakeNode0(char * text)
 {
@@ -325,6 +346,26 @@ int* createHandler(int* a, char b, char* name, SrcNode * code)
 	(*pointer).name=name;
 	(*pointer).code=code;
 	(*pointer).base.type=TYPE_HANDLER;
+	return (int*)pointer;
+}
+int* createAttributeHandler(int* a, char b, char* name, SrcNode * cExpression)
+{
+	ParserAttribute * pointer;
+	pointer=(ParserAttribute*)malloc(sizeof(ParserAttribute));
+	(*pointer).name=name;
+	(*pointer).name2=0;
+	(*pointer).expression=cExpression;
+	(*pointer).base.type=TYPE_ATTRIBUTE_HANDLER;
+	return (int*)pointer;
+}
+int* createAttribute2Handler(int* a, char b, char* name2, char* name, SrcNode * cExpression)
+{
+	ParserAttribute * pointer;
+	pointer=(ParserAttribute*)malloc(sizeof(ParserAttribute));
+	(*pointer).name=name;
+	(*pointer).name2=name2;
+	(*pointer).expression=cExpression;
+	(*pointer).base.type=TYPE_ATTRIBUTE_HANDLER;
 	return (int*)pointer;
 }
 

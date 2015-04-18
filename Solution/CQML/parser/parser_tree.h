@@ -5,6 +5,8 @@
 #define TYPE_HANDLER			(3)
 #define TYPE_IMPORT				(4)
 #define TYPE_INCLUDE			(5)
+#define TYPE_ATTRIBUTE_HANDLER	(6)
+#define TYPE_PROPERTY_HANDLER	(7)
 
 #define NODE_TYPE_NORMAL		(0)
 #define NODE_TYPE_ID			(1)
@@ -38,6 +40,7 @@ extern int id;
 extern "C"
 {
 	SrcNode* MakeNode0(char * text);
+	SrcNode* MakeNode0KW(char * text);
 	SrcNode* MakeNode0ID(char * text);
 	SrcNode* MakeNode1(SrcNode* child1);
 	SrcNode* MakeNode1A(SrcNode* child1);
@@ -57,6 +60,8 @@ extern "C"
 
 	int* createAttribute(int* a, char b, char* name, SrcNode * cExpression);
 	int* createAttribute2(int* a, char b, char* name2, char* name, SrcNode * cExpression);
+	int* createAttributeHandler(int* a, char b, char* name, SrcNode * code);
+	int* createAttribute2Handler(int* a, char b, char* name2, char* name, SrcNode * code);
 	int* createHandler(int* a, char b, char* name, SrcNode * code);
 	int* createElement(int *a, char b, int *listPointer, char * text);
 	int* createPropertyInit(int *a, int *attPointer, char * text);
@@ -73,10 +78,13 @@ extern "C"
 	int* createProperty(int *a, char * text, char * text2);
 	int* createAttribute(int *a, char b, char *c, char * d);
 	int* createAttribute2(int *a, char b, char *c2, char *c, char * d);
+	int* createAttributeHandler(int* a, char b, char* name, SrcNode * code);
+	int* createAttribute2Handler(int* a, char b, char* name2, char* name, SrcNode * code);
 	int* createImport( char * text, char * text2);
 	int* createInclude( char * text );
 	int* createHandler(int *a, char b, char *c, char * d);
 	int* MakeNode0ID(char * text);
+	int* MakeNode0KW(char * text);
 	int* MakeNode0(char * text);
 	int* MakeNode1(int* child1);
 	int* MakeNode1A(int* child1);
