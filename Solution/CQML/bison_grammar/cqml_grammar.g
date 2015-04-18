@@ -95,15 +95,17 @@ attribute
 	{ $<data.val>$ = createAttribute( $<data.val>1 , 'l', $<data.lexem>1, $<data.val>3);  }
 	|	IDENTIFIER '.' IDENTIFIER ':' conditional_expression
 	{ $<data.val>$ = createAttribute2( $<data.val>1 , 'l', $<data.lexem>3, $<data.lexem>1, $<data.val>5);  }
+	|	IDENTIFIER '.' IDENTIFIER ':' compound_statement
+	{ $<data.val>$ = createAttribute2Handler( $<data.val>1 , 'l', $<data.lexem>3, $<data.lexem>1, $<data.val>5);  }
 ;
 
 primary_expression
 	: IDENTIFIER
 	{ $<data.val>$ = MakeNode0ID($<data.lexem>1); }
 	| CONSTANT
-	{ $<data.val>$ = MakeNode0($<data.lexem>1); }
+	{ $<data.val>$ = MakeNode0KW($<data.lexem>1); }
 	| STRING_LITERAL
-	{ $<data.val>$ = MakeNode0($<data.lexem>1); }
+	{ $<data.val>$ = MakeNode0KW($<data.lexem>1); }
 	| '(' expression ')'
 	{ $<data.val>$ = MakeNode3(MakeNode0("("), $<data.val>2 ,MakeNode0(")")); }
 	;
@@ -627,35 +629,35 @@ expression_statement
 
 selection_statement
 	: IF '(' expression ')' statement
-	{ $<data.val>$ = MakeNode5($<data.lexem>1, MakeNode0("("), $<data.val>3, MakeNode0(")"), $<data.val>5); }
+	{ $<data.val>$ = MakeNode5(MakeNode0($<data.lexem>1), MakeNode0("("), $<data.val>3, MakeNode0(")"), $<data.val>5); }
 	| IF '(' expression ')' statement ELSE statement
-	{ $<data.val>$ = MakeNode7($<data.lexem>1, MakeNode0("("), $<data.val>3, MakeNode0(")"), $<data.val>5, $<data.lexem>6, $<data.val>7); }
+	{ $<data.val>$ = MakeNode7(MakeNode0($<data.lexem>1), MakeNode0("("), $<data.val>3, MakeNode0(")"), $<data.val>5, MakeNode0KW($<data.lexem>6), $<data.val>7); }
 	| SWITCH '(' expression ')' statement
-	{ $<data.val>$ = MakeNode5($<data.lexem>1, MakeNode0("("), $<data.val>3, MakeNode0(")"), $<data.val>5); }
+	{ $<data.val>$ = MakeNode5(MakeNode0($<data.lexem>1), MakeNode0("("), $<data.val>3, MakeNode0(")"), $<data.val>5); }
 	;
 
 iteration_statement
 	: WHILE '(' expression ')' statement
-	{ $<data.val>$ = MakeNode5ITER($<data.lexem>1, MakeNode0("("), $<data.val>3, MakeNode0(")"), $<data.val>5); }
+	{ $<data.val>$ = MakeNode5ITER(MakeNode0($<data.lexem>1), MakeNode0("("), $<data.val>3, MakeNode0(")"), $<data.val>5); }
 	| DO statement WHILE '(' expression ')' ';'
-	{ $<data.val>$ = MakeNode7ITER($<data.lexem>1, $<data.val>2, $<data.lexem>3, MakeNode0("("), $<data.val>5, MakeNode0(")"),  MakeNode0(";")); }
+	{ $<data.val>$ = MakeNode7ITER(MakeNode0KW($<data.lexem>1), $<data.val>2, $<data.lexem>3, MakeNode0KW("("), $<data.val>5, MakeNode0(")"),  MakeNode0(";")); }
 	| FOR '(' expression_statement expression_statement ')' statement
-	{ $<data.val>$ = MakeNode6ITER($<data.lexem>1, MakeNode0("("), $<data.val>3, $<data.val>4, MakeNode0(")"), $<data.val>6); }
+	{ $<data.val>$ = MakeNode6ITER(MakeNode0($<data.lexem>1), MakeNode0("("), $<data.val>3, $<data.val>4, MakeNode0(")"), $<data.val>6); }
 	| FOR '(' expression_statement expression_statement expression ')' statement
-	{ $<data.val>$ = MakeNode7ITER($<data.lexem>1, MakeNode0("("), $<data.val>3, $<data.val>4, $<data.val>5, MakeNode0(")"), $<data.val>7); }
+	{ $<data.val>$ = MakeNode7ITER(MakeNode0($<data.lexem>1), MakeNode0("("), $<data.val>3, $<data.val>4, $<data.val>5, MakeNode0(")"), $<data.val>7); }
 	;
 
 jump_statement
 	: GOTO IDENTIFIER ';'
-	{ $<data.val>$ = MakeNode3($<data.lexem>1, $<data.lexem>2, MakeNode0(";")); }
+	{ $<data.val>$ = MakeNode3(MakeNode0KW($<data.lexem>1), MakeNode0($<data.lexem>2), MakeNode0(";")); }
 	| CONTINUE ';'
-	{ $<data.val>$ = MakeNode2($<data.lexem>1, MakeNode0(";")); }
+	{ $<data.val>$ = MakeNode2(MakeNode0($<data.lexem>1), MakeNode0(";")); }
 	| BREAK ';'
-	{ $<data.val>$ = MakeNode2($<data.lexem>1, MakeNode0(";")); }
+	{ $<data.val>$ = MakeNode2(MakeNode0($<data.lexem>1), MakeNode0(";")); }
 	| RETURN ';'
-	{ $<data.val>$ = MakeNode2($<data.lexem>1, MakeNode0(";")); }
+	{ $<data.val>$ = MakeNode2(MakeNode0KW($<data.lexem>1), MakeNode0(";")); }
 	| RETURN expression ';'
-	{ $<data.val>$ = MakeNode3($<data.lexem>1, $<data.val>2, MakeNode0(";")); }
+	{ $<data.val>$ = MakeNode3(MakeNode0KW($<data.lexem>1), $<data.val>2, MakeNode0(";")); }
 	;
 
 pure_c_code
