@@ -23,13 +23,7 @@
 #include<stdlib.h>
 #include<string.h>
 
-
-#include "../CQML_DLL/cqml.h"
-#include "../CQML_DLL/gui.h"
-#include "../CQML_DLL/draw_iface.h"
-#include "../CQML_DLL/qml_includes.h"
-#include "../CQML_DLL/resource_manager.h"
-#include "../CQML_DLL/resource_manager.h"
+#include "qml_includes.h"
 #include "parser_output.h"
 
 

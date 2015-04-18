@@ -804,13 +804,13 @@ void makeMainSource()
 	file=fopen("parser_output.h","w");
 	if(file)
 	{
-fprintf(file,"#include \"qml_includes.h\"\n");
-fprintf(file,"struct ClassHashTable;\n");
-fprintf(file,"void _QML_Start();\n");
-fprintf(file,"void _QML_Update();\n");
-fprintf(file,"void _QML_Draw();\n");
+		fprintf(file,"#include \"qml_includes.h\"\n");
+		fprintf(file,"struct ClassHashTable;\n");
+		fprintf(file,"void _QML_Start();\n");
+		fprintf(file,"void _QML_Update();\n");
+		fprintf(file,"void _QML_Draw();\n");
 
-fprintf(file,"void InitHashTabs(ClassHashTable * hashTabs);\n");
+		fprintf(file,"void InitHashTabs(ClassHashTable * hashTabs);\n");
 		fclose(file);
 	}
 	
