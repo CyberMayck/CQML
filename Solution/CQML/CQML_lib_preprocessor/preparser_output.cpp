@@ -48,6 +48,7 @@ CQMLGUI::Element::Element()
 	width_Update=0;
 	height=0;
 	height_Update=0;
+	focus=0;
 	CustomKeyPressed=0;
 	CustomKeyReleased=0;
 	Init();
@@ -70,7 +71,6 @@ CQMLGUI::MouseArea::MouseArea()
 	CustomMouseMoved=0;
 	CustomMouseEntered=0;
 	CustomMouseExited=0;
-	CustomInputChanged=0;
 	CustomMouseScrolled=0;
 	Init();
 }
@@ -99,6 +99,7 @@ CQMLGUI::Text::Text()
 CQMLGUI::TextInput::TextInput()
 {
 	classID=8;
+	InputChange=0;
 	Init();
 }
 CQMLGUI::Image::Image()
@@ -192,6 +193,8 @@ Variant CQMLGUI::Element::Get(const char* s)
 		return Variant(width);
 	case 8:
 		return Variant(height);
+	case 9:
+		return Variant(focus);
 	default: break;
 	}
 	return Variant(0);
@@ -226,6 +229,8 @@ Variant CQMLGUI::Rectangle::Get(const char* s)
 		return Variant(width);
 	case 11:
 		return Variant(height);
+	case 12:
+		return Variant(focus);
 	default: break;
 	}
 	return Variant(0);
@@ -254,6 +259,8 @@ Variant CQMLGUI::MouseArea::Get(const char* s)
 		return Variant(width);
 	case 8:
 		return Variant(height);
+	case 9:
+		return Variant(focus);
 	default: break;
 	}
 	return Variant(0);
@@ -312,6 +319,8 @@ Variant CQMLGUI::Text::Get(const char* s)
 		return Variant(width);
 	case 14:
 		return Variant(height);
+	case 15:
+		return Variant(focus);
 	default: break;
 	}
 	return Variant(0);
@@ -352,6 +361,8 @@ Variant CQMLGUI::TextInput::Get(const char* s)
 		return Variant(width);
 	case 14:
 		return Variant(height);
+	case 15:
+		return Variant(focus);
 	default: break;
 	}
 	return Variant(0);
@@ -382,6 +393,8 @@ Variant CQMLGUI::Image::Get(const char* s)
 		return Variant(width);
 	case 9:
 		return Variant(height);
+	case 10:
+		return Variant(focus);
 	default: break;
 	}
 	return Variant(0);
@@ -420,6 +433,8 @@ Variant CQMLGUI::ScaledImage::Get(const char* s)
 		return Variant(width);
 	case 13:
 		return Variant(height);
+	case 14:
+		return Variant(focus);
 	default: break;
 	}
 	return Variant(0);
