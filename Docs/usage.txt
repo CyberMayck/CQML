@@ -16,37 +16,122 @@
 
 2. Using Library
 2.1	Compilation
-	Use DLL and lib files generated from building CQML_DLL project to compile test aplication
+	Use DLL and lib files generated from building CQML_DLL project to compile test application
+	Add output files from parser to test application.
+	Include necessary include files: "qml_include.h"
 
-2.2	Input handling
-
-2.3	Drawing Interface
-
-
-
-3. Adding new built-in Types:
-3.1	Registeration of primitive types:
-	Add new line into  #define REGISTRATION(MACRO2, MACRO2REF, MACRO3) \
-		REGPRIMITIVE(type_name)\
+2.2 Initialization
+	On the beggining of the program function _QML_Init() must be called
+	Resource Manager and Drawing interface objects then must be assigned.
+	After assignment of managers _QML_Start() is to be called for starting the GUI logic
 	
-3.2	Creating new composite type:
-		create new macro
-	#define MACRO_NAME(MF, F, M, ME, MEV, INHERIT) \
-	
-	Register new type:
-	Add new line into macro  #define REGISTRATION(MACRO2, MACRO2REF, MACRO3) \
-	MACRO2(MACRO_NAME, type_name) \
-	
+2.3	Input handling
+	Input events are processed by pushing them to queue via PushEvent(QMLEvent) function
+	QMLEvent is a structure with following attributes:
+		int EventType;			QML_KEY_EVENT or QML_MOUSE_EVENT
+		// QML_KEY_EVENT only
+			int keyEvent.action;	KEY_RELEASED or KEY_PRESSED
+			int keyEvent.key;		code of pressed key
+		// QML_MOUSE_EVENT only
+			int mouseEvent.action;		MOUSE_WHEEL_SCROLLED or MOUSE_MOVEMENT or MOUSE_BUTTON_RELEASED or MOUSE_BUTTON_PRESSED
+			int mouseEvent.button;		code of mouse button pressed
+			int mouseEvent.x;			coordinate x
+			int mouseEvent.y;			coordinate x
+			int mouseEvent.relativeX;	relative movement in x
+			int mouseEvent.relativeY;	relative movement in y
+			
+2.4	Drawing Interface
+	Is assigned using SetDrawIFace(DrawIFace *) function
+	Implements following methods:
+		void DrawRectangle(int x,int y,int w,int h,float r, float g, float b);
+		void DrawFilledRectangle(int x,int y,int w,int h,float r, float g, float b);
+		void DrawLine(int x1,int y1,int x2,int y2,float r, float g, float b);
+		void DrawPoint(int x,int y,float r, float g, float b);
+		void DrawArc(int x,int y,int w,int h, float angle1, float angle2, float r, float g, float b);
+		void DrawFilledArc(int x,int y,int w,int h, float angle1, float angle2, float r, float g, float b);
+		void DrawText(int x, int y, int w, int h, const char* text, void* font, float r, float g, float b);
+		void DrawImage(int x, int y, int w, int h, void* image);
+		void DrawImageSegment(int x, int y, int w, int h, void* image, int iX, int iY, int iW, int iH);
 		
-3.3	Create type which inherits from another composite type:
+2.5	Resource Manager Interface
+	Is assigned using SetResourceManager(ResourceManagerIface *) function
+	Implements following methods:
+		void* LoadFont(const char * fontStr, int fontSize);
+		ImageData LoadImage(const char *  path);
+		
+		where ImageData has following attributes:
+			void * img;
+			int w;
+			int h;
+			
+2.6	Update and Drawing
+	Updating is done via calling _QML_Update();
+	Drawing is done by calling _QML_Draw();
 	
-	#define MACRO_NAME(MF, F, M, ME, MEV, INHERIT) \
-		INHERIT(F, M, PARENT_MACRO_NAME) \
 	
+3.	Default Types
+3.1 Default Elements
+	Element
+		x				int		- horizontal coordinate
+		y				int		- vertical coordinate
+		width			int		- width of element
+		height			int		- height of element
+		KeyPressed				- event handler for key pressing
+		KeyReleased				- event	handler for key release
+		
+	Rectangle
+		Inherits from Element
+		border			int		- thickness of border
+		borderColor		Color	- color of border
+		color			Color	- color of rectangle fill
+		
+	Text
+		Inherits from Element
+		text			string	- text
+		font			Font	- font details 
+		text_color		Color	- color of text
+	Image
+		Inherits from Element
+		img				Img		- image data
+		
+	ScaledImage
+		Inherits from Image
+		leftBorder		int		- cutting offset of left border
+		rightBorder		int		- cutting offset of right border
+		topBorder		int		- cutting offset of top border
+		bottomBorder	int		- cutting offset of bottom border
 	
-	Register new type:
-	Add new line into macro  #define REGISTRATION(MACRO2, MACRO2REF, MACRO3)
-	MACRO3(MACRO_NAME, type_name, parent_type_name) \
+	MouseArea
+		Inherits from Element
+		MousePressed			- event handler for mouse press
+		MouseReleased			- event handler for mouse release
+		MouseClicked			- event handler for mouse click
+		MouseMoved				- event handler for mouse movement event
+		MouseScrolled			- event handler for mousewheel event
+		MouseEntered			- event handler for mouse entering
+		MouseExited				- event handler for mouse exiting
 	
+3.2	Non-Element Structures
+	Color
+		red				float	- red channel
+		green			float	- green channel
+		blue			float	- blue channel
+	Font
+		family			string	- font family name
+		size			int		- font size
+	Img
+		src				string	- path to image file
 	
+4.	Using components saved to separate files
+4.1	Create GUI structure in CQML format and save it
+4.2	Import component and assign it to specific keyword
+	example assigns component from file "usedcomponent.cqml" to keyword UsedComponent:
+		import "usedcomponent.cqml" as UsedComponent
+4.3 Create instances of imported component via using the assigned keyword as type of element
+
+5.	Importing C++ logic
+	Additional c++ logic can be added by including header files, imported functionality can then be
+	used just within function bodies in cqml files the same way they would be used in normal C++ code.
+	example:
+		include "logic.h"
 
