@@ -813,9 +813,9 @@ fprintf(file,"void _QML_Draw();\n");
 fprintf(file,"void InitHashTabs(ClassHashTable * hashTabs);\n");
 		fclose(file);
 	}
-
+	
 	file = fopen("parser_output.cpp","w");
-	fprintf(file,"#include \"output0outer.h\"\n\n#include \"qml_includes.h\"\n");
+	fprintf(file,"#include \"output0outer.h\"\n#include\"parser_output.h\"\n#include \"qml_includes.h\"\n");
 	fprintf(file,"void _QML_Update();\n");
 	fprintf(file,"void _QML_ClassTabsInit();\n");
 	fprintf(file,"void _QML_Draw();\n");
