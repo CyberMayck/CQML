@@ -1,27 +1,86 @@
 include "printSomething.h"
-Rectangle
+import "button.cqml" as Button
+Element
 {
 	x : 0;
 	y : 0;
 	width : 500;
 	height : width;
-	color.red : 1;
-	color.green : 1;
-	color.blue : 1;
 	ScaledImage
 	{
 		id : pacimg;
-		x : parent.height/2;
-		y : 5;
-		width : 200;
-		height : 300;
-		img.src : "img1.png";
-		topBorder : 20;
-		leftBorder : 20;
-		rightBorder : 20;
-		bottomBorder : 20;
+		x : {
+			if(status == 5)
+			{
+				return 25;
+			}
+			if(CanMove(x,y,status))
+			{
+				if(status == 0)
+				{
+					return x+1;
+				}
+				if(status == 2)
+				{
+					return x-1;
+				}
+			}
+			return x;
+		};
+		y : {
+			if(status == 5)
+			{
+				return 25;
+			}
+			if(CanMove(x,y,status))
+			{
+				if(status == 1)
+				{
+					return y+1;
+				}
+				if(status == 3)
+				{
+					return y-1;
+				}
+			}
+			return y;
+		};
+		property int status : 5;
+		width : 100;
+		height : 100;
+		img.src : {
+			if(status==0 || status==5) return "img1.png";
+			else if(status==1) return "img2.png";
+			else if(status==2) return "img3.png";
+			else return "img4.png";
+		};
+		topBorder : 10;
+		leftBorder : 10;
+		rightBorder : 10;
+		bottomBorder : 10;
+		KeyPressed :
+		{
+			WindowLimit(parent.width, parent.height);
+			if(EVENT.key=='w')
+			{
+				status=3;
+			}
+			if(EVENT.key=='s')
+			{
+				status=1;
+			}
+			if(EVENT.key=='d')
+			{
+				status=0;
+			}
+			if(EVENT.key=='a')
+			{
+				status=2;
+			}
+				
+		};
 	};
-	TextInput
+	Text
 	{
 		id : outputtxt;
 		x : 5;
@@ -38,7 +97,7 @@ Rectangle
 	Rectangle
 	{
 		x : 5;
-		y : parent.height/2;
+		y : parent.height-45;
 		color.red : 0;
 		color.green : 1;
 		color.blue : 0;
@@ -46,8 +105,8 @@ Rectangle
 		borderColor.red : 1;
 		borderColor.green : 0;
 		borderColor.blue : 0;
-		width : parent.width/2-10;
-		height : parent.height/2-10;
+		width : 40;
+		height : 40;
 		MouseArea
 		{
 			id : crap;
@@ -56,16 +115,23 @@ Rectangle
 			MousePressed : 
 			{
 				PrintNumber(13);
-				
-				pacimg.width=100;
-				pacimg.height=100;
+				if(meta==100)
+				{
+					pacimg.width=100;
+					pacimg.height=100;
+					meta=200;
+				}
+				else
+				{
+					pacimg.width=200;
+					pacimg.height=200;
+					meta=100;
+				}
 				
 				outputtxt.text = "pressed";
 			};
 			MouseReleased : 
 			{
-				pacimg.width=200;
-				pacimg.height=300;
 				outputtxt.text = "released";
 			};
 		};

@@ -4,4 +4,7 @@ Rectangle
 	y: 10;
 	width : 100;
 	height : 100;
+	color.red : 1;
+	color.green : 0;
+	color.blue : 0;
 }
