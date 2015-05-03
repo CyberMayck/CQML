@@ -9,6 +9,7 @@ unsigned long CRC32(char * str, unsigned int len);
 int processBasicTypes();
 void PrintClassTabs(FILE * file, int cnt);
 void PrintClassHashTabs(FILE * file, int cnt);
+void PrintClassInfos(FILE * file, int cnt);
 
 class ClassContainer;
 

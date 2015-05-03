@@ -4,9 +4,24 @@
 //#include "struct_definition_macros.h"
 #include "gui.h"
 
+
+
 static int classCnt;
 static ClassHashTable * classHashTables;
 
+bool IsCompatible(long lID,long rID)
+{
+	if(lID==rID)
+		return true;
+	if(classHashTables[rID].parentID==-1)
+		return false;
+	return IsCompatible(lID,classHashTables[rID].parentID);
+}
+
+bool IsValueType(long classID)
+{
+	return classHashTables[classID].isValueType==1;
+}
 
 int f1(const char * s, int * T, int n)
 {
@@ -60,13 +75,14 @@ int GetHash(long classID, const char* name)
 		return -1;
 	}
 }
-
+void InitDefaultHashTabs(ClassHashTable * hashTabs);
 void InitClassesSize(ClassHashTable *&classHashTables ,int cnt)
 {
 	classCnt=cnt;
 	//classes=(AttributeCheck*)malloc(classCnt*sizeof(AttributeCheck));
 
 	classHashTables=(ClassHashTable*)malloc(classCnt*sizeof(ClassHashTable));
+	InitDefaultHashTabs(classHashTables);
 }
 
 void InitHashTab(ClassHashTable * tab, int n, int m)
@@ -79,9 +95,9 @@ void InitHashTab(ClassHashTable * tab, int n, int m)
 	tab->g=(int *)malloc(sizeof(int)*n);
 }
 
-void (*InitHashTabs)(ClassHashTable*);
+void (*InitHashTabs)(ClassHashTable*&);
 
-void SetInitHashTabs(void (*fptr)(ClassHashTable*))
+void SetInitHashTabs(void (*fptr)(ClassHashTable*&))
 {
 	InitHashTabs=fptr;
 }
@@ -89,6 +105,7 @@ void SetInitHashTabs(void (*fptr)(ClassHashTable*))
 void QMLInitHashes()
 {
 	InitHashTabs(classHashTables);
+	int a=1;
 }
 
 

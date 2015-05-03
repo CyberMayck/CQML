@@ -1,6 +1,6 @@
 namespace CQMLGUI{
-struct Element;
+struct ElementCustom0;
 
-Element* acGUI_Rootoutput0();
+ElementCustom0* acGUI_Rootoutput0();
 
 }

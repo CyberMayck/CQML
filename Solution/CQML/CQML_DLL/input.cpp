@@ -127,7 +127,7 @@ QMLEvent PopEvent()
 
 void ProcessMouseEvent(QMLMouseEvent * mouseEvent)
 {
-	int a;
+//	int a;
 	switch(mouseEvent->action)
 	{
 	case MOUSE_BUTTON_PRESSED:

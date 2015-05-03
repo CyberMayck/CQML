@@ -8,8 +8,8 @@ unsigned long CRC32(char * str, unsigned int len);
 
 int processBasicTypes();
 void PrintClassTabs(FILE * file, int cnt);
-void PrintClassHashTabs(FILE * file, int cnt);
-
+void PrintDefaultClassHashTabs(FILE * file);
+void PrintDefaultValueTypeAssignment(FILE * file);
 class ClassContainer;
 
 class PropertyAndType
@@ -18,6 +18,7 @@ public:
 	string type;
 	string name;
 	string value;
+	int isReference;
 	long nameHash;
 	int isDefault;
 	ClassContainer* cont;

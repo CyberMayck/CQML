@@ -19,7 +19,7 @@ void Checker::Print(FILE * f)
 	
 	string str=elementName;
 
-	for(int i=0;i<checkers.size();i++)
+	for(unsigned int i=0;i<checkers.size();i++)
 	{
 		str="(("+checkers[i].cont->className+")"+str;
 		if(prevRef)

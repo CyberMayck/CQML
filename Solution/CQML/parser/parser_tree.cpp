@@ -11,7 +11,7 @@ SrcNode* MakeNode0KW(char * text)
 	//if(len>2)
 	{
 		char * txt=(char * )malloc((len+3)*sizeof(char));
-		strcpy(&txt[1],text);
+		strcpy_s(&txt[1],(len+1),text);
 		txt[0]=' ';
 		txt[len+1]=' ';
 		txt[len+2]='\0';
@@ -262,7 +262,7 @@ SrcNode* MakeNode7ITER(SrcNode* child1,SrcNode* child2,SrcNode* child3,SrcNode* 
 void makeParseTree(int *l)
 {
 	//ParserList* list;
-	int i;
+//	int i;
 	elementTree=(ParserList*)l;
 }
 

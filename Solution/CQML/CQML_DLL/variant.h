@@ -6,6 +6,11 @@
 #include <type_traits>
 
 struct CQMLObject;
+struct Variant;
+namespace CQMLGUI
+{
+	struct QML_Context;
+};
 
 	// enum here
 
@@ -22,8 +27,66 @@ enum type_variant
 	TYPE_LONG_DOUBLE,
 	TYPE_VOID_PTR,
 	TYPE_STRING,
-	TYPE_CQMLOBJECT
+	TYPE_CQMLOBJECT,
+	TYPE_CQMLOBJECT_VALUE,
+	TYPE_INVALID
+};
 
+struct VariantRef
+{
+	CQML_API VariantRef();
+	CQML_API VariantRef(int&, void (**r)(CQMLGUI::QML_Context*));
+	CQML_API VariantRef(long&, void (**r)(CQMLGUI::QML_Context*));
+	CQML_API VariantRef(long long&, void (**r)(CQMLGUI::QML_Context*));
+	CQML_API VariantRef(unsigned int&, void (**r)(CQMLGUI::QML_Context*));
+	CQML_API VariantRef(unsigned long&, void (**r)(CQMLGUI::QML_Context*));
+	CQML_API VariantRef(unsigned long long&, void (**r)(CQMLGUI::QML_Context*));
+	CQML_API VariantRef(float&, void (**r)(CQMLGUI::QML_Context*));
+	CQML_API VariantRef(double&, void (**r)(CQMLGUI::QML_Context*));
+	CQML_API VariantRef(long double&, void (**r)(CQMLGUI::QML_Context*));
+	//CQML_API VariantRef(const char*);
+	CQML_API VariantRef(std::string&, void (**r)(CQMLGUI::QML_Context*));
+	CQML_API VariantRef(void*&, void (**r)(CQMLGUI::QML_Context*));
+	CQML_API VariantRef(CQMLObject*, void (**r)(CQMLGUI::QML_Context*));
+	CQML_API VariantRef(CQMLObject**, void (**r)(CQMLGUI::QML_Context*));
+	long typeID;
+	union
+	{
+		int* v_int;
+		long* v_long;
+		long long* v_long_long;
+		unsigned int* v_unsigned_int;
+		unsigned long* v_unsigned_long;
+		unsigned long long* v_unsigned_long_long;
+		float* v_float;
+		double* v_double;
+		long double* v_long_double;
+		void** v_r_void;
+		std::string* v_string;
+		CQMLObject* v_CQMLObject;
+		CQMLObject** v_r_CQMLObject;
+	} value;
+	void (**updaterP)(CQMLGUI::QML_Context*);
+
+	CQML_API VariantRef Get(const char *);
+	CQML_API void SetUpdater(void (*r)(CQMLGUI::QML_Context*));
+
+	CQML_API const VariantRef& operator=(const Variant & rhs);
+	CQML_API const VariantRef& operator+=(const Variant & rhs);
+	CQML_API const VariantRef& operator-=(const Variant & rhs);
+	CQML_API const VariantRef& operator*=(const Variant & rhs);
+	CQML_API const VariantRef& operator/=(const Variant & rhs);
+	CQML_API const VariantRef& operator%=(const Variant & rhs);
+	CQML_API const Variant operator+(const Variant & rhs) const;
+	CQML_API const Variant operator-(const Variant & rhs) const;
+	CQML_API const Variant operator*(const Variant & rhs) const;
+	CQML_API const Variant operator/(const Variant & rhs) const;
+	CQML_API const Variant operator%(const Variant & rhs) const;
+
+	
+	//template<typename T> 
+	//T As() const;
+	
 };
 
 struct Variant
@@ -41,7 +104,8 @@ struct Variant
 		double v_double;
 		long double v_long_double;
 		void* v_r_void;
-		char* v_string;
+		//char* v_string;
+		std::string* v_string;
 		CQMLObject* v_r_CQMLObject;
 		//#include all_types.h
 	} value;
@@ -73,22 +137,24 @@ struct Variant
 	CQML_API Variant(std::string);
 	CQML_API Variant(void*);
 	CQML_API Variant(CQMLObject*);
+	CQML_API Variant(const VariantRef&);
+
 	CQML_API ~Variant();
 
-	Variant& Get(char *);
+	CQML_API VariantRef Get(const char *);
 	//#include all_types_constructor.h
 
-	CQML_API const Variant& operator=(Variant & rhs);
-	CQML_API const Variant& operator+=(Variant & rhs);
-	CQML_API const Variant& operator-=(Variant & rhs);
-	CQML_API const Variant& operator*=(Variant & rhs);
-	CQML_API const Variant& operator/=(Variant & rhs);
-	CQML_API const Variant& operator%=(Variant & rhs);
-	CQML_API const Variant operator+(Variant & rhs) const;
-	CQML_API const Variant operator-(Variant & rhs) const;
-	CQML_API const Variant operator*(Variant & rhs) const;
-	CQML_API const Variant operator/(Variant & rhs) const;
-	CQML_API const Variant operator%(Variant & rhs) const;
+	CQML_API const Variant& operator=(const Variant & rhs);
+	CQML_API const Variant& operator+=(const Variant & rhs);
+	CQML_API const Variant& operator-=(const Variant & rhs);
+	CQML_API const Variant& operator*=(const Variant & rhs);
+	CQML_API const Variant& operator/=(const Variant & rhs);
+	CQML_API const Variant& operator%=(const Variant & rhs);
+	CQML_API const Variant operator+(const Variant & rhs) const;
+	CQML_API const Variant operator-(const Variant & rhs) const;
+	CQML_API const Variant operator*(const Variant & rhs) const;
+	CQML_API const Variant operator/(const Variant & rhs) const;
+	CQML_API const Variant operator%(const Variant & rhs) const;
 
 };
 
@@ -170,31 +236,31 @@ typename std::enable_if<std::is_arithmetic<T>::value, T>::type Variant::As() con
 	switch(typeID)
 	{
 	case TYPE_INT:
-		return value.v_int;
+		return (T) value.v_int;
 		break;
 	case TYPE_LONG:
-		return value.v_long;
+		return (T) value.v_long;
 		break;
 	case TYPE_LONG_LONG:
-		return value.v_long_long;
+		return (T) value.v_long_long;
 		break;
 	case TYPE_UNSIGNED_INT:
-		return value.v_unsigned_int;
+		return (T) value.v_unsigned_int;
 		break;
 	case TYPE_UNSIGNED_LONG:
-		return value.v_unsigned_long;
+		return (T) value.v_unsigned_long;
 		break;
 	case TYPE_UNSIGNED_LONG_LONG:
-		return value.v_unsigned_long_long;
+		return (T) value.v_unsigned_long_long;
 		break;
 	case TYPE_FLOAT:
-		return value.v_float;
+		return (T) value.v_float;
 		break;
 	case TYPE_DOUBLE:
-		return value.v_double;
+		return (T) value.v_double;
 		break;
 	case TYPE_LONG_DOUBLE:
-		return value.v_long_double;
+		return (T) value.v_long_double;
 		break;
 	default:
 		throw 0;
@@ -202,6 +268,15 @@ typename std::enable_if<std::is_arithmetic<T>::value, T>::type Variant::As() con
 	}
 	return 0;
 }
+
+
+
+/*template<typename T> 
+T VariantRef::As() const
+{
+	return Variant(*this).As<T>();
+}*/
+
 
 
 #endif

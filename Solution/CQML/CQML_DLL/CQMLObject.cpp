@@ -2,10 +2,16 @@
 
 #include "variant.h"
 #include "CQMLObject.h"
+#include "attribControl.h"
 
-Variant CQMLObject::Get(char*)
+VariantRef CQMLObject::Get(const char*)
 {
-	return Variant(0);
+	return VariantRef();
+}
+
+CQMLObject* CQMLObject::Copy()
+{
+	return new CQMLObject(*this);
 }
 
 void CQMLObject::Init()

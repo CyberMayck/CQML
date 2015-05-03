@@ -2,13 +2,16 @@ include "printSomething.h"
 import "button.cqml" as Button
 Element
 {
+	id : roo;
 	x : 0;
 	y : 0;
 	width : 500;
 	height : width;
+	property Element refEl : pacimg;
 	ScaledImage
 	{
 		id : pacimg;
+		property Element refEl : roo;
 		x : {
 			if(status == 5)
 			{
@@ -123,7 +126,8 @@ Element
 				}
 				else
 				{
-					pacimg.width=200;
+					roo.refEl=pacimg;
+					roo.refEl.refEl.refEl.width=roo.refEl.refEl.refEl.width+200;
 					pacimg.height=200;
 					meta=100;
 				}

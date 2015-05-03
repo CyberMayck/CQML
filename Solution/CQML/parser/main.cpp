@@ -58,6 +58,8 @@ int elementCount;
 GUIElement * elementGroups[100];
 int elementGroupSizes[100];
 
+int customClassCnt=0;
+
 ParserList* elementTree;
 std::unordered_map<std::string, int> idMaps[100];
 
@@ -146,7 +148,7 @@ void PrintNode(SrcNode* node)
 void printHandlerAssignment()
 {
 	fprintf(file_class_source, "//printHandlerAssignment()\n");
-	int i;
+//	int i;
 
 	int currentId;
 	currentId=id;
@@ -185,7 +187,7 @@ void printHandlerAssignment()
 
 void printHandlers()
 {
-	int i;
+//	int i;
 
 	int currentId;
 	currentId=id;
@@ -208,7 +210,7 @@ void printHandlers()
 				if(ht!=0)
 				{
 					string str="";
-					for(int l=1;l<ht->paramNames.size();l++)
+					for(unsigned int l=1;l<ht->paramNames.size();l++)
 					{
 						str+=ht->paramTypes[l]+string(" ")+ht->paramNames[l];
 						if(l!=ht->paramNames.size()-1)
@@ -266,7 +268,7 @@ void printHandlers()
 
 void printAttributes()
 {
-	int i;
+//	int i;
 	//ParserAttribute* att;
 	int currentId;
 	currentId=id;
@@ -331,7 +333,7 @@ void classDeclaration(const char* rootName, int treeInd)
 
 		
 		char * customClassName= new char[100];
-		sprintf(customClassName,"%sCustom%d",elements[i].name,customClassCount);
+		sprintf_s(customClassName,100,"%sCustom%d",elements[i].name,customClassCount);
 		customClassCount++;
 		//clear?
 		elements[i].origClassName=elements[i].name;
@@ -363,6 +365,8 @@ void classDeclaration(const char* rootName, int treeInd)
 			fprintf(file_class_header,"\tvoid (* %s_Update)(QML_Context*);\n",prop->name);
 		}
 		fprintf(file_class_header,"\tvirtual void Update();\n");
+		fprintf(file_class_header,"VariantRef Get(const char* s);\n");
+		fprintf(file_class_header,"%s();\n",elements[i].name);
 		fprintf(file_class_header,"};\n");
 
 		fprintf(file_class_header,"%s* ac%s();\n\n",elements[i].name,elements[i].name);
@@ -398,22 +402,34 @@ void classDeclaration(const char* rootName, int treeInd)
 
 		fprintf(file_class_source,"}\n");
 	}*/
-	for(int i=0;i<classes[treeInd].size();i++)
+	for(unsigned int i=0;i<classes[treeInd].size();i++)
 	{
-		fprintf(file_class_source,"CQMLGUI::%s::%s()\n{\n",classes[treeInd][i]->className,classes[treeInd][i]->className);
+		fprintf(file_class_source,"CQMLGUI::%s::%s()\n{\n",classes[treeInd][i]->className.c_str(),classes[treeInd][i]->className.c_str());
 		
 		fprintf(file_class_source,"\tclassID=%d;\n",classes[treeInd][i]->classID);
 		
 
 		fprintf(file_class_source,"}\n");
 	}
+
 	
-	for(int i=0;i<classes[treeInd].size();i++)
+	/*for(int i=0;i<classes[treeInd].size();i++)
 	{
-		fprintf(file_class_source,"Variant CQMLGUI::%s::Get(const char* s)\n{\n",classes[treeInd][i]->className.c_str());
+		fprintf(file,"CQMLObject* CQMLGUI::%s::Copy()\n",classes[treeInd][i]->className.c_str());
 		
+		fprintf(file,"{\n");
+		fprintf(file,"\treturn new CQMLGUI::%s(*this);\n",classes[treeInd][i]->className.c_str());
+		fprintf(file,"}\n\n");
+	}*/
+	
+	for(unsigned int i=0;i<classes[treeInd].size();i++)
+	{
+		fprintf(file_class_source,"VariantRef CQMLGUI::%s::Get(const char* s)\n{\n",classes[treeInd][i]->className.c_str());
+		//fprintf(file_class_source,"Variant CQMLGUI::%s::Get(const char* s)\n{\n",classes[treeInd][i]->className.c_str());
+		
+
 		fprintf(file_class_source,"\tint hash=GetHash(classID,s);\n");
-		fprintf(file_class_source,"\tif(hash<0) return Variant(0);\n");
+		fprintf(file_class_source,"\tif(hash<0) \n\t{\n\t\tthrow(0); \n\t\treturn VariantRef();\n\t}\n");
 		fprintf(file_class_source,"\tswitch(hash)\n\t{\n");
 		PerfectHashData * hashData = classes[treeInd][i]->hashData;
 		for(int j=0;j<hashData->m;j++) ///ok
@@ -422,16 +438,25 @@ void classDeclaration(const char* rootName, int treeInd)
 
 			fprintf(file_class_source,"\tcase %d:\n",j);
 			if(prop->IsPrimitive())
-				fprintf(file_class_source,"\t\treturn Variant(%s);\n",hashData->keys[j].c_str());
+				fprintf(file_class_source,"\t\treturn VariantRef(%s,&%s_Update);\n",hashData->keys[j].c_str(),hashData->keys[j].c_str());
 			else
-				fprintf(file_class_source,"\t\treturn Variant(&%s);\n",hashData->keys[j].c_str());
-
+			{
+				ClassContainer * tCont=GetDefaultClassContainer(prop->type);
+				if(tCont->isReferencable)
+				{
+					fprintf(file_class_source,"\t\treturn VariantRef((CQMLObject**)&%s,&%s_Update);\n",hashData->keys[j].c_str(),hashData->keys[j].c_str());
+				}
+				else
+				{
+					fprintf(file_class_source,"\t\treturn VariantRef((CQMLObject*)&%s,&%s_Update);\n",hashData->keys[j].c_str(),hashData->keys[j].c_str());
+				}
+			}
 		}
 		
 		fprintf(file_class_source,"\tdefault: break;\n");
 		fprintf(file_class_source,"\t}\n");
 		
-		fprintf(file_class_source,"\treturn Variant(0);\n");
+		fprintf(file_class_source,"\treturn VariantRef();\n");
 
 		fprintf(file_class_source,"}\n");
 	}
@@ -553,7 +578,7 @@ void rootElementUpdater(const char * rootName, int treeInd)
 void printElementUpdatersHeaders()
 {
 	fprintf(file_class_source, "\n //printElementUpdatersHeaders() \n");
-	int i;
+//	int i;
 	//ParserAttribute* att;
 	int currentId;
 	currentId=id;
@@ -571,7 +596,7 @@ void printElementUpdatersHeaders()
 void printAttributeUpdatersHeaders()
 {
 	fprintf(file_class_source, "\n //printAttributeUpdatersHeaders() \n");
-	int i;
+//	int i;
 	//ParserAttribute* att;
 	int currentId;
 	currentId=id;
@@ -630,7 +655,7 @@ void printAttributeUpdatersHeaders()
 void printAttributeUpdaters()
 {
 	fprintf(file_class_source, "\n //printAttributeUpdaters() \n");
-	int i;
+//	int i;
 	//ParserAttribute* att;
 	int currentId;
 	currentId=id;
@@ -694,7 +719,7 @@ bool recursionDetectCycle(std::vector<GraphNode*> &graphNodes,GraphNode * node, 
 		return true;
 	processed[ind]=true;
 	visited[ind]=true;
-	for(int i=0;i<node->nextNodes.size();i++)
+	for(unsigned int i=0;i<node->nextNodes.size();i++)
 	{
 		if(recursionDetectCycle(graphNodes,graphNodes[node->nextNodes[i]],node->nextNodes[i]))
 			return true;
@@ -711,12 +736,12 @@ void sortTopologically(std::vector<GraphNode*> &graphNodes)
 	gLink=new int[graphNodes.size()];
 	stackCnts=new int[graphNodes.size()];
 	compInds=new int[graphNodes.size()];
-	for(int i=0;i<graphNodes.size();i++)
+	for(unsigned int i=0;i<graphNodes.size();i++)
 	{
 		gIndex[i]=-1;
 		stackCnts[i]=0;
 	}
-	for(int i=0;i<graphNodes.size();i++)
+	for(unsigned int i=0;i<graphNodes.size();i++)
 	{
 		if(gIndex[i]==-1)
 		{
@@ -733,7 +758,7 @@ void tarjanRecursion(std::vector<GraphNode*> &graphNodes,int ind)
 	tStack.push(ind);
 	stackCnts[ind]++;
 
-	for(int i=0;i<graphNodes[ind]->nextNodes.size();i++)
+	for(unsigned int i=0;i<graphNodes[ind]->nextNodes.size();i++)
 	{
 		int ind2=graphNodes[ind]->nextNodes[i];
 		if(gIndex[ind2]==-1)
@@ -774,7 +799,7 @@ bool detectCycle(std::vector<GraphNode*> &graphNodes)
 		visited[i]=false;
 		processed[i]=false;
 	}
-	for(int i=0;i<graphNodes.size();i++)
+	for(unsigned int i=0;i<graphNodes.size();i++)
 	{
 		if(!processed[i])
 		{
@@ -794,14 +819,14 @@ FILE **files;
 void makeMainSource()
 {
 	
-	file=fopen("alltypes.h","w");
+	fopen_s(&file,"alltypes.h","w");
 	if(file)
 	{
 		PrintTypesUnion(file);
 		fclose(file);
 	}
 
-	file=fopen("parser_output.h","w");
+	fopen_s(&file,"parser_output.h","w");
 	if(file)
 	{
 		fprintf(file,"#include \"qml_includes.h\"\n");
@@ -810,11 +835,11 @@ void makeMainSource()
 		fprintf(file,"void _QML_Update();\n");
 		fprintf(file,"void _QML_Draw();\n");
 
-		fprintf(file,"void InitHashTabs(ClassHashTable * hashTabs);\n");
+		fprintf(file,"void InitHashTabs(ClassHashTable *& hashTabs);\n");
 		fclose(file);
 	}
 	
-	file = fopen("parser_output.cpp","w");
+	fopen_s(&file,"parser_output.cpp","w");
 	fprintf(file,"#include \"output0outer.h\"\n#include\"parser_output.h\"\n#include \"qml_includes.h\"\n");
 	fprintf(file,"void _QML_Update();\n");
 	fprintf(file,"void _QML_ClassTabsInit();\n");
@@ -951,6 +976,8 @@ void makeMainSource()
 	
 	PrintClassHashTabs(file,elementTreeCnt);
 	
+	//PrintClassInfos(file,elementTreeCnt);
+	
 	/*fprintf(file,"void _QML_ClassTabsInit()\n");
 	fprintf(file,"{\n");
 	PrintClassTabs(file,elementTreeCnt);
@@ -962,7 +989,7 @@ void makeMainSource()
 void printElementUpdaters()
 {
 	fprintf(file_class_source, "\n //printElementUpdaters() \nusing namespace CQMLGUI;\n");
-	int i;
+//	int i;
 	//ParserAttribute* att;
 	int currentId;
 	currentId=id;
@@ -977,7 +1004,9 @@ void printElementUpdaters()
 			ClassContainer * parentCont=cont->GetAncestor();
 
 			fprintf(file_class_source, "void %s::Update()\n{\n",cont->className.c_str());
-
+			
+				
+			fprintf(file_class_source, "\tif(!enabled)\n\t\treturn;\n");
 			for(int j=0;j<elements[i].propertiesCount;j++)
 			{
 				GUIElementProperty* att=&elements[i].properties[j];
@@ -1005,7 +1034,7 @@ void printElementUpdaters()
 							fprintf(file_class_source, "(%s_context);\n",att->name); 
 							fprintf(file_class_source, "\telse\n\t{\n");
 
-							for(int k=0;k<tCont->props.size();k++)
+							for(unsigned int k=0;k<tCont->props.size();k++)
 							{
 								const char * tName=tCont->props[k].name.c_str();
 								fprintf(file_class_source, "\t\tif(%s.%s_Update)%s.%s_Update",att->name,tName,att->name,tName);
@@ -1039,7 +1068,7 @@ void printAttributesBodies()
 {
 	fprintf(file_class_source, "\n //printAttributesBodies()\n");
 
-	int i;
+//	int i;
 	//ParserAttribute* att;
 	int currentId;
 	currentId=id;
@@ -1172,7 +1201,7 @@ void printElementUpdaterAssignments();
 void printElementUpdaterAssignments()
 {
 	fprintf(file_class_source, "\n //printElementUpdaterAssignments() \n");
-	int i;
+//	int i;
 	//ParserAttribute* att;
 	int currentId;
 	currentId=id;
@@ -1188,12 +1217,12 @@ void printElementUpdaterAssignments()
 
 void PrintTypesUnion(FILE* f)
 {
-	for(int i=0;i<primitiveTypes.size();i++)
+	for(unsigned int i=0;i<primitiveTypes.size();i++)
 	{
 		fprintf(f,"%s ut_%s;\n",primitiveTypes[i]->name.c_str(),primitiveTypes[i]->name.c_str());
 	}
 	fprintf(f,"void* ut_ref;\n");
-	for(int i=0;i<defaultClasses.size();i++)
+	for(unsigned int i=0;i<defaultClasses.size();i++)
 	{
 		fprintf(f,"%s ut_%s;\n",defaultClasses[i]->className.c_str(),defaultClasses[i]->className.c_str());
 	}
@@ -1216,9 +1245,9 @@ void makeSource(std::string name, int treeInd)
 		//file_class_source= fopen("custom_classes.cpp","w");
 
 		//file = fopen("parser_output.cpp","w");
-		file_class_header= fopen(name1.c_str(),"w");
-		file_class_source= fopen(name2.c_str(),"w");
-		file = fopen(name3.c_str(),"w");
+		fopen_s(&file_class_header,name1.c_str(),"w");
+		fopen_s(&file_class_source,name2.c_str(),"w");
+		fopen_s(&file,name3.c_str(),"w");
 
 		//makeSource(elementTrees[i]);
 	}
@@ -1239,7 +1268,7 @@ void makeSource(std::string name, int treeInd)
 			fprintf(file_class_source,"#include \"%souter.h\"\n",importPathToName[imports[i].path].c_str());
 		}
 	}
-	for(int i=0;i<includes.size();i++)
+	for(unsigned int i=0;i<includes.size();i++)
 	{
 		if(includes[i].treeInd==treeInd)
 		{
@@ -1509,7 +1538,7 @@ bool processDots(SrcNode * node, int treeInd,int currentElementId, int graphInd,
 	{
 		curId=idMaps[treeInd][identifiers[0]];
 		
-		sprintf(str,"(*((GUI_Rootoutput%d *)context->root)->_QML_element%d)",treeInd,curId);
+		sprintf_s(str,256,"(*((GUI_Rootoutput%d*)context->root)->_QML_element%d)",treeInd,curId);
 		// start from ID
 		for(int i=1;i<cnt;i++)
 		{
@@ -1534,7 +1563,7 @@ bool processDots(SrcNode * node, int treeInd,int currentElementId, int graphInd,
 	else
 	{
 		PropertyAndType * prop=elements[curId].classContainer->CheckExistence(identifiers[0]);
-		sprintf(str,"(*((CQMLGUI::Rootoutput%d *)context->root)->_QML_element%d)",treeInd,curId);
+		sprintf_s(str,256,"(*((CQMLGUI::Rootoutput%d*)context->root)->_QML_element%d)",treeInd,curId);
 		if(prop!=0)
 		{
 			//start from this
@@ -1568,10 +1597,10 @@ bool processDots(SrcNode * node, int treeInd,int currentElementId, int graphInd,
 	if(isRight)
 	{
 		free(node->text);
-		sprintf(str,"var%d",(varId-1));
+		sprintf_s(str,256,"var%d",(varId-1));
 
 		node->text=new char[strlen(str)+1];
-		strcpy(node->text,str);
+		strcpy_s(node->text,strlen(str)+1,str);
 	}
 
 
@@ -1591,10 +1620,11 @@ void processRefs(SrcNode * node, int treeInd, int currentElementId, int graphInd
 			curId=idMaps[treeInd][std::string(node->text)];
 			
 			free(node->text);
-			sprintf(str,"(*((CQMLGUI::Rootoutput%d *)context->root)->_QML_element%d)",treeInd,curId);
+			//sprintf_s(str,256,"(*((CQMLGUI::Rootoutput%d *)context->root)->_QML_element%d)",treeInd,curId);
+			sprintf_s(str,256,"(*((CQMLGUI::Rootoutput%d*)context->root)->_QML_element%d)",treeInd,curId);
 			//sprintf(str,"(*self->localGroup->members[%d])",otherId);
 			node->text=new char[strlen(str)+1];
-			strcpy(node->text,str);
+			strcpy_s(node->text,strlen(str)+1,str);
 		}
 		else
 		{
@@ -1602,7 +1632,7 @@ void processRefs(SrcNode * node, int treeInd, int currentElementId, int graphInd
 			ClassContainer * cont=elements[currentElementId].classContainer;
 			PropertyAndType * prop=cont->CheckExistence(std::string(node->text));
 			
-			sprintf(str,"(*((CQMLGUI::Rootoutput%d *)context->root)->_QML_element%d)",treeInd,curId);
+			sprintf_s(str,256,"(*((CQMLGUI::Rootoutput%d*)context->root)->_QML_element%d)",treeInd,curId);
 			if(prop!=0)
 			{
 				// ap
@@ -1621,10 +1651,10 @@ void processRefs(SrcNode * node, int treeInd, int currentElementId, int graphInd
 				if(isRight)
 				{
 					free(node->text);
-					sprintf(str,"var%d",(varId-1));
+					sprintf_s(str,256,"var%d",(varId-1));
 
 					node->text=new char[strlen(str)+1];
-					strcpy(node->text,str);
+					strcpy_s(node->text,strlen(str)+1,str);
 				}
 			}
 			else
@@ -1670,7 +1700,7 @@ void printSubnodesToStr(SrcNode * node, string & str)
 void processApendi(SrcNode * node, int treeInd, int currentElementId, int graphInd, GUIElementHandler* h, int & varId)
 {
 	SrcApendix * ap=node->apendix;
-	for(int l=0;l<ap->sentences.size();l++)
+	for(unsigned int l=0;l<ap->sentences.size();l++)
 	{
 		SrcNode* node= ap->sentences[l].nodes[ap->sentences[l].nodes.size()-1];
 			int lastVar=0;
@@ -1772,7 +1802,7 @@ void processSrc(SrcNode * node, int treeInd, int currentElementId, SrcNode * las
 
 void processSrcReferences(SrcNode * node, int treeInd, int currentId, bool leftMostFound, bool dotNodePassed, int graphInd, GUIElementHandler* h)
 {
-	char str[100];
+	char str[256];
 	if(node->type==NODE_TYPE_DOT)
 	{
 		dotNodePassed=true;
@@ -1787,30 +1817,31 @@ void processSrcReferences(SrcNode * node, int treeInd, int currentId, bool leftM
 			{
 				int otherId=idMaps[treeInd][std::string(node->text)];
 				free(node->text);
-				sprintf(str,"(*((CQMLGUI::Rootoutput%d *)context->root)->_QML_element%d)",treeInd,otherId);
+				sprintf_s(str,256,"(*((CQMLGUI::Rootoutput%d*)context->root)->_QML_element%d)",treeInd,otherId);
+				//sprintf_s(str,256,"(*((CQMLGUI::Rootoutput%d *)context->root)->_QML_element%d)",treeInd,otherId);
 				//sprintf(str,"(*self->localGroup->members[%d])",otherId);
 				node->text=new char[strlen(str)+1];
-				strcpy(node->text,str);
+				strcpy_s(node->text,strlen(str)+1,str);
 			}
 			else if(isImportName)
 			{
 				int otherId=importToKeyMaps[treeInd][std::string(node->text)];
 				
 				free(node->text);
-				sprintf(str,"CQMLGUI::Root%s",importPathToName[imports[otherId].path].c_str());
+				sprintf_s(str,256,"CQMLGUI::Root%s",importPathToName[imports[otherId].path].c_str());
 				//sprintf(str,"(*self->localGroup->members[%d])",otherId);
 				node->text=new char[strlen(str)+1];
-				strcpy(node->text,str);
+				strcpy_s(node->text,strlen(str)+1,str);
 			}
 			else
 			{
 				if(strcmp("parent",node->text)==0)
 				{
 					free(node->text);
-					sprintf(str,"(*((CQMLGUI::Rootoutput%d *)context->root)->_QML_element%d->parent)",treeInd,currentId);
+					sprintf_s(str,256,"(*((CQMLGUI::Rootoutput%d*)context->root)->_QML_element%d->parent)",treeInd,currentId);
 					//sprintf(str,"(*self->localGroup->members[%d]->parent)",currentId);
 					node->text=new char[strlen(str)+1];
-					strcpy(node->text,str);
+					strcpy_s(node->text,strlen(str)+1,str);
 				}
 				else
 				{
@@ -1819,7 +1850,7 @@ void processSrcReferences(SrcNode * node, int treeInd, int currentId, bool leftM
 					if(prop!=0)
 					{
 						//
-						sprintf(str,"((%s*)((CQMLGUI::Rootoutput%d *)context->root)->_QML_element%d)->%s",prop->cont->className.c_str(),treeInd,currentId,node->text);
+						sprintf_s(str,256,"((%s*)((CQMLGUI::Rootoutput%d *)context->root)->_QML_element%d)->%s",prop->cont->className.c_str(),treeInd,currentId,node->text);
 							string checkStr=string("((CQMLGUI::Rootoutput")
 							+std::to_string(static_cast<long long>(treeInd))
 							+string(" *)context->root)->_QML_element")
@@ -1833,7 +1864,7 @@ void processSrcReferences(SrcNode * node, int treeInd, int currentId, bool leftM
 
 						free(node->text);
 						node->text=new char[strlen(str)+1];
-						strcpy(node->text,str);
+						strcpy_s(node->text,strlen(str)+1,str);
 
 						if(keyMap.count(key)!=0)
 						{
@@ -2064,7 +2095,7 @@ bool processSrcDots(SrcNode * node, int treeInd,int currentElementId, int graphI
 	}
 	completeStr=preStr+completeName+postStr;
 	node->text=new char[completeStr.length()+1];
-	std::strcpy(node->text,completeStr.c_str());
+	strcpy_s(node->text,completeStr.length()+1,completeStr.c_str());
 
 	checker.SetStartName(completeName);
 	h->checkers.push_back(checker);
@@ -2378,6 +2409,48 @@ void processTree(ParserList* elementTree, int treeInd)
 		rootElementCount++;
 	}
 
+	
+
+	//ddd
+	for(int i=0;i<elementCount;i++)
+	{
+		if(!elements[i].hasCustomClass)
+			continue;
+		
+		string nameC=string(elements[i].name)+string("Custom")+std::to_string(static_cast<long long>(customClassCnt));
+		
+		ClassContainer * cont = new ClassContainer(nameC, treeInd, totalClassCnt+customClassCnt);
+		string sp =elements[i].name;
+
+		cont->SetAncestor(defaultClasses[defaultClassMap[sp]]);
+
+		ClassContainer * ancestor= cont->GetAncestor();
+		while(ancestor!=0)
+		{
+			cont->isReferencable=ancestor->isReferencable;
+
+			ancestor=ancestor->GetAncestor();
+		}
+		
+
+		classes[treeInd].push_back(cont);
+
+		for(int j=0;j<elements[i].propertiesCount;j++)
+		{
+			GUIElementProperty * prop= &elements[i].properties[j];
+
+			PropertyAndType temp;
+			temp.name=prop->name;
+			temp.type=prop->typeName;
+			temp.value=string();
+			temp.isDefault=0;
+
+			cont->AddProp(temp);
+		}
+		customClassCnt++;
+	}
+	//ddd
+	
 	// create ids
 	for(int i=0;i<elementCount;i++)
 	{
@@ -2620,7 +2693,7 @@ int node(int a, char b, int c, char * d)
 void outputFile()
 {
 	FILE *file;
-	file = fopen("file.cpp","w");
+	fopen_s(&file,"file.cpp","w");
 	fprintf(file,"%s","stuff");
 	fclose(file);
 }
@@ -2631,7 +2704,7 @@ bool processFile(const char * name)
 {
 	printf("\n");
 	FILE *srcFile;
-	srcFile = fopen(name,"r");
+	fopen_s(&srcFile,name,"r");
 	if(!srcFile)
 	{
 		printf("failed to open file...\n");
@@ -2701,7 +2774,7 @@ int main(int argc, char ** argv)
 	
 
 	//return 0;
-	FILE *srcFile;
+//	FILE *srcFile;
 	int a=0;
 	id=0;
 	//srcFile = fopen("src4.cqml","r");

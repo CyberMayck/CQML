@@ -237,7 +237,7 @@ using namespace std;
 #define MAKE_STRUCTURE2(MACRO, NAME) \
 	struct NAME : public CQMLObject { \
 		CQML_API NAME();\
-		CQML_API virtual Variant Get(const char*);\
+		CQML_API virtual VariantRef Get(const char*);\
 		MACRO(PROP_FACTORY_DECL_MVAR4, PROP_FACTORY_DECL_VAR4, PROP_FACTORY_DECL_FUNC3P, PROP_FACTORY_DECL_METH3P, PROP_FACTORY_DECL_METHV3P, NOTHING) \
 	}; \
 
@@ -245,7 +245,7 @@ using namespace std;
 #define MAKE_STRUCTURE3(MACRO, NAME, PARENT) \
 	struct NAME : public PARENT { \
 		CQML_API NAME();\
-		CQML_API virtual Variant Get(const char*);\
+		CQML_API virtual VariantRef Get(const char*);\
 		MACRO(PROP_FACTORY_DECL_MVAR4, PROP_FACTORY_DECL_VAR4, PROP_FACTORY_DECL_FUNC3P, PROP_FACTORY_DECL_METH3P, PROP_FACTORY_DECL_METHV3P, NOTHING) \
 	}; \
      

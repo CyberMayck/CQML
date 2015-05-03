@@ -4,11 +4,85 @@
 #include "output1outer.h"
 #include "printSomething.h"
 //classDeclaration
-CQMLGUI::ScaledImageCustom0* CQMLGUI::acScaledImageCustom0()
+CQMLGUI::ElementCustom0* CQMLGUI::acElementCustom0()
 {
-	CQMLGUI::ScaledImageCustom0 * pointer;
-	pointer=new CQMLGUI::ScaledImageCustom0();
+	CQMLGUI::ElementCustom0 * pointer;
+	pointer=new CQMLGUI::ElementCustom0();
 	return pointer;
+}
+CQMLGUI::ScaledImageCustom1* CQMLGUI::acScaledImageCustom1()
+{
+	CQMLGUI::ScaledImageCustom1 * pointer;
+	pointer=new CQMLGUI::ScaledImageCustom1();
+	return pointer;
+}
+CQMLGUI::ElementCustom0::ElementCustom0()
+{
+	classID=11;
+}
+CQMLGUI::ScaledImageCustom1::ScaledImageCustom1()
+{
+	classID=12;
+}
+VariantRef CQMLGUI::ElementCustom0::Get(const char* s)
+{
+	int hash=GetHash(classID,s);
+	if(hash<0) 
+	{
+		throw(0); 
+		return VariantRef();
+	}
+	switch(hash)
+	{
+	case 0:
+		return VariantRef((CQMLObject**)&refEl,&refEl_Update);
+	case 1:
+		return VariantRef(x,&x_Update);
+	case 2:
+		return VariantRef(y,&y_Update);
+	case 3:
+		return VariantRef(width,&width_Update);
+	case 4:
+		return VariantRef(height,&height_Update);
+	default: break;
+	}
+	return VariantRef();
+}
+VariantRef CQMLGUI::ScaledImageCustom1::Get(const char* s)
+{
+	int hash=GetHash(classID,s);
+	if(hash<0) 
+	{
+		throw(0); 
+		return VariantRef();
+	}
+	switch(hash)
+	{
+	case 0:
+		return VariantRef((CQMLObject**)&refEl,&refEl_Update);
+	case 1:
+		return VariantRef(status,&status_Update);
+	case 2:
+		return VariantRef(leftBorder,&leftBorder_Update);
+	case 3:
+		return VariantRef(bottomBorder,&bottomBorder_Update);
+	case 4:
+		return VariantRef(rightBorder,&rightBorder_Update);
+	case 5:
+		return VariantRef(topBorder,&topBorder_Update);
+	case 6:
+		return VariantRef((CQMLObject*)&img,&img_Update);
+	case 7:
+		return VariantRef(x,&x_Update);
+	case 8:
+		return VariantRef(y,&y_Update);
+	case 9:
+		return VariantRef(width,&width_Update);
+	case 10:
+		return VariantRef(height,&height_Update);
+	default: break;
+	}
+	return VariantRef();
 }
 static void _QML_Update(CQMLGUI::Element *s);
 
@@ -34,8 +108,11 @@ if(meta== 100 ){(*((CQMLGUI::Rootoutput0*)context->root)->_QML_element1).width= 
 ;
 meta= 200 ;
 ;
-} else {(*((CQMLGUI::Rootoutput0*)context->root)->_QML_element1).width= 200 ;
-(*((CQMLGUI::Rootoutput0*)context->root)->_QML_element1).width_Update=0;
+} else {(*((CQMLGUI::Rootoutput0*)context->root)->_QML_element0).refEl=(((CQMLGUI::Rootoutput0*)context->root)->_QML_element1);
+(*((CQMLGUI::Rootoutput0*)context->root)->_QML_element0).refEl_Update=0;
+;
+(*((CQMLGUI::Rootoutput0*)context->root)->_QML_element0).refEl->Get("refEl").Get("refEl").Get("width")=(*((CQMLGUI::Rootoutput0*)context->root)->_QML_element0).refEl->Get("refEl").Get("refEl").Get("width")+ 200 ;
+(*((CQMLGUI::Rootoutput0*)context->root)->_QML_element0).refEl->Get("refEl").Get("refEl").Get("width").SetUpdater(0);
 ;
 (*((CQMLGUI::Rootoutput0*)context->root)->_QML_element1).height= 200 ;
 (*((CQMLGUI::Rootoutput0*)context->root)->_QML_element1).height_Update=0;
@@ -96,7 +173,7 @@ static int Handler_E1_x(CQMLGUI::QML_Context *context)
 }
 
  //rootElementAllocation() 
-CQMLGUI::Element* CQMLGUI::acGUI_Rootoutput0()
+CQMLGUI::ElementCustom0* CQMLGUI::acGUI_Rootoutput0()
 {
 	CQMLGUI::Rootoutput0 * pointer;
 	pointer=new CQMLGUI::Rootoutput0();
@@ -108,6 +185,8 @@ static void Update_E0_x(CQMLGUI::QML_Context *);
 static void Update_E0_y(CQMLGUI::QML_Context *);
 static void Update_E0_width(CQMLGUI::QML_Context *);
 static void Update_E0_height(CQMLGUI::QML_Context *);
+static void Update_E0_refEl(CQMLGUI::QML_Context *);
+static void Update_E1_refEl(CQMLGUI::QML_Context *);
 static void Update_E1_status(CQMLGUI::QML_Context *);
 static void Update_E1_width(CQMLGUI::QML_Context *);
 static void Update_E1_height(CQMLGUI::QML_Context *);
@@ -151,9 +230,9 @@ static void Update_E4(CQMLGUI::Element *self);
  //rootElementConstructor() 
 CQMLGUI::Rootoutput0::Rootoutput0()
 {
-	_QML_element0 = CQMLGUI::acElement();
+	_QML_element0 = CQMLGUI::acElementCustom0();
 	_QML_element0->root=(CQMLGUI::Element*)this;
-	_QML_element1 = CQMLGUI::acScaledImageCustom0();
+	_QML_element1 = CQMLGUI::acScaledImageCustom1();
 	_QML_element1->root=(CQMLGUI::Element*)this;
 	_QML_element2 = CQMLGUI::acText();
 	_QML_element2->root=(CQMLGUI::Element*)this;
@@ -175,8 +254,12 @@ CQMLGUI::Rootoutput0::Rootoutput0()
 	((Element*)_QML_element0)->width_Update  = Update_E0_width;
 	((Element*)_QML_element0)->height_context  = acQML_Context((CQMLGUI::Component*)this,(CQMLGUI::Element*)_QML_element0);
 	((Element*)_QML_element0)->height_Update  = Update_E0_height;
-	((ScaledImageCustom0*)_QML_element1)->status_context  = acQML_Context((CQMLGUI::Component*)this,(CQMLGUI::Element*)_QML_element1);
-	((ScaledImageCustom0*)_QML_element1)->status_Update  = Update_E1_status;
+	((ElementCustom0*)_QML_element0)->refEl_context  = acQML_Context((CQMLGUI::Component*)this,(CQMLGUI::Element*)_QML_element0);
+	((ElementCustom0*)_QML_element0)->refEl_Update  = Update_E0_refEl;
+	((ScaledImageCustom1*)_QML_element1)->refEl_context  = acQML_Context((CQMLGUI::Component*)this,(CQMLGUI::Element*)_QML_element1);
+	((ScaledImageCustom1*)_QML_element1)->refEl_Update  = Update_E1_refEl;
+	((ScaledImageCustom1*)_QML_element1)->status_context  = acQML_Context((CQMLGUI::Component*)this,(CQMLGUI::Element*)_QML_element1);
+	((ScaledImageCustom1*)_QML_element1)->status_Update  = Update_E1_status;
 	((Element*)_QML_element1)->width_context  = acQML_Context((CQMLGUI::Component*)this,(CQMLGUI::Element*)_QML_element1);
 	((Element*)_QML_element1)->width_Update  = Update_E1_width;
 	((Element*)_QML_element1)->height_context  = acQML_Context((CQMLGUI::Component*)this,(CQMLGUI::Element*)_QML_element1);
@@ -393,7 +476,15 @@ static void Update_E1_width(CQMLGUI::QML_Context *context)
 }
 static void Update_E1_status(CQMLGUI::QML_Context *context)
 {
-	((CQMLGUI::ScaledImageCustom0*)context->self)->status= 5 ;
+	((CQMLGUI::ScaledImageCustom1*)context->self)->status= 5 ;
+}
+static void Update_E1_refEl(CQMLGUI::QML_Context *context)
+{
+	((CQMLGUI::ScaledImageCustom1*)context->self)->refEl=(((CQMLGUI::Rootoutput0*)context->root)->_QML_element0);
+}
+static void Update_E0_refEl(CQMLGUI::QML_Context *context)
+{
+	((CQMLGUI::ElementCustom0*)context->self)->refEl=(((CQMLGUI::Rootoutput0*)context->root)->_QML_element1);
 }
 static void Update_E0_height(CQMLGUI::QML_Context *context)
 {
@@ -414,8 +505,18 @@ static void Update_E0_x(CQMLGUI::QML_Context *context)
 
  //printElementUpdaters() 
 using namespace CQMLGUI;
-void ScaledImageCustom0::Update()
+void ElementCustom0::Update()
 {
+	if(!enabled)
+		return;
+	if(refEl_Update)refEl_Update(refEl_context);
+	 Element::Update();
+}
+void ScaledImageCustom1::Update()
+{
+	if(!enabled)
+		return;
+	if(refEl_Update)refEl_Update(refEl_context);
 	if(status_Update)status_Update(status_context);
 	 ScaledImage::Update();
 }

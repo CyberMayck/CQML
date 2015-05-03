@@ -14,6 +14,8 @@ struct ClassHashTable
 	int * g; // n
 	int m;
 	int n;
+	int isValueType;
+	int parentID;
 };
 
 CQML_API void InitClassesSize(ClassHashTable*& tabs,int cnt);
@@ -21,5 +23,8 @@ CQML_API void InitHashTab(ClassHashTable * tab, int n, int m);
 CQML_API void QMLInitHashes();
 
 
-CQML_API void SetInitHashTabs(void (*fptr)(ClassHashTable*));
+CQML_API void SetInitHashTabs(void (*fptr)(ClassHashTable*&));
 CQML_API int GetHash(long classID, const char* name);
+CQML_API bool IsValueType(long classID);
+CQML_API bool IsCompatible(long lID,long rID);
+

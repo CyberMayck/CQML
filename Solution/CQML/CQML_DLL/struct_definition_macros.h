@@ -73,10 +73,12 @@ using namespace std;
 	F(int, x, 0, "x coordinate in pixels") \
 	F(int, y, 0, "y coordinate in pixels") \
 	F(int, width, 0, "width in pixels") \
-	F(int, height, 0, "height in pixels")\
-	MF(int, focus, 0, "focused")\
-	ME(int, Top, 0)\
-	ME(int, Left, 0)\
+	F(int, height, 0, "height in pixels") \
+	F(int, visible, 1, "visibility") \
+	F(int, enabled, 1, "enabled") \
+	MF(int, focus, 0, "focused") \
+	ME(int, Top, 0) \
+	ME(int, Left, 0) \
 	MEV(void, Draw, 0) \
 	MEV(void, Update, 0) \
 	MEV(int, MousePressed, 0, int, int, int) \
@@ -159,10 +161,10 @@ using namespace std;
 
 
 #define STRUCT_ANCHOR(MF, F, M, ME, MEV, INHERIT) \
-	F(Element*, top, 0, "top anchor") \
-	F(Element*, bottom, 0, "bottom anchor") \
-	F(Element*, left, 0, "left anchor") \
-	F(Element*, right, 0, "right anchor")
+	F(Element *, top, 0, "top anchor") \
+	F(Element *, bottom, 0, "bottom anchor") \
+	F(Element *, left, 0, "left anchor") \
+	F(Element *, right, 0, "right anchor")
 
 
 #ifdef CQML_PARSER
@@ -237,7 +239,8 @@ using namespace std;
 #define MAKE_STRUCTURE2(MACRO, NAME) \
 	struct NAME : public CQMLObject { \
 		CQML_API NAME();\
-		CQML_API virtual Variant Get(const char*);\
+		CQML_API CQMLObject* Copy();\
+		CQML_API virtual VariantRef Get(const char*);\
 		MACRO(PROP_FACTORY_DECL_MVAR4, PROP_FACTORY_DECL_VAR4, PROP_FACTORY_DECL_FUNC3P, PROP_FACTORY_DECL_METH3P, PROP_FACTORY_DECL_METHV3P, NOTHING) \
 	}; \
 
@@ -245,7 +248,8 @@ using namespace std;
 #define MAKE_STRUCTURE3(MACRO, NAME, PARENT) \
 	struct NAME : public PARENT { \
 		CQML_API NAME();\
-		CQML_API virtual Variant Get(const char*);\
+		CQML_API CQMLObject* Copy();\
+		CQML_API virtual VariantRef Get(const char*);\
 		MACRO(PROP_FACTORY_DECL_MVAR4, PROP_FACTORY_DECL_VAR4, PROP_FACTORY_DECL_FUNC3P, PROP_FACTORY_DECL_METH3P, PROP_FACTORY_DECL_METHV3P, NOTHING) \
 	}; \
      

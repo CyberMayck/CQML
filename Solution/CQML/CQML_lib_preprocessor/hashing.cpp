@@ -13,7 +13,7 @@ struct Edge
 int f1(string s, int * T, int n)
 {
 	int sum=0;
-	for(int i=0;i<s.length();i++)
+	for(unsigned int i=0;i<s.length();i++)
 	{
 		sum+=T[i]*(unsigned char)s[i];
 	}
@@ -28,6 +28,7 @@ string getEdgeStr(int u, int v, int n, int m, Edge * edges)
 		if((edges[i].a==u && edges[i].b==v) || (edges[i].b==u && edges[i].a==v))
 			return edges[i].str;
 	}
+	return "";
 }
 
 int getEdgeInd(int u, int v, int n, int m, Edge * edges)
@@ -37,6 +38,7 @@ int getEdgeInd(int u, int v, int n, int m, Edge * edges)
 		if((edges[i].a==u && edges[i].b==v) || (edges[i].b==u && edges[i].a==v))
 			return i;
 	}
+	return -1;
 }
 
 int h(string s, int n,int m, int * T1, int *T2, int*g)
@@ -52,7 +54,7 @@ int h(string s, int n,int m, int * T1, int *T2, int*g)
 void traverse(int ind, int n, int m, bool * visited, vector<int>* &neighbours, Edge * edges, int*g)
 {
 	visited[ind]=true;
-	for(int i=0;i<neighbours[ind].size();i++)
+	for(unsigned int i=0;i<neighbours[ind].size();i++)
 	{
 		if(visited[neighbours[ind][i]])
 			continue;
@@ -72,7 +74,7 @@ bool traverseAc(int ind, int origin, int n, bool * visited, vector<int>* &neighb
 		return false;
 	visited[ind]=true;
 	bool originVisited=false;
-	for(int j=0;j<neighbours[ind].size();j++)
+	for(unsigned int j=0;j<neighbours[ind].size();j++)
 	{
 		if(neighbours[ind][j]==origin)
 		{
@@ -101,7 +103,7 @@ bool checkAcyclicity(int n, bool * visited, vector<int>* &neighbours)
 		//if(visited[i])
 		//	continue;
 		visited[i]=true;
-		for(int j=0;j<neighbours[i].size();j++)
+		for(unsigned int j=0;j<neighbours[i].size();j++)
 		{
 			bool retVal=traverseAc(neighbours[i][j],i,n,visited,neighbours);
 			if(!retVal)
@@ -126,7 +128,7 @@ PerfectHashData * makePerfectHash(vector<string> & strs, int cnt)
 	
 	Edge * edges;
 	
-	int max=0;
+	unsigned int max=0;
 	for(int i=0;i<cnt;i++)
 	{
 		//visited[i]=false;
@@ -151,7 +153,7 @@ PerfectHashData * makePerfectHash(vector<string> & strs, int cnt)
 			delete visited;
 			visited=new bool[n];
 		}
-		for(int i=0;i<max;i++)
+		for(unsigned int i=0;i<max;i++)
 		{
 			T1[i] = rand() % n;
 			T2[i] = rand() % n;
@@ -223,8 +225,10 @@ PerfectHashData * makeHashFromClass(ClassContainer * cont)
 	ClassContainer * curCont=cont;
 	while(true)
 	{
-		for(int i=0;i<curCont->props.size();i++)
+		for(unsigned int i=0;i<curCont->props.size();i++)
 		{
+			if(curCont->props[i].isDefault)
+				continue;
 			names.push_back(curCont->props[i].name);
 		}
 
@@ -251,7 +255,7 @@ extern unordered_map<string, int> primitiveTypeMap;
 // print getters and setters and their initialization
 void MakeAllHashes()
 {
-	for(int j=0;j<defaultClasses.size();j++)
+	for(unsigned int j=0;j<defaultClasses.size();j++)
 	{
 		defaultClasses[j]->hashData=makeHashFromClass(defaultClasses[j]);
 	}

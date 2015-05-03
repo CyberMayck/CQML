@@ -168,7 +168,7 @@ SourceHandler* SourceToHandler(SrcNode * node)
 
 void SourceHandler::Print(string& dest)
 {
-	for(int i=0;i<tokens.size();i++)
+	for(unsigned int i=0;i<tokens.size();i++)
 		tokens[i]->Print(dest);
 	
 }
@@ -186,7 +186,7 @@ void SourceStatementToken::Print(string& dest)
 		setGetters[i]->Print(s);
 	}*/
 	dest+=s;
-	for(int i=0;i<tokens.size();i++)
+	for(unsigned int i=0;i<tokens.size();i++)
 	{
 		this->tokens[i]->Print(dest);
 	}
@@ -210,7 +210,7 @@ void SourceIdToken::Print(string& dest)
 	//this->
 	if(this->isElement)
 	{
-		dest+="(*((CQMLGUI::Rootoutput"+INTTOSTR(this->fileId)+"*)context->root)->"+
+		dest+="(((CQMLGUI::Rootoutput"+INTTOSTR(this->fileId)+"*)context->root)->"+
 		"_QML_element"+INTTOSTR(this->elementId)+")";
 	}
 	else if(this->isVar)
@@ -229,7 +229,8 @@ void SourceDotToken::PrintZeroUpdaters(string& dest)
 	{
 		dest+="(*((CQMLGUI::Rootoutput"+INTTOSTR(this->fileId)+"*)context->root)->"+
 			"_QML_element"+INTTOSTR(this->variableId)+")";
-		for(int i=0;i<this->isStatic.size();i++)
+		bool wasStatic=true;
+		for(unsigned int i=0;i<this->isStatic.size();i++)
 		{
 			if(this->isStatic[i])
 			{
@@ -241,10 +242,22 @@ void SourceDotToken::PrintZeroUpdaters(string& dest)
 			else
 			{
 				if(isStatic.size()-1==i)
-				dest+=string(".Get(\"")+identifiers[identifiers.size()-isStatic.size()+i]->GetId()+string("\").SetUpdater(0);\n");
+				{
+					if(wasStatic)
+						dest+=string("->Get(\"")+identifiers[identifiers.size()-isStatic.size()+i]->GetId()+string("\").SetUpdater(0);\n");
+					else
+						dest+=string(".Get(\"")+identifiers[identifiers.size()-isStatic.size()+i]->GetId()+string("\").SetUpdater(0);\n");
+
+				}
 				else
-				dest+=string(".Get(\"")+identifiers[identifiers.size()-isStatic.size()+i]->GetId()+string("\")");
+				{
+					if(wasStatic)
+						dest+=string("->Get(\"")+identifiers[identifiers.size()-isStatic.size()+i]->GetId()+string("\")");
+					else
+						dest+=string(".Get(\"")+identifiers[identifiers.size()-isStatic.size()+i]->GetId()+string("\")");
+				}
 			}
+			wasStatic=this->isStatic[i];
 		}
 		//dest+="_QVar"+INTTOSTR(this->variableId);
 		
@@ -257,7 +270,8 @@ void SourceDotToken::Print(string& dest)
 	{
 		dest+="(*((CQMLGUI::Rootoutput"+INTTOSTR(this->fileId)+"*)context->root)->"+
 			"_QML_element"+INTTOSTR(this->variableId)+")";
-		for(int i=0;i<this->isStatic.size();i++)
+		bool wasStatic=true;
+		for(unsigned int i=0;i<this->isStatic.size();i++)
 		{
 			if(this->isStatic[i])
 			{
@@ -265,15 +279,19 @@ void SourceDotToken::Print(string& dest)
 			}
 			else
 			{
-				dest+=string(".Get(\"")+identifiers[identifiers.size()-isStatic.size()+i]->GetId()+string("\")");
+				if(wasStatic)
+					dest+=string("->Get(\"")+identifiers[identifiers.size()-isStatic.size()+i]->GetId()+string("\")");
+				else
+					dest+=string(".Get(\"")+identifiers[identifiers.size()-isStatic.size()+i]->GetId()+string("\")");
 			}
+			wasStatic=isStatic[i];
 		}
 		//dest+="_QVar"+INTTOSTR(this->variableId);
 		
 	}
 	else
 	{
-		for(int i=0;i<tokens.size();i++)
+		for(unsigned int i=0;i<tokens.size();i++)
 		{
 			this->tokens[i]->Print(dest);
 		}
@@ -281,14 +299,14 @@ void SourceDotToken::Print(string& dest)
 }
 void SourceExprToken::PrintZeroUpdaters(string& dest)
 {
-	for(int i=0;i<tokens.size();i++)
+	for(unsigned int i=0;i<tokens.size();i++)
 	{
 		this->tokens[i]->PrintZeroUpdaters(dest);
 	}
 }
 void SourceExprToken::Print(string& dest)
 {
-	for(int i=0;i<tokens.size();i++)
+	for(unsigned int i=0;i<tokens.size();i++)
 	{
 		this->tokens[i]->Print(dest);
 	}
@@ -298,13 +316,13 @@ void SourceAssignmentToken::Print(string& dest)
 	//this->nodes[nodes.size()-1]->Print(dest);
 	this->nodes[0]->Print(dest);
 
-	for(int i=1;i<nodes.size();i++)
+	for(unsigned int i=1;i<nodes.size();i++)
 	{
 		dest+=this->ops[i-1].str;
 		this->nodes[i]->Print(dest);
 	}
 	if(nodes.size()>1)dest+=";\n";
-	for(int i=0;i<nodes.size()-1;i++)
+	for(unsigned int i=0;i<nodes.size()-1;i++)
 	{
 		this->nodes[i]->PrintZeroUpdaters(dest);
 	}
@@ -329,7 +347,7 @@ void ProcessSource(SourceHandler * handler,int treeInd, int currentElementId)
 
 void SourceHandler::Process(int treeInd, int currentElementId)
 {
-	for(int i=0;i<tokens.size();i++)
+	for(unsigned int i=0;i<tokens.size();i++)
 	{
 		tokens[i]->Process(treeInd,currentElementId,0,true);
 	}
@@ -351,7 +369,7 @@ void SourceIdToken::Process(int treeInd, int currentElementId, SourceStatementTo
 	if(isOtherId)
 	{
 		fileId=treeInd;
-		elementId=curId;
+		elementId=idMaps[treeInd][this->str];
 		isElement=true;
 		//sprintf(str,"(*((GUI_Rootoutput%d *)context->root)->_QML_element%d)",treeInd,curId);
 	}
@@ -598,7 +616,7 @@ void SourceDotToken::Process(int treeInd, int currentElementId, SourceStatementT
 
 void SourceStatementToken::Process(int treeInd, int currentElementId, SourceStatementToken* lastStatement, bool isRightVal)
 {
-	for(int i=0;i<this->tokens.size();i++)
+	for(unsigned int i=0;i<this->tokens.size();i++)
 	{
 		this->tokens[i]->Process(treeInd,currentElementId,this,isRightVal);
 	}
@@ -606,7 +624,7 @@ void SourceStatementToken::Process(int treeInd, int currentElementId, SourceStat
 
 void SourceExprToken::Process(int treeInd, int currentElementId, SourceStatementToken* lastStatement, bool isRightVal)
 {
-	for(int i=0;i<this->tokens.size();i++)
+	for(unsigned int i=0;i<this->tokens.size();i++)
 	{
 		this->tokens[i]->Process(treeInd,currentElementId,lastStatement,isRightVal);
 	}

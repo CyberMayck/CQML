@@ -121,327 +121,344 @@ CQMLGUI::ScaledImage::ScaledImage()
 	topBorder_Update=0;
 	Init();
 }
-Variant CQMLGUI::Color::Get(const char* s)
+CQMLObject* CQMLGUI::Color::Copy()
+{
+	return new CQMLGUI::Color(*this);
+}
+
+CQMLObject* CQMLGUI::Font::Copy()
+{
+	return new CQMLGUI::Font(*this);
+}
+
+CQMLObject* CQMLGUI::Img::Copy()
+{
+	return new CQMLGUI::Img(*this);
+}
+
+CQMLObject* CQMLGUI::Element::Copy()
+{
+	return new CQMLGUI::Element(*this);
+}
+
+CQMLObject* CQMLGUI::Rectangle::Copy()
+{
+	return new CQMLGUI::Rectangle(*this);
+}
+
+CQMLObject* CQMLGUI::MouseArea::Copy()
+{
+	return new CQMLGUI::MouseArea(*this);
+}
+
+CQMLObject* CQMLGUI::Anchor::Copy()
+{
+	return new CQMLGUI::Anchor(*this);
+}
+
+CQMLObject* CQMLGUI::Text::Copy()
+{
+	return new CQMLGUI::Text(*this);
+}
+
+CQMLObject* CQMLGUI::TextInput::Copy()
+{
+	return new CQMLGUI::TextInput(*this);
+}
+
+CQMLObject* CQMLGUI::Image::Copy()
+{
+	return new CQMLGUI::Image(*this);
+}
+
+CQMLObject* CQMLGUI::ScaledImage::Copy()
+{
+	return new CQMLGUI::ScaledImage(*this);
+}
+
+VariantRef CQMLGUI::Color::Get(const char* s)
 {
 	int hash=GetHash(classID,s);
-	if(hash<0) return Variant(0);
+	if(hash<0) 
+	{
+		throw(0); 
+		return VariantRef();
+	}
 	switch(hash)
 	{
 	case 0:
-		return Variant(red);
+		return VariantRef(red,&red_Update);
 	case 1:
-		return Variant(green);
+		return VariantRef(green,&green_Update);
 	case 2:
-		return Variant(blue);
+		return VariantRef(blue,&blue_Update);
 	default: break;
 	}
-	return Variant(0);
+	return VariantRef();
 }
-Variant CQMLGUI::Font::Get(const char* s)
+VariantRef CQMLGUI::Font::Get(const char* s)
 {
 	int hash=GetHash(classID,s);
-	if(hash<0) return Variant(0);
+	if(hash<0) 
+	{
+		throw(0); 
+		return VariantRef();
+	}
 	switch(hash)
 	{
 	case 0:
-		return Variant(capital);
+		return VariantRef(capital,&capital_Update);
 	case 1:
-		return Variant(italic);
+		return VariantRef(italic,&italic_Update);
 	case 2:
-		return Variant(bold);
+		return VariantRef(bold,&bold_Update);
 	case 3:
-		return Variant(size);
+		return VariantRef(size,&size_Update);
 	case 4:
-		return Variant(family);
+		return VariantRef(family,&family_Update);
 	default: break;
 	}
-	return Variant(0);
+	return VariantRef();
 }
-Variant CQMLGUI::Img::Get(const char* s)
+VariantRef CQMLGUI::Img::Get(const char* s)
 {
 	int hash=GetHash(classID,s);
-	if(hash<0) return Variant(0);
+	if(hash<0) 
+	{
+		throw(0); 
+		return VariantRef();
+	}
 	switch(hash)
 	{
 	case 0:
-		return Variant(src);
+		return VariantRef(src,&src_Update);
 	default: break;
 	}
-	return Variant(0);
+	return VariantRef();
 }
-Variant CQMLGUI::Element::Get(const char* s)
+VariantRef CQMLGUI::Element::Get(const char* s)
 {
 	int hash=GetHash(classID,s);
-	if(hash<0) return Variant(0);
+	if(hash<0) 
+	{
+		throw(0); 
+		return VariantRef();
+	}
 	switch(hash)
 	{
 	case 0:
-		return Variant(&root);
+		return VariantRef(x,&x_Update);
 	case 1:
-		return Variant(&parent);
+		return VariantRef(y,&y_Update);
 	case 2:
-		return Variant(&children);
+		return VariantRef(width,&width_Update);
 	case 3:
-		return Variant(childrenCount);
+		return VariantRef(height,&height_Update);
+	default: break;
+	}
+	return VariantRef();
+}
+VariantRef CQMLGUI::Rectangle::Get(const char* s)
+{
+	int hash=GetHash(classID,s);
+	if(hash<0) 
+	{
+		throw(0); 
+		return VariantRef();
+	}
+	switch(hash)
+	{
+	case 0:
+		return VariantRef((CQMLObject*)&borderColor,&borderColor_Update);
+	case 1:
+		return VariantRef(border,&border_Update);
+	case 2:
+		return VariantRef((CQMLObject*)&color,&color_Update);
+	case 3:
+		return VariantRef(x,&x_Update);
 	case 4:
-		return Variant(flags);
+		return VariantRef(y,&y_Update);
 	case 5:
-		return Variant(x);
+		return VariantRef(width,&width_Update);
 	case 6:
-		return Variant(y);
-	case 7:
-		return Variant(width);
-	case 8:
-		return Variant(height);
-	case 9:
-		return Variant(focus);
+		return VariantRef(height,&height_Update);
 	default: break;
 	}
-	return Variant(0);
+	return VariantRef();
 }
-Variant CQMLGUI::Rectangle::Get(const char* s)
+VariantRef CQMLGUI::MouseArea::Get(const char* s)
 {
 	int hash=GetHash(classID,s);
-	if(hash<0) return Variant(0);
+	if(hash<0) 
+	{
+		throw(0); 
+		return VariantRef();
+	}
 	switch(hash)
 	{
 	case 0:
-		return Variant(&borderColor);
+		return VariantRef(x,&x_Update);
 	case 1:
-		return Variant(border);
+		return VariantRef(y,&y_Update);
 	case 2:
-		return Variant(&color);
+		return VariantRef(width,&width_Update);
 	case 3:
-		return Variant(&root);
+		return VariantRef(height,&height_Update);
+	default: break;
+	}
+	return VariantRef();
+}
+VariantRef CQMLGUI::Anchor::Get(const char* s)
+{
+	int hash=GetHash(classID,s);
+	if(hash<0) 
+	{
+		throw(0); 
+		return VariantRef();
+	}
+	switch(hash)
+	{
+	case 0:
+		return VariantRef((CQMLObject**)&top,&top_Update);
+	case 1:
+		return VariantRef((CQMLObject**)&bottom,&bottom_Update);
+	case 2:
+		return VariantRef((CQMLObject**)&left,&left_Update);
+	case 3:
+		return VariantRef((CQMLObject**)&right,&right_Update);
+	default: break;
+	}
+	return VariantRef();
+}
+VariantRef CQMLGUI::Text::Get(const char* s)
+{
+	int hash=GetHash(classID,s);
+	if(hash<0) 
+	{
+		throw(0); 
+		return VariantRef();
+	}
+	switch(hash)
+	{
+	case 0:
+		return VariantRef((CQMLObject*)&text_color,&text_color_Update);
+	case 1:
+		return VariantRef(text,&text_Update);
+	case 2:
+		return VariantRef((CQMLObject*)&font,&font_Update);
+	case 3:
+		return VariantRef((CQMLObject*)&borderColor,&borderColor_Update);
 	case 4:
-		return Variant(&parent);
+		return VariantRef(border,&border_Update);
 	case 5:
-		return Variant(&children);
+		return VariantRef((CQMLObject*)&color,&color_Update);
 	case 6:
-		return Variant(childrenCount);
+		return VariantRef(x,&x_Update);
 	case 7:
-		return Variant(flags);
+		return VariantRef(y,&y_Update);
 	case 8:
-		return Variant(x);
+		return VariantRef(width,&width_Update);
 	case 9:
-		return Variant(y);
-	case 10:
-		return Variant(width);
-	case 11:
-		return Variant(height);
-	case 12:
-		return Variant(focus);
+		return VariantRef(height,&height_Update);
 	default: break;
 	}
-	return Variant(0);
+	return VariantRef();
 }
-Variant CQMLGUI::MouseArea::Get(const char* s)
+VariantRef CQMLGUI::TextInput::Get(const char* s)
 {
 	int hash=GetHash(classID,s);
-	if(hash<0) return Variant(0);
+	if(hash<0) 
+	{
+		throw(0); 
+		return VariantRef();
+	}
 	switch(hash)
 	{
 	case 0:
-		return Variant(&root);
+		return VariantRef((CQMLObject*)&text_color,&text_color_Update);
 	case 1:
-		return Variant(&parent);
+		return VariantRef(text,&text_Update);
 	case 2:
-		return Variant(&children);
+		return VariantRef((CQMLObject*)&font,&font_Update);
 	case 3:
-		return Variant(childrenCount);
+		return VariantRef((CQMLObject*)&borderColor,&borderColor_Update);
 	case 4:
-		return Variant(flags);
+		return VariantRef(border,&border_Update);
 	case 5:
-		return Variant(x);
+		return VariantRef((CQMLObject*)&color,&color_Update);
 	case 6:
-		return Variant(y);
+		return VariantRef(x,&x_Update);
 	case 7:
-		return Variant(width);
+		return VariantRef(y,&y_Update);
 	case 8:
-		return Variant(height);
+		return VariantRef(width,&width_Update);
 	case 9:
-		return Variant(focus);
+		return VariantRef(height,&height_Update);
 	default: break;
 	}
-	return Variant(0);
+	return VariantRef();
 }
-Variant CQMLGUI::Anchor::Get(const char* s)
+VariantRef CQMLGUI::Image::Get(const char* s)
 {
 	int hash=GetHash(classID,s);
-	if(hash<0) return Variant(0);
+	if(hash<0) 
+	{
+		throw(0); 
+		return VariantRef();
+	}
 	switch(hash)
 	{
 	case 0:
-		return Variant(&top);
+		return VariantRef((CQMLObject*)&img,&img_Update);
 	case 1:
-		return Variant(&bottom);
+		return VariantRef(x,&x_Update);
 	case 2:
-		return Variant(&left);
+		return VariantRef(y,&y_Update);
 	case 3:
-		return Variant(&right);
-	default: break;
-	}
-	return Variant(0);
-}
-Variant CQMLGUI::Text::Get(const char* s)
-{
-	int hash=GetHash(classID,s);
-	if(hash<0) return Variant(0);
-	switch(hash)
-	{
-	case 0:
-		return Variant(&text_color);
-	case 1:
-		return Variant(text);
-	case 2:
-		return Variant(&font);
-	case 3:
-		return Variant(&borderColor);
+		return VariantRef(width,&width_Update);
 	case 4:
-		return Variant(border);
-	case 5:
-		return Variant(&color);
-	case 6:
-		return Variant(&root);
-	case 7:
-		return Variant(&parent);
-	case 8:
-		return Variant(&children);
-	case 9:
-		return Variant(childrenCount);
-	case 10:
-		return Variant(flags);
-	case 11:
-		return Variant(x);
-	case 12:
-		return Variant(y);
-	case 13:
-		return Variant(width);
-	case 14:
-		return Variant(height);
-	case 15:
-		return Variant(focus);
+		return VariantRef(height,&height_Update);
 	default: break;
 	}
-	return Variant(0);
+	return VariantRef();
 }
-Variant CQMLGUI::TextInput::Get(const char* s)
+VariantRef CQMLGUI::ScaledImage::Get(const char* s)
 {
 	int hash=GetHash(classID,s);
-	if(hash<0) return Variant(0);
+	if(hash<0) 
+	{
+		throw(0); 
+		return VariantRef();
+	}
 	switch(hash)
 	{
 	case 0:
-		return Variant(&text_color);
+		return VariantRef(leftBorder,&leftBorder_Update);
 	case 1:
-		return Variant(text);
+		return VariantRef(bottomBorder,&bottomBorder_Update);
 	case 2:
-		return Variant(&font);
+		return VariantRef(rightBorder,&rightBorder_Update);
 	case 3:
-		return Variant(&borderColor);
+		return VariantRef(topBorder,&topBorder_Update);
 	case 4:
-		return Variant(border);
+		return VariantRef((CQMLObject*)&img,&img_Update);
 	case 5:
-		return Variant(&color);
+		return VariantRef(x,&x_Update);
 	case 6:
-		return Variant(&root);
+		return VariantRef(y,&y_Update);
 	case 7:
-		return Variant(&parent);
+		return VariantRef(width,&width_Update);
 	case 8:
-		return Variant(&children);
-	case 9:
-		return Variant(childrenCount);
-	case 10:
-		return Variant(flags);
-	case 11:
-		return Variant(x);
-	case 12:
-		return Variant(y);
-	case 13:
-		return Variant(width);
-	case 14:
-		return Variant(height);
-	case 15:
-		return Variant(focus);
+		return VariantRef(height,&height_Update);
 	default: break;
 	}
-	return Variant(0);
-}
-Variant CQMLGUI::Image::Get(const char* s)
-{
-	int hash=GetHash(classID,s);
-	if(hash<0) return Variant(0);
-	switch(hash)
-	{
-	case 0:
-		return Variant(&img);
-	case 1:
-		return Variant(&root);
-	case 2:
-		return Variant(&parent);
-	case 3:
-		return Variant(&children);
-	case 4:
-		return Variant(childrenCount);
-	case 5:
-		return Variant(flags);
-	case 6:
-		return Variant(x);
-	case 7:
-		return Variant(y);
-	case 8:
-		return Variant(width);
-	case 9:
-		return Variant(height);
-	case 10:
-		return Variant(focus);
-	default: break;
-	}
-	return Variant(0);
-}
-Variant CQMLGUI::ScaledImage::Get(const char* s)
-{
-	int hash=GetHash(classID,s);
-	if(hash<0) return Variant(0);
-	switch(hash)
-	{
-	case 0:
-		return Variant(leftBorder);
-	case 1:
-		return Variant(bottomBorder);
-	case 2:
-		return Variant(rightBorder);
-	case 3:
-		return Variant(topBorder);
-	case 4:
-		return Variant(&img);
-	case 5:
-		return Variant(&root);
-	case 6:
-		return Variant(&parent);
-	case 7:
-		return Variant(&children);
-	case 8:
-		return Variant(childrenCount);
-	case 9:
-		return Variant(flags);
-	case 10:
-		return Variant(x);
-	case 11:
-		return Variant(y);
-	case 12:
-		return Variant(width);
-	case 13:
-		return Variant(height);
-	case 14:
-		return Variant(focus);
-	default: break;
-	}
-	return Variant(0);
+	return VariantRef();
 }
 using namespace CQMLGUI;
 void Rectangle::Update()
 {
+	if(!enabled)
+		return;
 	if(borderColor_Update)borderColor_Update(borderColor_context);
 	else
 	{
@@ -462,11 +479,15 @@ DefaultUpdate();
 }
 void MouseArea::Update()
 {
+	if(!enabled)
+		return;
 	 Element::Update();
 DefaultUpdate();
 }
 void Text::Update()
 {
+	if(!enabled)
+		return;
 	if(text_color_Update)text_color_Update(text_color_context);
 	else
 	{
@@ -489,11 +510,15 @@ DefaultUpdate();
 }
 void TextInput::Update()
 {
+	if(!enabled)
+		return;
 	 Text::Update();
 DefaultUpdate();
 }
 void Image::Update()
 {
+	if(!enabled)
+		return;
 	if(img_Update)img_Update(img_context);
 	else
 	{
@@ -504,6 +529,8 @@ DefaultUpdate();
 }
 void ScaledImage::Update()
 {
+	if(!enabled)
+		return;
 	if(leftBorder_Update)leftBorder_Update(leftBorder_context);
 	if(bottomBorder_Update)bottomBorder_Update(bottomBorder_context);
 	if(rightBorder_Update)rightBorder_Update(rightBorder_context);
@@ -511,3 +538,545 @@ void ScaledImage::Update()
 	 Image::Update();
 DefaultUpdate();
 }
+void InitDefaultHashTabs(ClassHashTable * hashTabs)
+{
+ClassHashTable * data;
+data=&hashTabs[0];
+InitHashTab(data,9,3);
+data->keys[0]=(char *)malloc(sizeof(char) * 4);
+strcpy_s(data->keys[0],4,"red");
+data->keys[1]=(char *)malloc(sizeof(char) * 6);
+strcpy_s(data->keys[1],6,"green");
+data->keys[2]=(char *)malloc(sizeof(char) * 5);
+strcpy_s(data->keys[2],5,"blue");
+
+data->T1[0]=8;
+data->T1[1]=7;
+data->T1[2]=7;
+
+data->T2[0]=2;
+data->T2[1]=6;
+data->T2[2]=5;
+
+data->g[0]=0;
+data->g[1]=0;
+data->g[2]=0;
+data->g[3]=0;
+data->g[4]=0;
+data->g[5]=2;
+data->g[6]=0;
+data->g[7]=1;
+data->g[8]=0;
+
+
+data=&hashTabs[1];
+InitHashTab(data,15,5);
+data->keys[0]=(char *)malloc(sizeof(char) * 8);
+strcpy_s(data->keys[0],8,"capital");
+data->keys[1]=(char *)malloc(sizeof(char) * 7);
+strcpy_s(data->keys[1],7,"italic");
+data->keys[2]=(char *)malloc(sizeof(char) * 5);
+strcpy_s(data->keys[2],5,"bold");
+data->keys[3]=(char *)malloc(sizeof(char) * 5);
+strcpy_s(data->keys[3],5,"size");
+data->keys[4]=(char *)malloc(sizeof(char) * 7);
+strcpy_s(data->keys[4],7,"family");
+
+data->T1[0]=6;
+data->T1[1]=2;
+data->T1[2]=7;
+data->T1[3]=6;
+data->T1[4]=8;
+
+data->T2[0]=9;
+data->T2[1]=3;
+data->T2[2]=7;
+data->T2[3]=11;
+data->T2[4]=5;
+
+data->g[0]=0;
+data->g[1]=0;
+data->g[2]=0;
+data->g[3]=0;
+data->g[4]=1;
+data->g[5]=3;
+data->g[6]=0;
+data->g[7]=0;
+data->g[8]=0;
+data->g[9]=0;
+data->g[10]=0;
+data->g[11]=2;
+data->g[12]=0;
+data->g[13]=1;
+data->g[14]=0;
+
+
+data=&hashTabs[2];
+InitHashTab(data,3,1);
+data->keys[0]=(char *)malloc(sizeof(char) * 4);
+strcpy_s(data->keys[0],4,"src");
+
+data->T1[0]=0;
+
+data->T2[0]=1;
+
+data->g[0]=0;
+data->g[1]=0;
+data->g[2]=0;
+
+
+data=&hashTabs[3];
+InitHashTab(data,13,4);
+data->keys[0]=(char *)malloc(sizeof(char) * 2);
+strcpy_s(data->keys[0],2,"x");
+data->keys[1]=(char *)malloc(sizeof(char) * 2);
+strcpy_s(data->keys[1],2,"y");
+data->keys[2]=(char *)malloc(sizeof(char) * 6);
+strcpy_s(data->keys[2],6,"width");
+data->keys[3]=(char *)malloc(sizeof(char) * 7);
+strcpy_s(data->keys[3],7,"height");
+
+data->T1[0]=12;
+data->T1[1]=6;
+data->T1[2]=2;
+data->T1[3]=5;
+
+data->T2[0]=10;
+data->T2[1]=8;
+data->T2[2]=3;
+data->T2[3]=1;
+
+data->g[0]=0;
+data->g[1]=0;
+data->g[2]=0;
+data->g[3]=0;
+data->g[4]=2;
+data->g[5]=2;
+data->g[6]=0;
+data->g[7]=0;
+data->g[8]=0;
+data->g[9]=1;
+data->g[10]=2;
+data->g[11]=0;
+data->g[12]=0;
+
+
+data=&hashTabs[4];
+InitHashTab(data,21,7);
+data->keys[0]=(char *)malloc(sizeof(char) * 12);
+strcpy_s(data->keys[0],12,"borderColor");
+data->keys[1]=(char *)malloc(sizeof(char) * 7);
+strcpy_s(data->keys[1],7,"border");
+data->keys[2]=(char *)malloc(sizeof(char) * 6);
+strcpy_s(data->keys[2],6,"color");
+data->keys[3]=(char *)malloc(sizeof(char) * 2);
+strcpy_s(data->keys[3],2,"x");
+data->keys[4]=(char *)malloc(sizeof(char) * 2);
+strcpy_s(data->keys[4],2,"y");
+data->keys[5]=(char *)malloc(sizeof(char) * 6);
+strcpy_s(data->keys[5],6,"width");
+data->keys[6]=(char *)malloc(sizeof(char) * 7);
+strcpy_s(data->keys[6],7,"height");
+
+data->T1[0]=18;
+data->T1[1]=10;
+data->T1[2]=1;
+data->T1[3]=10;
+data->T1[4]=2;
+data->T1[5]=19;
+data->T1[6]=0;
+
+data->T2[0]=6;
+data->T2[1]=13;
+data->T2[2]=10;
+data->T2[3]=0;
+data->T2[4]=0;
+data->T2[5]=18;
+data->T2[6]=9;
+
+data->g[0]=0;
+data->g[1]=0;
+data->g[2]=0;
+data->g[3]=6;
+data->g[4]=0;
+data->g[5]=0;
+data->g[6]=0;
+data->g[7]=0;
+data->g[8]=0;
+data->g[9]=6;
+data->g[10]=0;
+data->g[11]=0;
+data->g[12]=3;
+data->g[13]=0;
+data->g[14]=0;
+data->g[15]=1;
+data->g[16]=0;
+data->g[17]=0;
+data->g[18]=3;
+data->g[19]=5;
+data->g[20]=0;
+
+
+data=&hashTabs[5];
+InitHashTab(data,13,4);
+data->keys[0]=(char *)malloc(sizeof(char) * 2);
+strcpy_s(data->keys[0],2,"x");
+data->keys[1]=(char *)malloc(sizeof(char) * 2);
+strcpy_s(data->keys[1],2,"y");
+data->keys[2]=(char *)malloc(sizeof(char) * 6);
+strcpy_s(data->keys[2],6,"width");
+data->keys[3]=(char *)malloc(sizeof(char) * 7);
+strcpy_s(data->keys[3],7,"height");
+
+data->T1[0]=2;
+data->T1[1]=10;
+data->T1[2]=10;
+data->T1[3]=12;
+
+data->T2[0]=8;
+data->T2[1]=10;
+data->T2[2]=11;
+data->T2[3]=3;
+
+data->g[0]=0;
+data->g[1]=0;
+data->g[2]=0;
+data->g[3]=0;
+data->g[4]=0;
+data->g[5]=2;
+data->g[6]=0;
+data->g[7]=0;
+data->g[8]=1;
+data->g[9]=0;
+data->g[10]=3;
+data->g[11]=0;
+data->g[12]=0;
+
+
+data=&hashTabs[6];
+InitHashTab(data,12,4);
+data->keys[0]=(char *)malloc(sizeof(char) * 4);
+strcpy_s(data->keys[0],4,"top");
+data->keys[1]=(char *)malloc(sizeof(char) * 7);
+strcpy_s(data->keys[1],7,"bottom");
+data->keys[2]=(char *)malloc(sizeof(char) * 5);
+strcpy_s(data->keys[2],5,"left");
+data->keys[3]=(char *)malloc(sizeof(char) * 6);
+strcpy_s(data->keys[3],6,"right");
+
+data->T1[0]=0;
+data->T1[1]=1;
+data->T1[2]=0;
+data->T1[3]=8;
+
+data->T2[0]=2;
+data->T2[1]=10;
+data->T2[2]=1;
+data->T2[3]=4;
+
+data->g[0]=0;
+data->g[1]=0;
+data->g[2]=0;
+data->g[3]=0;
+data->g[4]=0;
+data->g[5]=3;
+data->g[6]=0;
+data->g[7]=0;
+data->g[8]=0;
+data->g[9]=2;
+data->g[10]=0;
+data->g[11]=1;
+
+
+data=&hashTabs[7];
+InitHashTab(data,31,10);
+data->keys[0]=(char *)malloc(sizeof(char) * 11);
+strcpy_s(data->keys[0],11,"text_color");
+data->keys[1]=(char *)malloc(sizeof(char) * 5);
+strcpy_s(data->keys[1],5,"text");
+data->keys[2]=(char *)malloc(sizeof(char) * 5);
+strcpy_s(data->keys[2],5,"font");
+data->keys[3]=(char *)malloc(sizeof(char) * 12);
+strcpy_s(data->keys[3],12,"borderColor");
+data->keys[4]=(char *)malloc(sizeof(char) * 7);
+strcpy_s(data->keys[4],7,"border");
+data->keys[5]=(char *)malloc(sizeof(char) * 6);
+strcpy_s(data->keys[5],6,"color");
+data->keys[6]=(char *)malloc(sizeof(char) * 2);
+strcpy_s(data->keys[6],2,"x");
+data->keys[7]=(char *)malloc(sizeof(char) * 2);
+strcpy_s(data->keys[7],2,"y");
+data->keys[8]=(char *)malloc(sizeof(char) * 6);
+strcpy_s(data->keys[8],6,"width");
+data->keys[9]=(char *)malloc(sizeof(char) * 7);
+strcpy_s(data->keys[9],7,"height");
+
+data->T1[0]=9;
+data->T1[1]=16;
+data->T1[2]=28;
+data->T1[3]=6;
+data->T1[4]=24;
+data->T1[5]=10;
+data->T1[6]=14;
+data->T1[7]=23;
+data->T1[8]=23;
+data->T1[9]=23;
+
+data->T2[0]=12;
+data->T2[1]=28;
+data->T2[2]=14;
+data->T2[3]=7;
+data->T2[4]=8;
+data->T2[5]=23;
+data->T2[6]=28;
+data->T2[7]=11;
+data->T2[8]=7;
+data->T2[9]=13;
+
+data->g[0]=0;
+data->g[1]=0;
+data->g[2]=9;
+data->g[3]=8;
+data->g[4]=0;
+data->g[5]=0;
+data->g[6]=0;
+data->g[7]=0;
+data->g[8]=0;
+data->g[9]=0;
+data->g[10]=8;
+data->g[11]=0;
+data->g[12]=0;
+data->g[13]=0;
+data->g[14]=9;
+data->g[15]=0;
+data->g[16]=0;
+data->g[17]=0;
+data->g[18]=0;
+data->g[19]=0;
+data->g[20]=1;
+data->g[21]=0;
+data->g[22]=2;
+data->g[23]=0;
+data->g[24]=0;
+data->g[25]=0;
+data->g[26]=7;
+data->g[27]=0;
+data->g[28]=4;
+data->g[29]=2;
+data->g[30]=3;
+
+
+data=&hashTabs[8];
+InitHashTab(data,31,10);
+data->keys[0]=(char *)malloc(sizeof(char) * 11);
+strcpy_s(data->keys[0],11,"text_color");
+data->keys[1]=(char *)malloc(sizeof(char) * 5);
+strcpy_s(data->keys[1],5,"text");
+data->keys[2]=(char *)malloc(sizeof(char) * 5);
+strcpy_s(data->keys[2],5,"font");
+data->keys[3]=(char *)malloc(sizeof(char) * 12);
+strcpy_s(data->keys[3],12,"borderColor");
+data->keys[4]=(char *)malloc(sizeof(char) * 7);
+strcpy_s(data->keys[4],7,"border");
+data->keys[5]=(char *)malloc(sizeof(char) * 6);
+strcpy_s(data->keys[5],6,"color");
+data->keys[6]=(char *)malloc(sizeof(char) * 2);
+strcpy_s(data->keys[6],2,"x");
+data->keys[7]=(char *)malloc(sizeof(char) * 2);
+strcpy_s(data->keys[7],2,"y");
+data->keys[8]=(char *)malloc(sizeof(char) * 6);
+strcpy_s(data->keys[8],6,"width");
+data->keys[9]=(char *)malloc(sizeof(char) * 7);
+strcpy_s(data->keys[9],7,"height");
+
+data->T1[0]=2;
+data->T1[1]=30;
+data->T1[2]=18;
+data->T1[3]=0;
+data->T1[4]=10;
+data->T1[5]=8;
+data->T1[6]=13;
+data->T1[7]=5;
+data->T1[8]=27;
+data->T1[9]=16;
+
+data->T2[0]=13;
+data->T2[1]=18;
+data->T2[2]=21;
+data->T2[3]=3;
+data->T2[4]=12;
+data->T2[5]=13;
+data->T2[6]=28;
+data->T2[7]=10;
+data->T2[8]=1;
+data->T2[9]=5;
+
+data->g[0]=0;
+data->g[1]=0;
+data->g[2]=0;
+data->g[3]=0;
+data->g[4]=0;
+data->g[5]=0;
+data->g[6]=0;
+data->g[7]=0;
+data->g[8]=1;
+data->g[9]=5;
+data->g[10]=2;
+data->g[11]=0;
+data->g[12]=0;
+data->g[13]=0;
+data->g[14]=0;
+data->g[15]=0;
+data->g[16]=0;
+data->g[17]=0;
+data->g[18]=0;
+data->g[19]=0;
+data->g[20]=0;
+data->g[21]=0;
+data->g[22]=0;
+data->g[23]=4;
+data->g[24]=0;
+data->g[25]=3;
+data->g[26]=3;
+data->g[27]=0;
+data->g[28]=8;
+data->g[29]=4;
+data->g[30]=2;
+
+
+data=&hashTabs[9];
+InitHashTab(data,16,5);
+data->keys[0]=(char *)malloc(sizeof(char) * 4);
+strcpy_s(data->keys[0],4,"img");
+data->keys[1]=(char *)malloc(sizeof(char) * 2);
+strcpy_s(data->keys[1],2,"x");
+data->keys[2]=(char *)malloc(sizeof(char) * 2);
+strcpy_s(data->keys[2],2,"y");
+data->keys[3]=(char *)malloc(sizeof(char) * 6);
+strcpy_s(data->keys[3],6,"width");
+data->keys[4]=(char *)malloc(sizeof(char) * 7);
+strcpy_s(data->keys[4],7,"height");
+
+data->T1[0]=1;
+data->T1[1]=4;
+data->T1[2]=11;
+data->T1[3]=8;
+data->T1[4]=12;
+
+data->T2[0]=2;
+data->T2[1]=15;
+data->T2[2]=0;
+data->T2[3]=6;
+data->T2[4]=10;
+
+data->g[0]=0;
+data->g[1]=0;
+data->g[2]=0;
+data->g[3]=0;
+data->g[4]=0;
+data->g[5]=0;
+data->g[6]=0;
+data->g[7]=0;
+data->g[8]=1;
+data->g[9]=2;
+data->g[10]=0;
+data->g[11]=0;
+data->g[12]=0;
+data->g[13]=3;
+data->g[14]=0;
+data->g[15]=1;
+
+
+data=&hashTabs[10];
+InitHashTab(data,27,9);
+data->keys[0]=(char *)malloc(sizeof(char) * 11);
+strcpy_s(data->keys[0],11,"leftBorder");
+data->keys[1]=(char *)malloc(sizeof(char) * 13);
+strcpy_s(data->keys[1],13,"bottomBorder");
+data->keys[2]=(char *)malloc(sizeof(char) * 12);
+strcpy_s(data->keys[2],12,"rightBorder");
+data->keys[3]=(char *)malloc(sizeof(char) * 10);
+strcpy_s(data->keys[3],10,"topBorder");
+data->keys[4]=(char *)malloc(sizeof(char) * 4);
+strcpy_s(data->keys[4],4,"img");
+data->keys[5]=(char *)malloc(sizeof(char) * 2);
+strcpy_s(data->keys[5],2,"x");
+data->keys[6]=(char *)malloc(sizeof(char) * 2);
+strcpy_s(data->keys[6],2,"y");
+data->keys[7]=(char *)malloc(sizeof(char) * 6);
+strcpy_s(data->keys[7],6,"width");
+data->keys[8]=(char *)malloc(sizeof(char) * 7);
+strcpy_s(data->keys[8],7,"height");
+
+data->T1[0]=13;
+data->T1[1]=16;
+data->T1[2]=22;
+data->T1[3]=18;
+data->T1[4]=15;
+data->T1[5]=6;
+data->T1[6]=19;
+data->T1[7]=17;
+data->T1[8]=10;
+
+data->T2[0]=21;
+data->T2[1]=17;
+data->T2[2]=0;
+data->T2[3]=16;
+data->T2[4]=5;
+data->T2[5]=8;
+data->T2[6]=2;
+data->T2[7]=16;
+data->T2[8]=18;
+
+data->g[0]=0;
+data->g[1]=0;
+data->g[2]=0;
+data->g[3]=0;
+data->g[4]=0;
+data->g[5]=0;
+data->g[6]=0;
+data->g[7]=6;
+data->g[8]=4;
+data->g[9]=0;
+data->g[10]=0;
+data->g[11]=0;
+data->g[12]=0;
+data->g[13]=2;
+data->g[14]=0;
+data->g[15]=0;
+data->g[16]=0;
+data->g[17]=0;
+data->g[18]=7;
+data->g[19]=8;
+data->g[20]=0;
+data->g[21]=5;
+data->g[22]=3;
+data->g[23]=1;
+data->g[24]=2;
+data->g[25]=0;
+data->g[26]=0;
+
+
+}
+
+void AssignCQMLValue(CQMLObject * l,CQMLObject * rhs)
+{
+	switch(l->classID)
+	{	case 0:
+		*((Color*)l)=*((Color*)rhs);
+		break;
+	case 1:
+		*((Font*)l)=*((Font*)rhs);
+		break;
+	case 2:
+		*((Img*)l)=*((Img*)rhs);
+		break;
+	case 6:
+		*((Anchor*)l)=*((Anchor*)rhs);
+		break;
+	default:
+		throw 0;
+		break;
+	}
+}
+

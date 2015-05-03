@@ -3,7 +3,7 @@
 #include <unordered_map>
 
 struct SrcNode;
-class AssignmentOperator;
+struct AssignmentOperator;
 
 using namespace std;
 

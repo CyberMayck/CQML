@@ -103,7 +103,7 @@ ClassContainer * ClassContainer::GetAncestor()
 }
 PropertyAndType* ClassContainer::CheckExistence(string s)
 {
-	for(int i=0;i<props.size();i++)
+	for(unsigned int i=0;i<props.size();i++)
 	{
 		if(props[i].name==s)
 		{
@@ -117,7 +117,7 @@ PropertyAndType* ClassContainer::CheckExistence(string s)
 
 HandlerAndType* ClassContainer::CheckHExistence(string s)
 {
-	for(int i=0;i<handlers.size();i++)
+	for(unsigned int i=0;i<handlers.size();i++)
 	{
 		if(handlers[i].name==s)
 		{
@@ -160,6 +160,7 @@ bool PropertyAndType::IsPrimitive()
 	{
 		return true;
 	}
+	return false;
 }
 ClassContainer* GetClassContainer(string n, int treeInd)
 {
@@ -349,7 +350,7 @@ void PrintHashTab(FILE * file, int classID, PerfectHashData * data)
 	for(int i=0;i<data->m;i++)
 	{
 		fprintf(file,"data->keys[%d]=(char *)malloc(sizeof(char) * %d);\n",i,data->keys[i].length()+1);
-		fprintf(file,"strcpy(data->keys[%d],\"%s\");\n",i,data->keys[i].c_str());
+		fprintf(file,"strcpy_s(data->keys[%d],%d,\"%s\");\n",i,data->keys[i].length()+1,data->keys[i].c_str());
 	}
 	fprintf(file,"\n");
 	for(int i=0;i<data->m;i++)
@@ -374,13 +375,13 @@ void InitClassIDs(int classCnt)
 {
 	int classID=0;
 	
-	for(int i=0;i<defaultClasses.size();i++)
+	for(unsigned int i=0;i<defaultClasses.size();i++)
 	{
 		defaultClasses[i]->classID=classID++;
 	}
 	for(int j=0;j<classCnt;j++)
 	{
-		for(int i=0;i<classes[j].size();i++)
+		for(unsigned int i=0;i<classes[j].size();i++)
 		{
 			classes[j][i]->classID=classID++;
 			
@@ -388,12 +389,13 @@ void InitClassIDs(int classCnt)
 	}
 }
 
+
 void PrintClassHashTabs(FILE * file, int classCnt)
 {
 	int classID=0;
 	PerfectHashData * data;
 	
-	fprintf(file,"void InitHashTabs(ClassHashTable * hashTabs)\n{\n");
+	fprintf(file,"void InitHashTabs(ClassHashTable *& hashTabs)\n{\n");
 	fprintf(file,"ClassHashTable * data;\n");
 
 	int size=defaultClasses.size();
@@ -402,21 +404,51 @@ void PrintClassHashTabs(FILE * file, int classCnt)
 		size+=classes[i].size();
 	}
 	fprintf(file,"InitClassesSize(hashTabs, %d);\n\n",size);
-
 	
-	PrintClassTabs(file, classCnt);
-
-
-
-	for(int i=0;i<defaultClasses.size();i++)
+	//PrintClassTabs(file, classCnt);
+	classID=0;
+	int val=0;
+	int parentID=-1;
+	ClassContainer *par=0;
+	for(unsigned int i=0;i<defaultClasses.size();i++)
 	{
-		data=defaultClasses[i]->hashData;
-		PrintHashTab(file,classID,data);
+		val=(defaultClasses[i]->isReferencable?0:1);
+		par=defaultClasses[i]->GetAncestor();
+		if(par==0)
+			parentID=-1;
+		else
+			parentID=par->classID;
+		fprintf(file,"hashTabs[%d].isValueType=%d;\n",classID,val);
+		fprintf(file,"hashTabs[%d].parentID=%d;\n",classID,parentID);
 		classID++;
 	}
 	for(int j=0;j<classCnt;j++)
 	{
-		for(int i=0;i<classes[j].size();i++)
+		for(unsigned int i=0;i<classes[j].size();i++)
+		{
+			par=classes[j][i]->GetAncestor();
+			if(par==0)
+				parentID=-1;
+			else
+				parentID=par->classID;
+			val=(classes[j][i]->isReferencable?0:1);
+			fprintf(file,"hashTabs[%d].isValueType=%d;\n",classID,val);
+			fprintf(file,"hashTabs[%d].parentID=%d;\n",classID,parentID);
+			classID++;
+		}
+	}
+
+	classID=defaultClasses.size();
+
+	/*for(int i=0;i<defaultClasses.size();i++)
+	{
+		data=defaultClasses[i]->hashData;
+		PrintHashTab(file,classID,data);
+		classID++;
+	}*/
+	for(int j=0;j<classCnt;j++)
+	{
+		for(unsigned int i=0;i<classes[j].size();i++)
 		{
 			data=classes[j][i]->hashData;
 			PrintHashTab(file,classID,data);
@@ -434,7 +466,7 @@ void PrintClassTabs(FILE * file, int classCnt)
 	int ind=0;
 	int pInd=0;
 	ClassContainer * c;
-	for(int i=0;i<defaultClasses.size();i++)
+	for(unsigned int i=0;i<defaultClasses.size();i++)
 	{
 		c= defaultClasses[i]->GetAncestor();
 		if(c==0)
@@ -446,7 +478,7 @@ void PrintClassTabs(FILE * file, int classCnt)
 	}
 	for(int j=0;j<classCnt;j++)
 	{
-		for(int i=0;i<classes[j].size();i++)
+		for(unsigned int i=0;i<classes[j].size();i++)
 		{
 			c= classes[j][i]->GetAncestor();
 
@@ -463,9 +495,9 @@ void PrintClassTabs(FILE * file, int classCnt)
 	
 
 	
-	for(int i=0;i<defaultClasses.size();i++)
+	for(unsigned int i=0;i<defaultClasses.size();i++)
 	{
-		for(int k=0;k<defaultClasses[i]->props.size();k++)
+		for(unsigned int k=0;k<defaultClasses[i]->props.size();k++)
 		{
 			PropertyAndType& p=defaultClasses[i]->props[k];
 			
@@ -477,9 +509,9 @@ void PrintClassTabs(FILE * file, int classCnt)
 
 	for(int j=0;j<classCnt;j++)
 	{
-		for(int i=0;i<classes[j].size();i++)
+		for(unsigned int i=0;i<classes[j].size();i++)
 		{
-			for(int k=0;k<classes[j][i]->props.size();k++)
+			for(unsigned int k=0;k<classes[j][i]->props.size();k++)
 			{
 				PropertyAndType& p=classes[j][i]->props[k];
 			
@@ -499,7 +531,7 @@ int processBasicTypes()
 	return 1;
 	
 	FILE *file;
-	file = fopen("basic_types.cfg","r");
+	fopen_s(&file,"basic_types.cfg","r");
 	if (file == NULL)
 	{
 		perror ("Error opening file basic_types.cfg");
@@ -544,7 +576,7 @@ int processBasicTypes()
 			string type;
 			string name;
 			bool splitFound=false;
-			for(int i=0;i<s.length();i++)
+			for(unsigned int i=0;i<s.length();i++)
 			{
 				if(s[i]==' ')
 				{

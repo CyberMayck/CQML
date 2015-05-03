@@ -18,7 +18,7 @@ InternalResourceManager::InternalResourceManager()
 
 void InternalResourceManager::LoadImages()
 {
-	for(int i=0;i<imageLoadQueue.size();i++)
+	for(unsigned int i=0;i<imageLoadQueue.size();i++)
 	{
 		string &txt=imageLoadQueue[i];
 		if(images.count(txt)>0)
@@ -41,7 +41,7 @@ void InternalResourceManager::LoadImages()
 }
 void InternalResourceManager::LoadFonts()
 {
-	for(int i=0;i<fontLoadQueue.size();i++)
+	for(unsigned int i=0;i<fontLoadQueue.size();i++)
 	{
 		string &txt=fontLoadQueue[i];
 		int size=fontSizeLoadQueue[i];

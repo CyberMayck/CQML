@@ -15,7 +15,7 @@ namespace CQMLGUI
 	extern CQMLGUI::Element* root;
 	Element* acElement()
 	{
-		Element * a;
+//		Element * a;
 		return new Element();
 	}
 	Text* acText()
@@ -71,6 +71,8 @@ namespace CQMLGUI
 
 	void Element::Update()
 	{
+		if(!enabled)
+			return;
 		int i;
 		if(x_Update) x_Update(x_context);
 		if(y_Update) y_Update(y_context);
@@ -92,6 +94,8 @@ namespace CQMLGUI
 
 	void Element::Draw()
 	{
+		if(!visible)
+			return;
 		int i;
 
 		for(i=0;i<childrenCount;i++)
@@ -449,6 +453,8 @@ namespace CQMLGUI
 
 	void TextInput::Draw()
 	{
+		if(!visible)
+			return;
 		int x,y,w,h;
 		x=Left();
 		y=Top();
@@ -487,6 +493,8 @@ namespace CQMLGUI
 
 	void Image::Draw()
 	{
+		if(!visible)
+			return;
 		int x,y,w,h;
 		x=Left();
 		y=Top();
@@ -500,6 +508,8 @@ namespace CQMLGUI
 	}
 	void ScaledImage::Draw()
 	{
+		if(!visible)
+			return;
 		int x,y,w,h;
 		x=Left();
 		y=Top();
@@ -531,6 +541,8 @@ namespace CQMLGUI
 
 	void Text::Draw()
 	{
+		if(!visible)
+			return;
 		int x,y,w,h;
 		x=Left();
 		y=Top();
@@ -547,6 +559,8 @@ namespace CQMLGUI
 
 	void Rectangle::Draw()
 	{
+		if(!visible)
+			return;
 		int x,y,w,h;
 		Rectangle* me=(Rectangle* )this;
 
