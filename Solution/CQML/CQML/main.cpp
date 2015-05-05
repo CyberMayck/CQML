@@ -13,10 +13,10 @@
 #endif
 
 #ifdef USESDL
-#include <SDL/SDL.h>
+#include "SDL/SDL.h"
 #undef main
-#include <SDL/SDL_TTF.h>
-#include <SDL/SDL_image.h>
+#include "SDL/SDL_TTF.h"
+#include "SDL/SDL_image.h"
 #endif
 
 #include<stdio.h>

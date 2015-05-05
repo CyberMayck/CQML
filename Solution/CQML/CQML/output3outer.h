@@ -2,6 +2,6 @@
 namespace CQMLGUI{
 struct Rectangle;
 
-Rectangle* acGUI_Rootoutput0();
+Rectangle* acGUI_Rootoutput3();
 
 }

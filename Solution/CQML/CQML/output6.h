@@ -1,11 +1,11 @@
 #pragma once
 #include "qml_includes.h"
 namespace CQMLGUI{
-struct Rootoutput1;
+struct Rootoutput6;
 
-struct MouseAreaCustom3;
+struct MouseAreaCustom0;
 
-struct MouseAreaCustom3
+struct MouseAreaCustom0
 	: MouseArea
 {
 	int pressed;
@@ -23,23 +23,19 @@ struct MouseAreaCustom3
 	string defImg;
 	QML_Context * defImg_context;
 	void (* defImg_Update)(QML_Context*);
-	string text;
-	QML_Context * text_context;
-	void (* text_Update)(QML_Context*);
 	virtual void Update();
 VariantRef Get(const char* s);
-MouseAreaCustom3();
+MouseAreaCustom0();
 };
-MouseAreaCustom3* acMouseAreaCustom3();
+MouseAreaCustom0* acMouseAreaCustom0();
 
-struct Rootoutput1
+struct Rootoutput6
 	:Component
 {
-	Rootoutput1();
-	MouseAreaCustom3* _QML_element0;
+	Rootoutput6();
+	MouseAreaCustom0* _QML_element0;
 	Image* _QML_element1;
-	Text* _QML_element2;
 };
-MouseAreaCustom3* acGUI_Rootoutput1();
-Rootoutput1 cGUI_Rootoutput1();
+MouseAreaCustom0* acGUI_Rootoutput6();
+Rootoutput6 cGUI_Rootoutput6();
 };

@@ -1,6 +1,7 @@
+#pragma once
 namespace CQMLGUI{
-struct Rectangle;
+struct MouseAreaCustom3;
 
-Rectangle* acGUI_Rootoutput1();
+MouseAreaCustom3* acGUI_Rootoutput1();
 
 }

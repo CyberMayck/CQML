@@ -36,6 +36,24 @@
     <ClCompile Include="output1.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="output2.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="output3.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="output4.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="calc_logic.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="output5.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="output6.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="custombuild.bat">
@@ -54,6 +72,9 @@
     </ClInclude>
     <ClInclude Include="parser_output.h">
       <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="calc_logic.h">
+      <Filter>Resource Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
