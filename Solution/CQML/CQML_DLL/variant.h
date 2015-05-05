@@ -77,6 +77,7 @@ struct VariantRef
 	CQML_API const VariantRef& operator*=(const Variant & rhs);
 	CQML_API const VariantRef& operator/=(const Variant & rhs);
 	CQML_API const VariantRef& operator%=(const Variant & rhs);
+	CQML_API bool operator==(const Variant & rhs) const;
 	CQML_API const Variant operator+(const Variant & rhs) const;
 	CQML_API const Variant operator-(const Variant & rhs) const;
 	CQML_API const Variant operator*(const Variant & rhs) const;
@@ -84,8 +85,8 @@ struct VariantRef
 	CQML_API const Variant operator%(const Variant & rhs) const;
 
 	
-	//template<typename T> 
-	//T As() const;
+	template<typename T> 
+	typename T As() const;
 	
 };
 
@@ -115,13 +116,13 @@ struct Variant
 	//template<typename T>
 	//typename std::enable_if<std::is_arithmetic<T>::value, T>::type As() const;
 	template<typename T>
-	CQML_API typename std::enable_if<std::is_arithmetic<T>::value, T>::type As() const;
+	typename std::enable_if<std::is_arithmetic<T>::value, T>::type As() const;
 	template<typename T>
-	CQML_API typename std::enable_if<std::is_same<T,std::string>::value, T>::type As() const;
+	typename std::enable_if<std::is_same<T,std::string>::value, T>::type As() const;
 	template<typename T>
-	CQML_API typename std::enable_if<std::is_same<T,CQMLObject*>::value, T>::type As() const;
+	typename std::enable_if<std::is_same<T,CQMLObject*>::value, T>::type As() const;
 	template<typename T>
-	CQML_API typename std::enable_if<!(std::is_arithmetic<T>::value ||std::is_same<T,std::string>::value || std::is_same<T,CQMLObject*>::value), T>::type As() const;
+	typename std::enable_if<!(std::is_arithmetic<T>::value ||std::is_same<T,std::string>::value || std::is_same<T,CQMLObject*>::value), T>::type As() const;
 	
 
 	CQML_API Variant(int);
@@ -150,6 +151,7 @@ struct Variant
 	CQML_API const Variant& operator*=(const Variant & rhs);
 	CQML_API const Variant& operator/=(const Variant & rhs);
 	CQML_API const Variant& operator%=(const Variant & rhs);
+	CQML_API bool operator==(const Variant & rhs) const;
 	CQML_API const Variant operator+(const Variant & rhs) const;
 	CQML_API const Variant operator-(const Variant & rhs) const;
 	CQML_API const Variant operator*(const Variant & rhs) const;
@@ -166,7 +168,8 @@ struct ElementVariant
 };
 
 // SFINAE
-#ifdef CQML_DLL_EXPORTS
+//#define CQML_DLL_EXPORTS
+//#ifdef CQML_DLL_EXPORTS
 
 template<typename T>
 typename std::enable_if<std::is_same<T,CQMLObject*>::value, T>::type Variant::As() const
@@ -270,13 +273,13 @@ typename std::enable_if<std::is_arithmetic<T>::value, T>::type Variant::As() con
 }
 
 
-
-/*template<typename T> 
+template<typename T> 
 T VariantRef::As() const
 {
 	return Variant(*this).As<T>();
-}*/
+}
 
 
 
-#endif
+
+//#endif

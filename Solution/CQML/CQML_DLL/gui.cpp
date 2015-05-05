@@ -12,6 +12,7 @@ CQMLGUI::Element * lastPressed;
 
 namespace CQMLGUI
 {
+	vector<Element*> pressedElements;
 	extern CQMLGUI::Element* root;
 	Element* acElement()
 	{
@@ -78,6 +79,8 @@ namespace CQMLGUI
 		if(y_Update) y_Update(y_context);
 		if(width_Update) width_Update(width_context);
 		if(height_Update) height_Update(height_context);
+		if(visible_Update) visible_Update(visible_context);
+		if(enabled_Update) enabled_Update(enabled_context);
 
 		for(i=0;i<childrenCount;i++)
 		{
@@ -107,6 +110,8 @@ namespace CQMLGUI
 
 	int Element::MousePressed(int x, int y, int button)
 	{
+		if(!enabled)
+			return 0;
 		int i;
 		int processed=0;
 		for(i=0;i<childrenCount;i++)
@@ -119,6 +124,8 @@ namespace CQMLGUI
 
 	int Element::KeyPressed(int key)
 	{
+		if(!enabled)
+			return 0;
 		int i;
 		int processed=0;
 		for(i=0;i<childrenCount;i++)
@@ -136,6 +143,8 @@ namespace CQMLGUI
 	}
 	int TextInput::KeyPressed(int key)
 	{
+		if(!enabled)
+			return 0;
 		if(focus)
 		{
 			
@@ -149,10 +158,14 @@ namespace CQMLGUI
 	}
 	int TextInput::KeyReleased(int key)
 	{
+		if(!enabled)
+			return 0;
 		return 1;
 	}
 	int Element::KeyReleased(int key)
 	{
+		if(!enabled)
+			return 0;
 		int i;
 		int processed=0;
 		for(i=0;i<childrenCount;i++)
@@ -171,17 +184,25 @@ namespace CQMLGUI
 
 	int Element::MouseReleased(int x, int y, int button)
 	{
-		int i;
+		if(!enabled)
+			return 0;
+		for(int i=0;i<pressedElements.size();i++)
+		{
+			pressedElements[i]->MouseReleased(x,y,button);
+		}
+		/*int i;
 		int processed=0;
 		for(i=0;i<childrenCount;i++)
 		{
 			processed+=children[i]->MouseReleased(x,y,button);
 		}
-		return processed;
+		return processed;*/
 	}
 
 	int Element::MouseMoved(int x, int y, int relx, int rely)
 	{
+		if(!enabled)
+			return 0;
 		int i;
 		int processed=0;
 		for(i=0;i<childrenCount;i++)
@@ -193,6 +214,8 @@ namespace CQMLGUI
 
 	int Element::MouseScrolled(int x, int y, int relx, int rely)
 	{
+		if(!enabled)
+			return 0;
 		int i;
 		int processed=0;
 		for(i=0;i<childrenCount;i++)
@@ -204,6 +227,8 @@ namespace CQMLGUI
 
 	int Element::MouseClicked(int x, int y, int button)
 	{
+		if(!enabled)
+			return 0;
 		int i;
 		int processed=0;
 		for(i=0;i<childrenCount;i++)
@@ -222,6 +247,8 @@ namespace CQMLGUI
 
 	int TextInput::MouseClicked(int x, int y,int button)
 	{
+		if(!enabled)
+			return 0;
 		int x1,y1,w,h;
 	
 		//int processed=Element::MouseClicked(x,y,button);
@@ -244,6 +271,8 @@ namespace CQMLGUI
 
 	int MouseArea::MouseClicked(int x, int y,int button)
 	{
+		if(!enabled)
+			return 0;
 		int x1,y1,w,h;
 		Rectangle* me;
 	
@@ -282,6 +311,8 @@ namespace CQMLGUI
 
 	int MouseArea::MousePressed(int x, int y, int button)
 	{
+		if(!enabled)
+			return 0;
 		int x1,y1,w,h;
 		Rectangle* me;
 	
@@ -296,6 +327,7 @@ namespace CQMLGUI
 	
 		if(x1<x && x<x1+w && y1<y && y<y1+h)
 		{
+			pressedElements.push_back(this);
 			lastPressed=this;
 			if(CustomMousePressed!=0)
 			{
@@ -314,30 +346,33 @@ namespace CQMLGUI
 
 	int MouseArea::MouseReleased(int x, int y, int button)
 	{
+		if(!enabled)
+			return 0;
 		int x1,y1,w,h;
 		Rectangle* me;
 	
-		int processed=Element::MouseReleased(x,y,button);
-		if(processed!=0)
-			return processed;
+		//int processed=Element::MouseReleased(x,y,button);
+		//if(processed!=0)
+		//	return processed;
 		me=(Rectangle* )this;
 		x1=Left();
 		y1=Top();
 		w=width;
 		h=height;
+			
+		if(CustomMouseReleased!=0)
+		{
+			QMLMouseEvent e;
+			e.x=x;
+			e.y=y;
+			e.button=button;
+			CustomMouseReleased(this->CustomMouseReleased_context, e);
+		}
 	
 		if(x1<x && x<x1+w && y1<y && y<y1+h)
 		{
-			if(CustomMouseReleased!=0)
-			{
-				QMLMouseEvent e;
-				e.x=x;
-				e.y=y;
-				e.button=button;
-				CustomMouseReleased(this->CustomMousePressed_context, e);
-			}
 
-			if(lastPressed==this && CustomMouseClicked!=0)
+			if(CustomMouseClicked!=0)
 			{
 				QMLMouseEvent e;
 				e.x=x;
@@ -354,12 +389,14 @@ namespace CQMLGUI
 
 	int MouseArea::MouseMoved(int x, int y, int relx, int rely)
 	{
+		if(!enabled)
+			return 0;
 		int x1,y1,w,h;
 		int xold, yold;
 		Rectangle* me;
-		int processed=Element::MouseMoved(x,y,relx,rely);
-		if(processed!=0)
-			return processed;
+		//int processed=Element::MouseMoved(x,y,relx,rely);
+		//if(processed!=0)
+		//	return processed;
 		me=(Rectangle* )this;
 		x1=Left();
 		y1=Top();
@@ -374,7 +411,7 @@ namespace CQMLGUI
 		{
 			if(CustomMouseEntered!=0)
 			{
-				if(!(x1<xold && xold<x1+w && y1<yold && yold<y1+h))
+				//if(!(x1<xold && xold<x1+w && y1<yold && yold<y1+h))
 				{
 					QMLMouseEvent e;
 					e.x=x;
@@ -399,7 +436,7 @@ namespace CQMLGUI
 		{
 			if(CustomMouseExited!=0)
 			{
-				if(x1<xold && xold<x1+w && y1<yold && yold<y1+h)
+				//if(x1<xold && xold<x1+w && y1<yold && yold<y1+h)
 				{
 					QMLMouseEvent e;
 					e.x=x;
@@ -416,6 +453,8 @@ namespace CQMLGUI
 
 	int MouseArea::MouseScrolled(int x, int y, int relx, int rely)
 	{
+		if(!enabled)
+			return 0;
 		int x1,y1,w,h;
 		Rectangle* me;
 		int processed=Element::MouseScrolled(x,y,relx,rely);
@@ -598,6 +637,16 @@ namespace CQMLGUI
 	}
 	void PostDraw()
 	{
+	}
+
+	void CopyChildren(Element *self,Element *src)
+	{
+		for(int i=0;i<(*src).childrenCount;i++)
+		{
+			mGUI_Element_InsertChild(self,src->children[i]);
+		}
+		(*src).childrenCount=0;
+		delete src->children;
 	}
 
 	void mGUI_Element_InsertChild(Element *self,Element *child)

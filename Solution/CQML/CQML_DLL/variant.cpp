@@ -254,7 +254,7 @@ VariantRef Variant::Get(const char * s)
 
 void TryAssignCQMLReference(CQMLObject ** l,CQMLObject * rhs)
 {
-	if(!IsCompatible((*l)->classID,rhs->classID))
+	if((*l)!=0 && !IsCompatible((*l)->classID,rhs->classID))
 	{
 		throw 0;
 		return;
@@ -275,51 +275,57 @@ void TryAssignCQMLValue(CQMLObject * l,CQMLObject * rhs)
 }
 
 #define VARIANT_TO_VARIANTREF(rhs) \
-	typeID=rhs.typeID;\
-	switch(typeID)\
+	if(typeID==rhs.typeID)\
 	{\
-	case TYPE_INT:\
-		*value.v_int=rhs.value.v_int;\
-		break;\
-	case TYPE_LONG:\
-		*value.v_long=rhs.value.v_long;\
-		break;\
-	case TYPE_LONG_LONG:\
-		*value.v_long_long=rhs.value.v_long_long;\
-		break;\
-	case TYPE_UNSIGNED_INT:\
-		*value.v_unsigned_int=rhs.value.v_unsigned_int;\
-		break;\
-	case TYPE_UNSIGNED_LONG:\
-		*value.v_unsigned_long=rhs.value.v_unsigned_long;\
-		break;\
-	case TYPE_UNSIGNED_LONG_LONG:\
-		*value.v_unsigned_long_long=rhs.value.v_unsigned_long_long;\
-		break;\
-	case TYPE_FLOAT:\
-		*value.v_float=rhs.value.v_float;\
-		break;\
-	case TYPE_DOUBLE:\
-		*value.v_double= rhs.value.v_double;\
-		break;\
-	case TYPE_LONG_DOUBLE:\
-		*value.v_long_double= rhs.value.v_long_double;\
-		break;\
-	case TYPE_VOID_PTR:\
-		*value.v_r_void= rhs.value.v_r_void;\
-		break;\
-	case TYPE_STRING:\
-		*value.v_string= *rhs.value.v_string;\
-		break;\
-	case TYPE_CQMLOBJECT:\
-		TryAssignCQMLReference(value.v_r_CQMLObject,rhs.value.v_r_CQMLObject); \
-		break;\
-	case TYPE_CQMLOBJECT_VALUE:\
-		TryAssignCQMLValue(value.v_CQMLObject,rhs.value.v_r_CQMLObject);\
-		break;\
-	default:\
+		switch(typeID)\
+		{\
+		case TYPE_INT:\
+			*value.v_int=rhs.value.v_int;\
+			break;\
+		case TYPE_LONG:\
+			*value.v_long=rhs.value.v_long;\
+			break;\
+		case TYPE_LONG_LONG:\
+			*value.v_long_long=rhs.value.v_long_long;\
+			break;\
+		case TYPE_UNSIGNED_INT:\
+			*value.v_unsigned_int=rhs.value.v_unsigned_int;\
+			break;\
+		case TYPE_UNSIGNED_LONG:\
+			*value.v_unsigned_long=rhs.value.v_unsigned_long;\
+			break;\
+		case TYPE_UNSIGNED_LONG_LONG:\
+			*value.v_unsigned_long_long=rhs.value.v_unsigned_long_long;\
+			break;\
+		case TYPE_FLOAT:\
+			*value.v_float=rhs.value.v_float;\
+			break;\
+		case TYPE_DOUBLE:\
+			*value.v_double= rhs.value.v_double;\
+			break;\
+		case TYPE_LONG_DOUBLE:\
+			*value.v_long_double= rhs.value.v_long_double;\
+			break;\
+		case TYPE_VOID_PTR:\
+			*value.v_r_void= rhs.value.v_r_void;\
+			break;\
+		case TYPE_STRING:\
+			*value.v_string= *rhs.value.v_string;\
+			break;\
+		case TYPE_CQMLOBJECT:\
+			TryAssignCQMLReference(value.v_r_CQMLObject,rhs.value.v_r_CQMLObject); \
+			break;\
+		case TYPE_CQMLOBJECT_VALUE:\
+			TryAssignCQMLValue(value.v_CQMLObject,rhs.value.v_r_CQMLObject);\
+			break;\
+		default:\
+			throw 0;\
+			break;\
+		}\
+	}\
+	else\
+	{\
 		throw 0;\
-		break;\
 	}
 
 const VariantRef & VariantRef::operator=(const Variant & rhs)
@@ -367,7 +373,62 @@ const VariantRef & VariantRef::operator=(const Variant & rhs)
 		throw 0;
 		break;
 	}*/
-	VARIANT_TO_VARIANTREF(rhs)
+
+	//VARIANT_TO_VARIANTREF(rhs)
+	
+	if(typeID==rhs.typeID)
+	{
+		switch(typeID)
+		{
+		case TYPE_INT:
+			*value.v_int=rhs.value.v_int;
+			break;
+		case TYPE_LONG:
+			*value.v_long=rhs.value.v_long;
+			break;
+		case TYPE_LONG_LONG:
+			*value.v_long_long=rhs.value.v_long_long;
+			break;
+		case TYPE_UNSIGNED_INT:
+			*value.v_unsigned_int=rhs.value.v_unsigned_int;
+			break;
+		case TYPE_UNSIGNED_LONG:
+			*value.v_unsigned_long=rhs.value.v_unsigned_long;
+			break;
+		case TYPE_UNSIGNED_LONG_LONG:
+			*value.v_unsigned_long_long=rhs.value.v_unsigned_long_long;
+			break;
+		case TYPE_FLOAT:
+			*value.v_float=rhs.value.v_float;
+			break;
+		case TYPE_DOUBLE:
+			*value.v_double= rhs.value.v_double;
+			break;
+		case TYPE_LONG_DOUBLE:
+			*value.v_long_double= rhs.value.v_long_double;
+			break;
+		case TYPE_VOID_PTR:
+			*value.v_r_void= rhs.value.v_r_void;
+			break;
+		case TYPE_STRING:
+			*value.v_string= *rhs.value.v_string;
+			break;
+		case TYPE_CQMLOBJECT:
+			TryAssignCQMLReference(value.v_r_CQMLObject,rhs.value.v_r_CQMLObject); 
+			break;
+		case TYPE_CQMLOBJECT_VALUE:
+			TryAssignCQMLValue(value.v_CQMLObject,rhs.value.v_r_CQMLObject);
+			break;
+		default:
+			throw 0;
+			break;
+		}
+	}
+	else
+	{
+		throw 0;
+	}
+	//typeID=rhs.typeID;
 	return *this;
 }
 
@@ -388,6 +449,12 @@ const VariantRef& VariantRef::operator##OP##=(const Variant & rhs) \
 
 #define VARIANTREF_SIMPLE_OPERATOR(OP) \
 const Variant VariantRef::operator##OP (const Variant & rhs) const \
+{ \
+	return Variant(*this) OP rhs; \
+}
+
+#define VARIANTREF_SIMPLE_OPERATOR_BOOL(OP) \
+bool VariantRef::operator##OP (const Variant & rhs) const \
 { \
 	return Variant(*this) OP rhs; \
 }
@@ -433,6 +500,46 @@ const Variant Variant::operator##OP (const Variant & rhs) const \
 }
 
 
+#define VARIANT_SIMPLE_OPERATOR_BOOL(OP) \
+bool Variant::operator##OP (const Variant & rhs) const \
+{ \
+	Variant v(*this); \
+	switch(typeID) \
+	{ \
+	case TYPE_INT: \
+		return v.value.v_int OP rhs.As<int>(); \
+		break; \
+	case TYPE_LONG: \
+		v.value.v_long=v.value.v_long OP rhs.As<long>(); \
+		break; \
+	case TYPE_LONG_LONG: \
+		return v.value.v_long_long OP rhs.As<long long>(); \
+		break; \
+	case TYPE_UNSIGNED_INT: \
+		return v.value.v_unsigned_int OP rhs.As<unsigned int>(); \
+		break; \
+	case TYPE_UNSIGNED_LONG: \
+		return v.value.v_unsigned_long OP rhs.As<unsigned long>(); \
+		break; \
+	case TYPE_UNSIGNED_LONG_LONG: \
+		return v.value.v_unsigned_long_long OP rhs.As<unsigned long long>(); \
+		break; \
+	case TYPE_FLOAT: \
+		return v.value.v_float OP rhs.As<float>(); \
+		break; \
+	case TYPE_DOUBLE: \
+		return v.value.v_double OP rhs.As<double>(); \
+		break; \
+	case TYPE_LONG_DOUBLE: \
+		return v.value.v_long_double OP rhs.As<long double>(); \
+		break; \
+	default: \
+		throw 0; \
+		break; \
+	} \
+	return false; \
+}
+
 #define VARIANT_INTEGER_OPERATOR(OP) \
 const Variant Variant::operator##OP (const Variant & rhs) const \
 { \
@@ -470,11 +577,16 @@ VARIANT_SIMPLE_OPERATOR(*)
 VARIANT_SIMPLE_OPERATOR(/)
 VARIANT_INTEGER_OPERATOR(%)
 
+VARIANT_SIMPLE_OPERATOR_BOOL(==)
+
 VARIANTREF_SIMPLE_OPERATOR(+)
 VARIANTREF_SIMPLE_OPERATOR(-)
 VARIANTREF_SIMPLE_OPERATOR(*)
 VARIANTREF_SIMPLE_OPERATOR(/)
 VARIANTREF_SIMPLE_OPERATOR(%)
+
+
+VARIANTREF_SIMPLE_OPERATOR_BOOL(==)
 
 VARIANTREF_ASSIGN_OPERATOR(+)
 VARIANTREF_ASSIGN_OPERATOR(-)

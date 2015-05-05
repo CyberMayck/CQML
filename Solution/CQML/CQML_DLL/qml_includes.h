@@ -10,5 +10,7 @@
 #include "context.h"
 #include "variant.h"
 
+#define INTTOSTR(x)	std::to_string(static_cast<long long>(x))
+
 #define member_size(type, member) sizeof(((type *)0)->member)
 void PrintMeMyFriend(char * str);

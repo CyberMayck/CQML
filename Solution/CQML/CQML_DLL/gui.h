@@ -44,7 +44,7 @@ struct Component
 	CQML_API CQMLGUI::Image* acImage();
 	CQML_API CQMLGUI::ScaledImage* acScaledImage();
 
-
+	CQML_API void CopyChildren(CQMLGUI::Element *self,CQMLGUI::Element *src);
 	CQML_API void mGUI_Element_InsertChild(CQMLGUI::Element *self,CQMLGUI::Element *child);
 
 	CQML_API int mGUI_Element_Clicked(CQMLGUI::Element *self, int x, int y, int button);
