@@ -423,6 +423,10 @@ void SourceDotToken::Process(int treeInd, int currentElementId, SourceStatementT
 	
 	if(isOtherId)
 	{
+		if(identifiers[0]->GetId()=="thisButton")
+		{
+			int a=400;
+		}
 		curId=idMaps[treeInd][identifiers[0]->GetId()];
 		
 		int cnt=this->identifiers.size();
@@ -469,6 +473,9 @@ void SourceDotToken::Process(int treeInd, int currentElementId, SourceStatementT
 
 				if(prop==0)
 				{
+					printf("primitive doesnt have members");
+					getchar();
+					exit(0);
 					//error does not exist
 				}
 				string typeName=prop->type;

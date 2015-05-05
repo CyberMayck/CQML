@@ -47,6 +47,7 @@ public:
 	int parentId;
 	char * name;
 	char * origClassName;
+	char * importName;
 	bool hasCustomClass;
 	GUIElement ** children;
 	GUIElementAttribute * attributes;
@@ -67,6 +68,7 @@ class GUIElementProperty
 public:
 	char * typeName;
 	char * name;
+	int hasUpdater;
 	//int graphInd;
 };
 

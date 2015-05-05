@@ -148,7 +148,7 @@ void parserDeclare(const char* type, const char* name, const char* value);
 void parserDeclareDefault(const char* type, const char* name, const char* value);
 void parserDeclareFunc(const char* , const char* , const char*, const char * s);
 #define CQML_PARSER
-#include "..\CQML\struct_definition_macros.h"
+#include "..\CQML_DLL\struct_definition_macros.h"
 
 ClassContainer * curCont;
 
@@ -432,8 +432,8 @@ void PrintClassHashTabs(FILE * file, int classCnt)
 			else
 				parentID=par->classID;
 			val=(classes[j][i]->isReferencable?0:1);
-			fprintf(file,"hashTabs[%d].isValueType=%d;\n",classID,val);
-			fprintf(file,"hashTabs[%d].parentID=%d;\n",classID,parentID);
+			fprintf(file,"hashTabs[%d].isValueType=%d;\n",classes[j][i]->classID,val);
+			fprintf(file,"hashTabs[%d].parentID=%d;\n",classes[j][i]->classID,parentID);
 			classID++;
 		}
 	}
@@ -451,7 +451,7 @@ void PrintClassHashTabs(FILE * file, int classCnt)
 		for(unsigned int i=0;i<classes[j].size();i++)
 		{
 			data=classes[j][i]->hashData;
-			PrintHashTab(file,classID,data);
+			PrintHashTab(file,classes[j][i]->classID,data);
 			classID++;
 		}
 	}

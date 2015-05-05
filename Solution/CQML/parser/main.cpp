@@ -328,15 +328,22 @@ void classDeclaration(const char* rootName, int treeInd)
 	// header
 	for(int i=0;i<elementCount;i++)
 	{
+		elements[i].importName=elements[i].name;
 		if(!elements[i].hasCustomClass)
 			continue;
 
 		
-		char * customClassName= new char[100];
-		sprintf_s(customClassName,100,"%sCustom%d",elements[i].name,customClassCount);
+		char * customClassName= new char[256];
+		sprintf_s(customClassName,256,"%s",elements[i].classContainer->className.c_str());
+		char * originalClassName= new char[256];
+		sprintf_s(originalClassName,256,"%s",elements[i].classContainer->GetAncestor()->className.c_str());
+		
+		//sprintf_s(customClassName,100,"%sCustom%d",elements[i].name,elements[i].classContainer->classID);//customClassCount);
 		customClassCount++;
 		//clear?
-		elements[i].origClassName=elements[i].name;
+		//elements[i].origClassName=elements[i].name;
+		//elements[i].name=customClassName;
+		elements[i].origClassName=originalClassName;
 		elements[i].name=customClassName;
 		
 		//fprintf(file_class_header,"typedef struct GUI_%s GUI_%s;\n\n",elements[i].name,elements[i].name);
@@ -407,6 +414,21 @@ void classDeclaration(const char* rootName, int treeInd)
 		fprintf(file_class_source,"CQMLGUI::%s::%s()\n{\n",classes[treeInd][i]->className.c_str(),classes[treeInd][i]->className.c_str());
 		
 		fprintf(file_class_source,"\tclassID=%d;\n",classes[treeInd][i]->classID);
+		for(unsigned int j=0;j<classes[treeInd][i]->props.size();j++)
+		{
+			if(!classes[treeInd][i]->props[j].isDefault)
+			{
+				fprintf(file_class_source,"\t%s_Update=0;\n",classes[treeInd][i]->props[j].name.c_str());
+				fprintf(file_class_source,"\t%s_context=0;\n",classes[treeInd][i]->props[j].name.c_str());
+			}
+			PropertyAndType* prop= &classes[treeInd][i]->props[j];
+			ClassContainer * cont= GetClassContainer(prop->type,treeInd);
+			if(cont && cont->isReferencable)
+			{
+				fprintf(file_class_source,"\t%s=0;\n",classes[treeInd][i]->props[j].name.c_str());
+			}
+		}
+		//jep
 		
 
 		fprintf(file_class_source,"}\n");
@@ -473,7 +495,9 @@ void rootElementDeclaration(const char * rootName)
 	}
 	fprintf(file_class_header,"};\n");
 	//fprintf(file_class_header,"Root%s* acGUI_Root%s();\n",rootName,rootName);
-	fprintf(file_class_header,"%s* acGUI_Root%s();\n",elements[0].name,rootName);
+
+	fprintf(file_class_header,"%s* acGUI_Root%s();\n",elements[0].classContainer->className.c_str(),rootName);
+	//fprintf(file_class_header,"%s* acGUI_Root%s();\n",elements[0].name,rootName);
 	fprintf(file_class_header,"Root%s cGUI_Root%s();\n",rootName,rootName);
 }
 
@@ -486,8 +510,9 @@ void rootElementAllocation(const char * rootName, int treeInd)
 {
 	
 	fprintf(file_class_source, "\n //rootElementAllocation() \n");
+	fprintf(file_class_source,"CQMLGUI::%s* CQMLGUI::acGUI_Root%s()\n{\n",elements[0].classContainer->className.c_str(),rootName);
+	//fprintf(file_class_source,"CQMLGUI::%s* CQMLGUI::acGUI_Root%s()\n{\n",elements[0].name,rootName);
 
-	fprintf(file_class_source,"CQMLGUI::%s* CQMLGUI::acGUI_Root%s()\n{\n",elements[0].name,rootName);
 		//fprintf(file_class_source,"CQMLGUI::Root%s* CQMLGUI::acGUI_Root%s()\n{\n",rootName,rootName);
 		fprintf(file_class_source,"\tCQMLGUI::Root%s * pointer;\n\tpointer=new CQMLGUI::Root%s();\n",rootName,rootName);
 
@@ -508,7 +533,7 @@ void rootElementConstructor(const char * rootName, int treeInd)
 {
 	fprintf(file_class_source, "\n //rootElementConstructor() \n");
 
-	fprintf(file_class_source,"CQMLGUI::Root%s::Root%s()\n{\n",rootName,rootName);
+	fprintf(file_class_source,"CQMLGUI::Root%s::Root%s()\n{\n\tCQMLGUI::Element*tmp=0;\n",rootName,rootName);
 	//fprintf(file_class_source,"\tCQMLGUI::Root%s s;\n",rootName);
 	//fprintf(file_class_source,"\tCQMLGUI::Root%s * self=&s;\n",rootName);
 
@@ -517,12 +542,68 @@ void rootElementConstructor(const char * rootName, int treeInd)
 
 	for(int i=0;i<elementCount;i++)
 	{
-		bool isImportName=importToKeyMaps[treeInd].count(std::string(elements[i].name))!=0;
+		bool isImportName=importToKeyMaps[treeInd].count(std::string(elements[i].importName))!=0;
 		if(isImportName)
 		{
-			const char *nam= importPathToName[imports[importToKeyMaps[treeInd][std::string(elements[i].name)]].path].c_str();
-			//fprintf(file_class_source, "\t_QML_element%d = (CQMLGUI::Element*)CQMLGUI::acGUI_Root%s();\n",i,nam);
-			fprintf(file_class_source, "\t_QML_element%d = CQMLGUI::acGUI_Root%s();\n",i,nam);
+			if(elements[i].hasCustomClass)
+			{
+				const char *nam= importPathToName[imports[importToKeyMaps[treeInd][std::string(elements[i].importName)]].path].c_str();
+				//fprintf(file_class_source, "\t_QML_element%d = (CQMLGUI::Element*)CQMLGUI::acGUI_Root%s();\n",i,nam);
+				
+				//fprintf(file_class_source, "\t%s;\n",elements[i].name);
+
+				fprintf(file_class_source, "\t_QML_element%d = CQMLGUI::ac%s();\n",i,elements[i].name);
+				fprintf(file_class_source, "\ttmp=CQMLGUI::acGUI_Root%s();\n",nam);
+				fprintf(file_class_source, "\tCopyChildren(_QML_element%d,tmp);\n",i);
+				fprintf(file_class_source, "\ttmp=tmp->root;\n",i);
+
+				//copy intrails
+				ClassContainer * parCont=elements[i].classContainer->GetAncestor();
+				if(parCont!=0)
+				{
+					for(unsigned int j=0;j<parCont->props.size();j++)
+					{
+						fprintf(file_class_source, "\t_QML_element%d->%s=((CQMLGUI::Root%s*)tmp)->_QML_element0->%s;\n",i,parCont->props[j].name.c_str(),nam,parCont->props[j].name.c_str());
+						fprintf(file_class_source, "\t_QML_element%d->%s_Update=((CQMLGUI::Root%s*)tmp)->_QML_element0->%s_Update;\n",i,parCont->props[j].name.c_str(),nam,parCont->props[j].name.c_str());
+						fprintf(file_class_source, "\t_QML_element%d->%s_context=((CQMLGUI::Root%s*)tmp)->_QML_element0->%s_context;\n",i,parCont->props[j].name.c_str(),nam,parCont->props[j].name.c_str());
+						fprintf(file_class_source, "\tif(_QML_element%d->%s_context)\n",i,parCont->props[j].name.c_str());
+						fprintf(file_class_source, "\t\t_QML_element%d->%s_context->self=_QML_element%d;\n",i,parCont->props[j].name.c_str(),i);
+					}
+					//parCont->handlers
+				}
+				while(parCont!=0)
+				{
+					for(unsigned int j=0;j<parCont->handlers.size();j++)
+					{
+						//GUIElementHandler
+						HandlerAndType* handler=&parCont->handlers[j];
+						//if(!handler->isProperty)
+						
+						{
+							fprintf(file_class_source, "\t_QML_element%d->%s=((CQMLGUI::Root%s*)tmp)->_QML_element0->%s;\n",i,handler->name.c_str(),nam,handler->name.c_str());
+							
+							fprintf(file_class_source, "\t_QML_element%d->%s_context=((CQMLGUI::Root%s*)tmp)->_QML_element0->%s_context;\n",i,handler->name.c_str(),nam,handler->name.c_str());
+							fprintf(file_class_source, "\tif(_QML_element%d->%s_context)\n",i,handler->name.c_str());
+						
+							fprintf(file_class_source, "\t\t_QML_element%d->%s_context->self=_QML_element%d;\n",i,handler->name.c_str(),i);
+						
+							//fprintf(file_class_source, "\t_QML_element%d->Custom%s=_QML_element%d_%s;\n",i,handler->name,i,handler->name);
+							//fprintf(file_class_source, "\t_QML_element%d->Custom%s_context=acQML_Context((CQMLGUI::Component*)this,(CQMLGUI::Element*)_QML_element%d);\n",i,handler->name,i);
+						}
+					}
+					parCont=parCont->GetAncestor();
+				}
+				//
+
+				fprintf(file_class_source, "\tdelete ((CQMLGUI::Root%s*)tmp)->_QML_element0;\n",nam);
+				fprintf(file_class_source, "\t((CQMLGUI::Root%s*)tmp)->_QML_element0=_QML_element%d;\n",nam,i);
+			}
+			else
+			{
+				const char *nam= importPathToName[imports[importToKeyMaps[treeInd][std::string(elements[i].importName)]].path].c_str();
+				//fprintf(file_class_source, "\t_QML_element%d = (CQMLGUI::Element*)CQMLGUI::acGUI_Root%s();\n",i,nam);
+				fprintf(file_class_source, "\t_QML_element%d = CQMLGUI::acGUI_Root%s();\n",i,nam);
+			}
 		}
 		else
 			fprintf(file_class_source, "\t_QML_element%d = CQMLGUI::ac%s();\n",i,elements[i].name);
@@ -1258,16 +1339,21 @@ void makeSource(std::string name, int treeInd)
 	//file = fopen("parser_output.cpp","w");
 	//file_class_header= fopen("custom_classes.h","w");
 	//file_class_source= fopen("custom_classes.cpp","w");
-	
-	fprintf(file_class_header,"#include \"qml_includes.h\"\nnamespace CQMLGUI{\n");
+	fprintf(file_class_header,"#pragma once\n");
+	fprintf(file,"#pragma once\n");
+
+	fprintf(file_class_header,"#include \"qml_includes.h\"\n");
 	fprintf(file_class_source,"#include \"%s\"\n\n#include \"qml_includes.h\"\n",name1.c_str());
 	for(int i=0;i<importCnt;i++)
 	{
 		if(imports[i].treeInd==treeInd)
 		{
-			fprintf(file_class_source,"#include \"%souter.h\"\n",importPathToName[imports[i].path].c_str());
+			//fprintf(file_class_source,"#include \"%souter.h\"\n",importPathToName[imports[i].path].c_str());
+			fprintf(file_class_header,"#include \"%s.h\"\n",importPathToName[imports[i].path].c_str());
 		}
 	}
+	
+	fprintf(file_class_header,"namespace CQMLGUI{\n");
 	for(unsigned int i=0;i<includes.size();i++)
 	{
 		if(includes[i].treeInd==treeInd)
@@ -1445,7 +1531,7 @@ GUIElement * recursionConstructGUIStructures(ParserGUIElement * element)
 				instance->properties[propertyCnt]=GUIElementProperty();
 				instance->properties[propertyCnt].name=prop->attName;
 				instance->properties[propertyCnt].typeName=prop->typeName;
-				
+				instance->properties[propertyCnt].hasUpdater=0;
 				if(prop->attribute!=0)
 				{
 					instance->attributes[attribCnt]=GUIElementAttribute();
@@ -1455,6 +1541,7 @@ GUIElement * recursionConstructGUIStructures(ParserGUIElement * element)
 					instance->attributes[attribCnt].source=ExprToHandler(prop->attribute->expression);
 
 					instance->attributes[attribCnt].handler=0;//new GUIElementHandler();
+					instance->properties[propertyCnt].hasUpdater=1;
 
 					attribCnt++;
 				}
@@ -2412,7 +2499,7 @@ void processTree(ParserList* elementTree, int treeInd)
 	
 
 	//ddd
-	for(int i=0;i<elementCount;i++)
+/*	for(int i=0;i<elementCount;i++)
 	{
 		if(!elements[i].hasCustomClass)
 			continue;
@@ -2420,6 +2507,7 @@ void processTree(ParserList* elementTree, int treeInd)
 		string nameC=string(elements[i].name)+string("Custom")+std::to_string(static_cast<long long>(customClassCnt));
 		
 		ClassContainer * cont = new ClassContainer(nameC, treeInd, totalClassCnt+customClassCnt);
+		
 		string sp =elements[i].name;
 
 		cont->SetAncestor(defaultClasses[defaultClassMap[sp]]);
@@ -2431,7 +2519,7 @@ void processTree(ParserList* elementTree, int treeInd)
 
 			ancestor=ancestor->GetAncestor();
 		}
-		
+		elements[i].classContainer=cont;
 
 		classes[treeInd].push_back(cont);
 
@@ -2448,7 +2536,7 @@ void processTree(ParserList* elementTree, int treeInd)
 			cont->AddProp(temp);
 		}
 		customClassCnt++;
-	}
+	}*/
 	//ddd
 	
 	// create ids
@@ -2501,11 +2589,14 @@ void processTree(ParserList* elementTree, int treeInd)
 			if(elements[i].propertiesCount>0)
 			{
 				//[0]
-				std::string className=std::string("GUI_")+std::string(elements[i].name)+std::string("Custom")+std::to_string(static_cast<long long>(customClassCount));
-				customClassCount++;
+				std::string parName=elementGroups[importFileInd][0].classContainer->className;
+				//std::string className=std::string(elements[i].name)+std::string("Custom")+std::to_string(static_cast<long long>(customClassCnt));
+				std::string className=parName+std::string("Custom")+std::to_string(static_cast<long long>(customClassCnt));
+				
+				customClassCnt++;
 				ClassContainer * cont=new ClassContainer(className,treeInd,totalClassCnt++);
 				cont->SetAncestor(elementGroups[importFileInd][0].classContainer);
-				
+
 				elements[i].classContainer=cont;
 			}
 			else
@@ -2517,8 +2608,8 @@ void processTree(ParserList* elementTree, int treeInd)
 		{
 			if(elements[i].propertiesCount>0)
 			{
-				std::string className=std::string("")+std::string(elements[i].name)+std::string("Custom")+std::to_string(static_cast<long long>(customClassCount));
-				customClassCount++;
+				std::string className=std::string("")+std::string(elements[i].name)+std::string("Custom")+std::to_string(static_cast<long long>(customClassCnt));
+				customClassCnt++;
 				ClassContainer * cont=new ClassContainer(className, treeInd,totalClassCnt++);
 				cont->SetAncestor(defaultClasses[defaultClassMap[string("")+string(elements[i].name)]]);
 				
@@ -2529,8 +2620,33 @@ void processTree(ParserList* elementTree, int treeInd)
 				elements[i].classContainer=defaultClasses[defaultClassMap[string("")+string(elements[i].name)]];
 			}
 		}
+		if(elements[i].propertiesCount>0)
+		{
+			ClassContainer * cont = elements[i].classContainer;
+			classes[treeInd].push_back(cont);
 
-		for(int j=0;j<elements[i].propertiesCount;j++)
+			for(int j=0;j<elements[i].propertiesCount;j++)
+			{
+				GUIElementProperty * prop= &elements[i].properties[j];
+
+				PropertyAndType temp;
+				temp.name=prop->name;
+				temp.type=prop->typeName;
+				temp.value=string();
+				temp.isDefault=0;
+
+				cont->AddProp(temp);
+			}
+			ClassContainer* ancestor=cont->GetAncestor();
+			while(ancestor!=0)
+			{
+				cont->isReferencable=ancestor->isReferencable;
+
+				ancestor=ancestor->GetAncestor();
+			}
+		}
+
+		/*for(int j=0;j<elements[i].propertiesCount;j++)
 		{
 			PropertyAndType temp;
 			temp.name=elements[i].properties[j].name;
@@ -2546,7 +2662,7 @@ void processTree(ParserList* elementTree, int treeInd)
 			}
 
 			elements[i].classContainer->AddProp(temp);
-		}
+		}*/
 	}
 
 	// process expressions in elements
@@ -2566,7 +2682,7 @@ void processTree(ParserList* elementTree, int treeInd)
 			if(t==0)
 			{
 					//assert(false);
-				perror("nonexistent atribute");
+				printf("nonexistent atribute %s in %s\n",att->name,elements[i].name);
 				exit(-1);
 			}
 
@@ -2574,11 +2690,12 @@ void processTree(ParserList* elementTree, int treeInd)
 			if(att->name2!=0)
 			{
 				// todo? maybe check non-default too?
+				PropertyAndType* oldT=t;
 				t=defaultClasses[defaultClassMap[t->type]]->CheckExistence(std::string(att->name2));
 				if(t==0)
 				{
 						//assert(false);
-					printf("nonexistent attribute: %s \nin %s\n",att->name2,t->type.c_str());
+					printf("nonexistent attribute: %s \nin %s\n",att->name2,oldT->type.c_str());
 					exit(-1);
 				}
 			}
