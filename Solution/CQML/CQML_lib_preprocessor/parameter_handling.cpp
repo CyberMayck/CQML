@@ -149,7 +149,7 @@ void parserDeclare(const char* type, const char* name, const char* value);
 void parserDeclareDefault(const char* type, const char* name, const char* value);
 void parserDeclareFunc(const char* , const char* , const char*, const char * s);
 #define CQML_PARSER
-#include "..\CQML\struct_definition_macros.h"
+#include "..\CQML_DLL\struct_definition_macros.h"
 
 ClassContainer * curCont;
 

@@ -70,11 +70,15 @@ void makeMainSource()
 					//fprintf(file,"\t%s_Update=0;\n",parCont->props[j].name.c_str());
 				}
 				if(!parCont->props[j].isDefault)
+				{
 					fprintf(file,"\t%s_Update=0;\n",parCont->props[j].name.c_str());
+					fprintf(file,"\t%s_context=0;\n",parCont->props[j].name.c_str());
+				}
 			}
 			for(unsigned int j=0;j<parCont->handlers.size();j++)
 			{
 					fprintf(file,"\t%s=0;\n",parCont->handlers[j].name.c_str());
+					fprintf(file,"\t%s_context=0;\n",parCont->handlers[j].name.c_str());
 			}
 			//parCont=parCont->GetAncestor();
 		}
