@@ -1,0 +1,143 @@
+import "calc_button.cqml" as CalculatorButton
+include "calc_logic.h"
+Rectangle {
+    width : 1024;
+    height: 768;
+    color.red : 1;
+    color.green : 1;
+    color.blue : 1;
+	
+    ScaledImage
+    {
+        img.src: "pics/button_square.png";
+        x:parent.width/5-75;
+        y:0;
+        topBorder: 60;
+        leftBorder: 60;
+        rightBorder: 60;
+        bottomBorder: 60;
+        width:3*parent.width/5+150;
+        height:150;
+        Text
+        {
+            id: outputLine;
+            x:40;
+            width: parent.width;
+            height : parent.height;
+			y:10;
+            color.red : 0;
+            color.green : 0;
+            color.blue : 0;
+            font.family: "Tahoma";
+            font.size: parent.height/2;
+            text : "0";
+        };
+    };
+
+    CalculatorButton{
+        x:parent.width - 120;
+        y:25;
+        width:100;
+        height:100;
+        text: "C";
+        MouseClicked : { outputLine.text=CalcLogic.reset(); };
+    };
+
+    CalculatorButton{
+        x:4*parent.width/5 - width/2;
+        y:150;
+        text: "+";
+        MouseClicked : { outputLine.text=CalcLogic.setOp('+'); };
+    };
+    CalculatorButton{
+        x:4*parent.width/5 - width/2;
+        y:300;
+        text: "-";
+        MouseClicked : { outputLine.text=CalcLogic.setOp('-'); };
+    };
+    CalculatorButton{
+        x:4*parent.width/5 - width/2;
+        y:450;
+        text: "*";
+        MouseClicked : { outputLine.text=CalcLogic.setOp('*'); };
+    };
+    CalculatorButton{
+        x:4*parent.width/5 - width/2;
+        y:600;
+        text: "/";
+        MouseClicked : { outputLine.text=CalcLogic.setOp('/'); };
+    };
+
+    CalculatorButton{
+        x:1*parent.width/5 - width/2;
+        y:150;
+        text: "7";
+        MouseClicked : { outputLine.text=CalcLogic.setNum(7); };
+    };
+    CalculatorButton{
+        x:2*parent.width/5 - width/2;
+        y:150;
+        text: "8";
+        MouseClicked : { outputLine.text=CalcLogic.setNum(8); };
+    };
+    CalculatorButton{
+        x:3*parent.width/5 - width/2;
+        y:150;
+        text: "9";
+        MouseClicked : { outputLine.text=CalcLogic.setNum(9); };
+    };
+    CalculatorButton{
+        x:1*parent.width/5 - width/2;
+        y:300;
+        text: "4";
+        MouseClicked : { outputLine.text=CalcLogic.setNum(4); };
+    };
+    CalculatorButton{
+        x:2*parent.width/5 - width/2;
+        y:300;
+        text: "5";
+        MouseClicked : { outputLine.text=CalcLogic.setNum(5); };
+    };
+    CalculatorButton{
+        x:3*parent.width/5 - width/2;
+        y:300;
+        text: "6";
+        MouseClicked : { outputLine.text=CalcLogic.setNum(6); };
+    };
+    CalculatorButton{
+        x:1*parent.width/5 - width/2;
+        y:450;
+        text: "1";
+        MouseClicked : { outputLine.text=CalcLogic.setNum(1); };
+    };
+    CalculatorButton{
+        x:2*parent.width/5 - width/2;
+        y:450;
+        text: "2";
+        MouseClicked : { outputLine.text=CalcLogic.setNum(2); };
+    };
+    CalculatorButton{
+        x:3*parent.width/5 - width/2;
+        y:450;
+        text: "3";
+        MouseClicked : { outputLine.text=CalcLogic.setNum(3); };
+    };
+    CalculatorButton{
+        x:parent.width/5 - width/2;
+        y:600;
+        text: "0";
+        MouseClicked : { outputLine.text=CalcLogic.setNum(0); };
+    };
+    CalculatorButton{
+        x:2*parent.width/5 - width/2;
+        y:600;
+        text: ",";
+        MouseClicked : { outputLine.text=CalcLogic.comma(); };
+    };
+    CalculatorButton{
+        x:3*parent.width/5 - width/2;
+        y:600;
+        text: "=";
+        MouseClicked : { outputLine.text=CalcLogic.setOp('='); };
+    };
+}

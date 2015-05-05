@@ -1,0 +1,66 @@
+MouseArea {
+	id: thisButton;
+    width: 600;
+    height: 140;
+    property int pressed : 0;
+    property int entered : 0;
+    property string pressedImg : "pics/button_long_down.png";
+    property string overImg: "pics/button_long_over.png";
+    property string defImg: "pics/button_long.png";
+    property string text : "Button";
+
+    MousePressed:
+    {
+        pressed=1;
+        im.img.src= pressedImg;
+    };
+    MouseReleased:
+    {
+        pressed=0;
+        if(entered==1)
+		{
+			im.img.src= overImg;
+		}
+        else 
+		{
+			im.img.src= defImg;
+		}
+    };
+    MouseEntered:
+    {
+        entered = 1;
+        if(pressed==1)
+		{
+			im.img.src= pressedImg;
+		}
+        else 
+		{
+			im.img.src= overImg;
+		}
+    };
+    MouseExited:
+    {
+        entered = 0;
+        im.img.src= defImg;
+    };
+
+    Image {
+        id : im;
+		width : parent.width;
+		height : parent.height;
+        img.src: thisButton.defImg;
+    };
+
+    Text{
+        id: txt;
+        text : thisButton.text;
+        font.family: "Tahoma";
+        font.size: parent.height/4;
+		color.red : 1;
+		color.green : 1;
+		color.blue : 1;
+		x : parent.width/2;
+		y : parent.height/2;
+
+    };
+}

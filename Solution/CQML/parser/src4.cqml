@@ -8,6 +8,35 @@ Element
 	width : 500;
 	height : width;
 	property Element refEl : pacimg;
+	
+	Button
+	{
+		x : 50;
+		y : 50;
+		width : 50;
+		height : 200;
+		newProp : 200;
+		MousePressed : 
+		{
+			PrintNumber(13);
+			if(meta==100)
+			{
+				pacimg.width=100;
+				pacimg.height=100;
+				meta=200;
+			}
+			else
+			{
+				roo.refEl=pacimg;
+				roo.refEl.refEl.refEl.width=roo.refEl.refEl.refEl.width+200;
+				pacimg.height=200;
+				meta=100;
+			}
+			
+			outputtxt.text = "pressed";
+		};
+	};
+	
 	ScaledImage
 	{
 		id : pacimg;
