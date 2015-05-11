@@ -1,0 +1,86 @@
+\select@language {english}
+\select@language {czech}
+\contentsline {chapter}{\numberline {1}\IeC {\'U}vod}{1}{chapter.1}
+\contentsline {chapter}{\numberline {2}Re\IeC {\v s}er\IeC {\v s}e}{3}{chapter.2}
+\contentsline {section}{\numberline {2.1}Historie \textit {GUI}}{3}{section.2.1}
+\contentsline {subsection}{\numberline {2.1.1}Po\IeC {\v c}\IeC {\'a}tky \textit {GUI}}{3}{subsection.2.1.1}
+\contentsline {subsection}{\numberline {2.1.2}Prvn\IeC {\'\i } \textit {GUI}}{3}{subsection.2.1.2}
+\contentsline {subsection}{\numberline {2.1.3}Rozvoj v osmdes\IeC {\'a}t\IeC {\'y}ch letech}{4}{subsection.2.1.3}
+\contentsline {subsubsection}{Apple}{5}{section*.5}
+\contentsline {subsubsection}{Microsoft Windows}{5}{section*.6}
+\contentsline {subsubsection}{Amiga Workbench}{5}{section*.7}
+\contentsline {subsubsection}{Acorn}{7}{section*.8}
+\contentsline {section}{\numberline {2.2}Tvorba \textit {GUI} pomoc\IeC {\'\i } deklarativn\IeC {\'\i }ch model\IeC {\r u}}{7}{section.2.2}
+\contentsline {section}{\numberline {2.3}\textit {GUI} Editory}{9}{section.2.3}
+\contentsline {section}{\numberline {2.4}Deklarativn\IeC {\'\i } \textit {GUI}}{10}{section.2.4}
+\contentsline {section}{\numberline {2.5}Jazyk \textit {QML}}{11}{section.2.5}
+\contentsline {subsection}{\numberline {2.5.1}Qt}{11}{subsection.2.5.1}
+\contentsline {subsection}{\numberline {2.5.2}Qt Quick}{11}{subsection.2.5.2}
+\contentsline {subsection}{\numberline {2.5.3}QML}{11}{subsection.2.5.3}
+\contentsline {subsubsection}{Syntaxe}{11}{section*.9}
+\contentsline {subsubsection}{P\IeC {\v r}id\IeC {\'a}v\IeC {\'a}n\IeC {\'\i } nov\IeC {\'y}ch atribut\IeC {\r u}}{12}{section*.10}
+\contentsline {subsubsection}{V\IeC {\'y}razy}{12}{section*.11}
+\contentsline {subsubsection}{Identifik\IeC {\'a}tory objekt\IeC {\r u}}{13}{section*.12}
+\contentsline {subsubsection}{Komponenty}{13}{section*.13}
+\contentsline {subsubsection}{Funkce}{13}{section*.14}
+\contentsline {subsubsection}{Kontrola atribut\IeC {\r u}}{14}{section*.15}
+\contentsline {subsubsection}{V\IeC {\'y}hody a Nev\IeC {\'y}hody}{14}{section*.16}
+\contentsline {chapter}{\numberline {3}N\IeC {\'a}vrh Jazyka}{17}{chapter.3}
+\contentsline {section}{\numberline {3.1}Jazyk \textit {CQML} - N\IeC {\'a}vrh a vlastnosti}{17}{section.3.1}
+\contentsline {chapter}{\numberline {4}N\IeC {\'a}vrh aplikace}{21}{chapter.4}
+\contentsline {section}{\numberline {4.1}Deklarace vestav\IeC {\v e}n\IeC {\'y}ch typ\IeC {\r u}}{22}{section.4.1}
+\contentsline {section}{\numberline {4.2}P\IeC {\v r}eklada\IeC {\v c}}{25}{section.4.2}
+\contentsline {subsection}{\numberline {4.2.1}Zpracov\IeC {\'a}n\IeC {\'\i } k\IeC {\'o}du v jazyce \textit {C++}}{26}{subsection.4.2.1}
+\contentsline {subsubsection}{Zpracov\IeC {\'a}n\IeC {\'\i } identifik\IeC {\'a}tor\IeC {\r u}}{26}{section*.17}
+\contentsline {subsubsection}{Dynamick\IeC {\'a} kontrola typ\IeC {\r u} a p\IeC {\v r}i\IeC {\v r}azov\IeC {\'a}n\IeC {\'\i } hodnot}{27}{section*.18}
+\contentsline {subsection}{\numberline {4.2.2}V\IeC {\'y}stup}{27}{subsection.4.2.2}
+\contentsline {section}{\numberline {4.3}Preprocesor datov\IeC {\'y}ch typ\IeC {\r u}}{27}{section.4.3}
+\contentsline {subsection}{\numberline {4.3.1} Ha\IeC {\v s}ov\IeC {\'a}n\IeC {\'\i }}{28}{subsection.4.3.1}
+\contentsline {section}{\numberline {4.4}Knihovna}{29}{section.4.4}
+\contentsline {subsection}{\numberline {4.4.1}Vstup}{30}{subsection.4.4.1}
+\contentsline {subsection}{\numberline {4.4.2}Spr\IeC {\'a}va \textit {GUI}}{31}{subsection.4.4.2}
+\contentsline {subsection}{\numberline {4.4.3}Vykreslov\IeC {\'a}n\IeC {\'\i }}{31}{subsection.4.4.3}
+\contentsline {subsection}{\numberline {4.4.4}Inicializace}{32}{subsection.4.4.4}
+\contentsline {subsection}{\numberline {4.4.5}Variant}{32}{subsection.4.4.5}
+\contentsline {chapter}{\numberline {5}Implementace}{37}{chapter.5}
+\contentsline {section}{\numberline {5.1}P\IeC {\v r}id\IeC {\'a}v\IeC {\'a}n\IeC {\'\i } vestav\IeC {\v e}n\IeC {\'y}ch typ\IeC {\r u}}{37}{section.5.1}
+\contentsline {section}{\numberline {5.2}P\IeC {\v r}eklada\IeC {\v c}}{39}{section.5.2}
+\contentsline {subsection}{\numberline {5.2.1}Zpracov\IeC {\'a}n\IeC {\'\i } vstupu}{39}{subsection.5.2.1}
+\contentsline {subsection}{\numberline {5.2.2}Konstrukce a zpracov\IeC {\'a}n\IeC {\'\i } pomocn\IeC {\'y}ch struktur}{39}{subsection.5.2.2}
+\contentsline {subsection}{\numberline {5.2.3}Zpracov\IeC {\'a}n\IeC {\'\i } k\IeC {\'o}du v jazyce \textit {C}}{40}{subsection.5.2.3}
+\contentsline {subsection}{\numberline {5.2.4}V\IeC {\'y}stup}{40}{subsection.5.2.4}
+\contentsline {section}{\numberline {5.3}Preprocesor vestav\IeC {\v e}n\IeC {\'y}ch typ\IeC {\r u}}{41}{section.5.3}
+\contentsline {subsection}{\numberline {5.3.1}Inicializace}{41}{subsection.5.3.1}
+\contentsline {subsection}{\numberline {5.3.2}Generov\IeC {\'a}n\IeC {\'\i } ha\IeC {\v s}ovac\IeC {\'\i }ch funkc\IeC {\'\i }}{41}{subsection.5.3.2}
+\contentsline {subsection}{\numberline {5.3.3}Generov\IeC {\'a}n\IeC {\'\i } v\IeC {\'y}stupn\IeC {\'\i }ho k\IeC {\'o}du}{42}{subsection.5.3.3}
+\contentsline {section}{\numberline {5.4}Knihovna}{43}{section.5.4}
+\contentsline {subsection}{\numberline {5.4.1}Inicializace}{43}{subsection.5.4.1}
+\contentsline {subsection}{\numberline {5.4.2}Update}{44}{subsection.5.4.2}
+\contentsline {subsection}{\numberline {5.4.3}Vykreslov\IeC {\'a}n\IeC {\'\i }}{44}{subsection.5.4.3}
+\contentsline {subsection}{\numberline {5.4.4}Zpracov\IeC {\'a}n\IeC {\'\i } vstupu}{45}{subsection.5.4.4}
+\contentsline {subsection}{\numberline {5.4.5}Spr\IeC {\'a}va extern\IeC {\'\i }ch zdroj\IeC {\r u}}{47}{subsection.5.4.5}
+\contentsline {subsection}{\numberline {5.4.6}Datov\IeC {\'y} typ \textit {Variant} a \textit {VariantRef}}{47}{subsection.5.4.6}
+\contentsline {subsection}{\numberline {5.4.7}Datov\IeC {\'e} typy \textit {CQML}}{48}{subsection.5.4.7}
+\contentsline {section}{\numberline {5.5}U\IeC {\v z}ivatelsk\IeC {\'a} aplikace}{49}{section.5.5}
+\contentsline {chapter}{\numberline {6}V\IeC {\'y}sledky}{51}{chapter.6}
+\contentsline {section}{\numberline {6.1}Srovn\IeC {\'a}n\IeC {\'\i } tvorby jednoduch\IeC {\'e}ho rozhran\IeC {\'\i } pomoc\IeC {\'\i } \textit {CQML} a \textit {QML}}{51}{section.6.1}
+\contentsline {subsection}{\numberline {6.1.1}Hlavn\IeC {\'\i } nab\IeC {\'\i }dka}{51}{subsection.6.1.1}
+\contentsline {subsubsection}{QML Realizace}{51}{section*.19}
+\contentsline {subsubsection}{CQML Realizace}{52}{section*.20}
+\contentsline {subsection}{\numberline {6.1.2}Kalkula\IeC {\v c}ka}{53}{subsection.6.1.2}
+\contentsline {subsubsection}{QML Realizace}{53}{section*.21}
+\contentsline {subsubsection}{CQML Realizace}{54}{section*.22}
+\contentsline {subsection}{\numberline {6.1.3}Jednoduch\IeC {\'a} hra}{54}{subsection.6.1.3}
+\contentsline {subsubsection}{QML Realizace}{55}{section*.23}
+\contentsline {subsubsection}{CQML Realizace}{56}{section*.24}
+\contentsline {section}{\numberline {6.2}Porovn\IeC {\'a}n\IeC {\'\i } \textit {QML} a \textit {CQML}}{56}{section.6.2}
+\contentsline {subsection}{\numberline {6.2.1}Tvorba v\IeC {\'\i }ce oken}{57}{subsection.6.2.1}
+\contentsline {subsection}{\numberline {6.2.2}Reference na atributy}{57}{subsection.6.2.2}
+\contentsline {subsection}{\numberline {6.2.3}Dynamick\IeC {\'a} zm\IeC {\v e}na hierarchie element\IeC {\r u}}{58}{subsection.6.2.3}
+\contentsline {subsection}{\numberline {6.2.4}Roz\IeC {\v s}i\IeC {\v r}itelnost}{58}{subsection.6.2.4}
+\contentsline {section}{\numberline {6.3}Z\IeC {\'a}v\IeC {\v e}r}{58}{section.6.3}
+\contentsline {chapter}{\numberline {A}P\IeC {\v r}\IeC {\'\i }loha A - Gramatika }{63}{appendix.A}
+\contentsline {chapter}{\numberline {B}P\IeC {\v r}\IeC {\'\i }loha B - Pou\IeC {\v z}it\IeC {\'e} technologie }{65}{appendix.B}
+\contentsline {subsubsection}{Flex}{65}{section*.26}
+\contentsline {subsubsection}{Bison}{65}{section*.27}
+\contentsline {subsubsection}{SDL2}{65}{section*.28}

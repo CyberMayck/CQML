@@ -1,0 +1,561 @@
+\documentclass[report,11pt]{elsarticle}
+%\documentclass{article}[11pt,a4]
+%\documentclass[11pt]{article}
+
+\usepackage[lined,linesnumbered]{algorithm2e}
+\usepackage{a4wide}
+\usepackage{ae}
+\usepackage[czech,english]{babel}
+\usepackage[utf8x]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{graphicx}
+\usepackage{url}
+\usepackage{pdfpages}
+
+\usepackage{listings}
+
+\paperwidth=210 true mm
+\paperheight=297 true mm
+\pdfpagewidth=210 true mm
+\pdfpageheight=297 true mm
+
+% Pro cestinu zakomentuj nasledujici radek
+%\selectlanguage{english}
+% Pro anglictinu zakomentuj nasledujici radek
+\selectlanguage{czech}
+
+% Znakem procenta zacina komentovan
+
+%%%% Pokud chcete
+%%% odkomentu
+%\usepackage[lined,linesnumbered]{algorithm2e}
+%\usepackage{algorithm2e}
+% Tento b
+%\usepackage{ctable}
+%\DeclareGraphicsExtensions{.pdf}
+
+\begin{document}
+
+\begin{frontmatter}
+
+\title{Softwarový Projekt\\ Jazyk pro definici uživatelského rozhraní}
+
+\author{Michal Hotovec\footnote{A4M39SVP -- Michal Hotovec, zimní semestr 2014/15}\\
+Katedra pořítačové grafiky a interakce,\\ Fakulta elektrotechnická, ČVUT Praha
+}
+
+\date{}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%
+%%  Abstract
+%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{abstract}
+  Implement a ray tracer using kd-trees with cost model based on surface area heuristics that makes use of sampling and applies clipping in a fast way.
+\end{abstract}
+
+  % Klicova slova k uloze
+\begin{keyword}
+ray tracing,kd-trees, splitclipping, perfect split, mailboxing, surface area heuristics
+\end{keyword}
+
+\end{frontmatter}
+
+%\maketitle
+
+%% \input{./section1.tex}
+%% \input{./section2.tex}
+%% \input{./section3.tex}
+%% \input{./section4.tex}
+%% \input{./section5.tex}
+
+%%%% -------------------------------------------------------- 
+\section{\label{SEC:Intro}Zadání}
+Úkolem řešitele je studium nástrojů pro tvorbu moderních grafických uživatelských rozhraní.
+Student se zvlášť zaměří na jazyk QML. Výsledkem práce je jazyk co nejvíce podobný QML,
+nicméně přímo integrovatelný do C/C++ aplikací. Navrhnutý jazyk student popíše gramatikou a
+implementuje jeho překladač do pomocného C/C++ kódu. Výsledky své práce student předvede na
+C/C++ aplikaci obsahující jím vytvořené statické uživatelské rozhraní.\\
+Pokyny pro vypracování:
+\begin{enumerate}
+\item Důkladně nastudujte jazyk QML.
+\item Popište vlastnosti jazyka QML, shrňte jeho klady a zápory.
+\item Z QML odvoďte jazyk vhodný k přímé integraci do C/C++ aplikací.
+\item Vzniklý jazyk popište gramatikou.
+\item Implementujte překladač vzniklého jazyka, který ze vstupních zdrojových souborů vytvoří
+validní C/C++ zdrojový kód.
+\item Funkčnost demonstrujte na jednoduché grafické aplikaci obsahující takto vytvořené statické
+uživatelské rozhraní.
+\end{enumerate}
+
+
+\section{\label{SEC:Intro}Úvod}
+%\section{\label{SEC:Intro}Introduction}
+Cílem této semestrální bylo implementovat raytracer využívající akcelerační datovou strukturu typu kd-strom, přičemž mělo být čerpáno z několika článků. Úkolem je vytvořit program, který dokáže pomocí metody vrhání paprsku vykreslit scénu model a to tak, že nejprve sestaví kd-strom pro danou scénu a následně jej využije pro vykreslení scény na obrazovku. Motivací bylo navázat na znalosti z předmětu Algoritmy počítačové grafiky, které se týkaly vrhání paprsku a vyzkoušet efektivnější implementaci tohoto způsobu vykreslování.
+
+\section{\label{SEC:Intro}Jazyk QML}
+\subsection{Qt}
+Qt je multi-platformní open-source knihovna sloužící k vývoji především GUI aplikací v jazyce C++. Aplikace se vyznačují tzv. nativním vzhledem GUI, což znamená, že se pro grafické rozhraní využívají standardní nástroje/knihovny poskytované operačním systémem. Tímto je dosaženo obdobného vzhledu, jaký mají standardní aplikace pro daný operační systém. Jednou z výhod této knihovny je, že dosahuje výkonu nativních aplikací. Součástí Qt je Qt Quick, což je soubor technologií sloužících k tvorbě deklarativního GUI.\\
+Qt poskytuje vývojové prostředí Qt creator, které lze použít pro vývoj C++ aplikací využívající prvky Qt nebo aplikací Qt Quick. Součástí Qt creator je vizuální debuger C++.
+
+\subsection{Qt Quick}
+Qt Quick je soubor technologií sloužících k tvorbě deklarativního GUI. Poskytuje sadu GUI elementů, deklarativní jazyk QML a modul Qt declarative. Qt declarative je interpret jazyka JavaScript, který umožňuje spuštění QML aplikací s backendem založeným na Qt. Qt declarative odděluje logiku QML definovaného GUI od aplikační logiky C++. K datům vytvořených v QML lze přistupovat, v C++ části aplikace a naopak.
+
+\subsection{QML}
+QML je jazyk vycházející z jazyka JavaScript. Jedná se o jazyk pro deklaraci hierarchického GUI, na vrcholu hierarchie je vždy jediný element a všechny ostatní elementy jsou na něj navázány ve stromové struktuře. Každý element může mít teoreticky neomezené množství potomků (elementy, jež se nacházejí v hierarchii přímo pod ním), avšak může mít nanejvýš jednoho rodiče (element, který se nachází v hierarchii přímo nad ním). Pouze kořenový element na vrcholu hierarchie nemá žádného rodiče.
+
+
+\subsubsection{Syntaxe}
+Základní syntaxe je ilustrována viz. Listing1.
+\begin{lstlisting}[frame=single,caption=Tvorba dvou jednoduchých elementů pomocí jazyka QML.,label=Tvorba dvou jednoduchých elementů pomocí jazyka QML.]
+Rectangle
+{
+	width : 100; height : 100
+	Image
+	{
+		source : "img.jpg"
+	}
+}
+\end{lstlisting}
+Soubor s tímto kódem vytvoří dva GUI elementy. Kořenovým prvkem je element typu Rectangle, jehož potomkem je element typu Image. Element typu Rectangle má přiřazenu hodnotu dvěma atributům width a height, zatímco element typu Image má nastaven atribut source řetězcem „img.jpg“.
+
+\subsubsection{Přidávání nových atributů}
+QML umožňuje rozšířit existující typ elementu o přídavné atributy, pomocí klíčového slova property a zadáním  datového typu atributu viz. 
+\begin{lstlisting}[frame=single,caption=Ukázka deklarace dvou nových atributů.]
+Rectangle
+{
+	property int newProp01
+	property int newProp02 : 5
+}
+\end{lstlisting}
+Tento kód vytvoří dva nové atributy typu int jménem newProp01 a newProp02, přičemž newProp02 inicializuje na hodnotu 5.
+\subsubsection{Výrazy}
+Hodnoty jednotlivých atributů lze definovat pomocí výrazů. Hodnoty výrazů se přepočítávají za běhu aplikace, pokud se jejich hodnota může změnit, jak je ilustrováno viz.
+\begin{lstlisting}[frame=single,caption=Několik ilustrativních příkladů formy výrazů.]
+1.	width : 5
+2.	width : height/2
+3.	width : parent.width/3
+\end{lstlisting}
+V prvním výrazu je hodnota nastavena na konstantní hodnotu 5.\\
+V druhém výrazu je atribut nastaven pomocí jiného atributu height, kdykoli se tudíž za běhu programu změní hodnota atributu height, pak se změní i hodnota atributu width.\\
+V posledním výrazu je použito klíčové slovo parent, pomocí nějž lze přistupovat k atributům nadřazeného elementu v hierarchii (tzv. rodiče). Pokud se v takovémto případě změní hodnota rodičova atributu width, dojde i k opětovnému spočtení výrazu a tak i k úpravě hodnoty width potomka. Tímto způsobem je umožněno dynamicky přizpůsobovat velikosti elementů v hierarchii v závislosti na změnách velikostí jiných elementů.\\
+vlastnost bla
+
+
+\subsubsection{Identifikátory objektů}
+Každý objekt může mít přiřazen speciální identifikátor, pomocí nějž může být k němu přistupováno.  K tomu slouží speciální atribut "id", do nějž může být přiřazen daný identifikátor. Identifikátor musí být unikátní v dané komponontě. Na viz. je ukázka použití tohoho atributu.
+
+\begin{lstlisting}[frame=single,caption=Ukázka použití atributu id.]
+Rectangle
+{
+	id : identifier01
+	width : 100
+}
+Rectangle
+{
+	width : identifier01.width
+}
+\end{lstlisting}
+V tomto případě je hornímu elementu nastaven atribut width na hodnotu 100 a atribut width spodního elementu je nastaven na totožnou hodnotu.
+
+\subsubsection{Komponenty}
+GUI definované uvnitř jednoho QML souboru se označuje jako komponenta. Každou komponentu je možné znovu použít jako stavební elemnty jiných komponent, obdobně jako je tomu u standardních typů elementů. Komponenty se importují automaticky, při použití jména souboru jako typu GUI elementu.
+
+\begin{lstlisting}[frame=single,caption=Ukázka použití komponenty z jiného souboru.]
+Rectangle
+{
+	CutomButton {}
+}
+\end{lstlisting}
+Například existuje-li soubor CustomButton.qml, pak kód viz. vytvoří uvnitř obdélníka komponentu definovanou v importovaném souboru CustomButton.qml.
+
+\subsubsection{Funkce}
+
+V QML lze pomocí klíčového slova function definovat funkci se zdrojovým kódem v jazyce JavaScript, při vyhodnocování výrazu v takovýchto funkcích platí totožná pravidla s těmi pro vyhodnocování výrazů přiřazených atributům.\\
+Pokud místo výrazu je atributu přiřazen kód těla funkce v jazyce JavaScript ohraničený složenými závorky, bude pro vyhodnocení hodnoty atributu použita tato funkce, výsledná hodnota atributu se v takovém případě vrací pomocí klíčového slova return.
+
+\subsubsection{Kontrola atributů}
+Kontrola existence atributů nebo kontrola datových typů je částečně řešena při zpracování QML souboru a částečně až za běhu výsledného programu. Pokud je nějakému atributu přiřazena hodnota mimo JavaScriptový kód nějaké funkce, je kontrolována existence daného atributu již při zpracování QML souboru. Ve všech ostatních případech, ať už se jedná o přiřazení hodnoty atributu, získání hodnoty nějakého atributu jsou existence atributů kontrolovány až při jejich čtení nebo pokusu o změnu za běhu programu.
+\begin{lstlisting}[frame=single,caption=Ukázka použití komponenty z jiného souboru.]
+{
+	v : w.x + d
+}
+\end{lstlisting}
+Uvažujme příklad viz. Pokud element nemá atribut se jménem v, nastane chyba už při zpracování QML souboru. V opačném případě mohou nastat chyby až během spuštění programu. Aby byl kód validní, musí existovat buď element identifikátorem w, mající atribut x typu kompatibilním s v nebo musí element mít atribut w, který obsahuje objekt, jež má atribut x typově kompatibilní s v. Zároveň musí existovat atribut d, který je typově kompatibilní s v, přičemž musí tento typ podporovat operaci sčítání.\\
+V případě, že existuje zároveň atribut w a element s identifikátorem w, bere se v potaz pouze element s identifikátorem w. Tudíž pokud existuje atribut w obsahující atribut x, ale zároveň existuje nějaký element s identifikátorem w, který neobsahuje atribut x, dojde k chybě, kvůli neexistenci atributu x. 
+
+\subsubsection{Výhody a Nevýhody}
+
+
+
+\section{\label{SEC:Intro}Jazyk CQML - Návrh a vlastnosti}
+Cílem při návrhu jazyka CQML bylo zachovat, co největší podobnost s QML, co se týče jeho funkčnosti a možností, ale zároveň umožnit, jednoduchou integraci do aplikací v jazycích C,C++ a Objective C. Z tohoto důvodu byl pro výstupní jazyk překladače vybrán jazyk C. Pro jednodušší převod do výstupního formátu je pro kódy funkcí pro obsluhu událostí a výpočtů hodnot atributů oproti jazyku QML (využívající JavaScript) použita syntaxe jazyka C. Což umožní ve výsledném kódu vygenerovaným překladačem  například zavolat funkce či přistupovat ke globálním proměnným.\\
+Syntaxe byla zvolena podobná jazyku QML. Rozdílem je ukončující znak středníku na konci každého výrazu. Ačkoli ukončovací znak není nutný (viz. QML a JavaScript), je tímto dosaženo toho, že výsledná gramatika bude nevypouštěcí, což bude mít za následek, jednodušší zpracování CQML kódu a také přesnější chybová hlášení při syntaktické analýze. Základní syntaxe je ilustrována viz.
+\begin{lstlisting}[frame=single,caption=Tvorba dvou jednoduchých elementů pomocí jazyka CQML.,label=Tvorba dvou jednoduchých elementů pomocí jazyka CQML.]
+Rectangle
+{
+	id : identifier01;
+	width : 100;
+};
+Rectangle
+{
+	width : identifier01.width;
+};
+\end{lstlisting}
+Tímto způsobem se vytvoří stejné GUI, jako v případě jazyka QML viz. 
+\\
+Programovací jazyky zpravidla nebývají bezkontextové, nicméně jejich syntaktická analýza (nikoli však sémantická) lze provést pomocí bezkontextové gramatiky. Toto platí například pro jazyk C, z jehož gramatiky se bude vycházet pro syntaktickou analýzu kódu funkcí a výrazů v CQML. Z tohoto hlediska bude i gramatika CQML bezkontextová, protože typová kontrola a kontrola existence atributů či identifikátorů nebude prováděna během syntaktické analýzy. To má za výhodu, že nebude během syntaktické analýzy potřeba použití vyhledávací tabulky pro kontrolu symbolů.\\
+Gramatika jazyka CQML je víceznačná, protože pro definici funkcí a výrazů používá syntaxi jazyka C, jehož gramatika je víceznačná. Víceznačnost je způsobena pravidlem pro podmínku IF-ELSE (viz.), jedná se o tzv. "dangling else problem".\\
+\begin{lstlisting}[frame=single,caption=Víceznačné IF-ELSE pravidlo gramatiky.]
+selection_statement
+	: IF '(' expression ')' statement
+	| IF '(' expression ')' statement ELSE statement 
+\end{lstlisting}
+Výrok (viz.) může být podle daného pravidla rozparsován dvěma způsoby viz.
+\begin{lstlisting}[frame=single,caption=Příklad víceznačného výroku IF-ELSE]
+if (a) if (b) s; else s2;
+\end{lstlisting}
+
+\begin{lstlisting}[frame=single,caption=Možnosti interpretace víceznačného výroku IF-ELSE]
+1.
+if(a){
+	if(b)
+		s;
+	else
+		s2;
+}
+
+2.
+if(a){
+	if(b)
+		s;
+}
+else
+	s2;
+\end{lstlisting}
+Podle konvencí se preferuje první způsob interpretace, který lze chápat tak, že se ELSE přiřadí k nejvnitřnějšímu IF.
+
+
+
+\section{\label{SEC:Intro}Návrh Překladače}
+Cílem je vytvořit aplikaci překladače, která přemění kód z jazyka CQML pro deklarativní GUI, kód importovatelný do aplikace v jazyce C. Tudíž na vstupu bude soubor se zdrojovým kódem v jazyce CQML a výstupem bude zdrojový kód v jazyce C, ve formě definicí datových struktur pro GUI a funkcí. Vzhledem k tomu, že jazyk C na rozdíl od vyšších programovacích jazyků (C++, Java) nepodporuje členské metody u struktur (resp. tříd), je tento nedostatek obejit tím, že se použije funkce, která je rozšířena o jeden parametr, jako který přijímá ukazatel na objekt, který by danou metodu volal. V případě virtuálních metod je jako člen struktury použit ukazatel na funkci, která se bude volat.\\
+Výsledný překladač je navržen tak, že lze rozdělit do několika bloků (viz. obrázek).\\
+\\
+Cílem prvního bloku (FLEX/BISON Parser) je přečíst zdrojový kód z CQML souboru a ověřit jeho syntaktickou správnost. V případě, že je kód syntakticky v pořádku, bude výstupem tohoto bloku syntaktický strom. Pro tento blok budou použity zdrojové kódy vygenerované pomocí aplikací Bison a Flex, z YACC gramatiky pro CQML.\\
+V syntaktickém stromu budou nalezeny příkazy pro import souborů (blok Import Processor). Tyto soubory budou následně otevřeny a postupně zpracovány totožným způsobem.\\
+Jakmile jsou všechny importované soubory zpracovány a jsou jejich zpracováním vytvořeny jejich syntaktické stromy, bude zjištěno, zda jsou některé soubory cyklicky závislé. To se bude realizovat pomocí konstrukce orientovaného grafu, kde každý vrchol představuje soubor a závislost mezi soubory je znázorněna hranou (směřující k importovanému souboru), a následným zjištěním zda v grafu existuje orientovaný cyklus. Pokud v grafu takový cyklus existuje, pak jsou soubory cyklicky závislé, což vyústí v chybu a ukončení programu. Je-li graf acyklický, jsou podle něho topologicky seřazeny syntaktické stromy jednotlivých souborů (vrcholy) pro následné zpracování.\\
+V dalším bloku (Syntax Tree Processor) se zpracuje syntaktický strom a podle něj se vytvoří GUI hierarchie. Pro každý uzel představující GUI element, atribut, funkci, či nový atribut se vytvoří instance příslušné třídy. Každému elementu jsou podle jeho potomků v syntaktickém stromu přiřazeny jeho potomci v GUI hierarchii a jeho atributy a funkce.
+Následně se zpracují všechny elementy s definovaným atributem ID, a tyto identifikátory se použijí ke tvorbě mapy, pomocí níž bude umožněno přistupovat k danému elementu podle definovaného identifikátoru.\\
+V další části programu (C Source Processor) se zpracují kódy funkcí do formy potřebné pro závěrečný výstup v jazyce C. 
+
+\subsection{\label{SEC:Intro}Zpracování kódu v jazyce C}
+Syntaktické stromy jednotlivých funkcí (případně výrazů) se projdou a převedou se na pole samostatných tokenů, takovým způsobem, že jeden prvek v poli bude představovat list stromu. Vzhledem k nutnosti kontroly existence atributů, budou pro snadnější zpracování některé tokeny v poli seskupeny do jednoho, který bude mít v sobě uloženo pole tokenů, které seskupil. Vzhledem k tomu, že každý token může obsahovat další tokeny, se bude stále jednat o stromovou strukturu, nicméně, bude mít nižší hloubku.\\
+\\
+Na obrázku (viz.) je znázorněn diagram tříd tokenů. Všechny tokeny dědí z jedné abstraktní třídy „Source Token“. Vhledem k tomu, že pro implementaci překladače byl zvolen jazyk C++, je využito mnohonásobné dědičnosti a tokeny, jež sdružují skupinu tokenů do jednoho, dědí z třídy „Token Container“. „ID Token“ představuje nějaký identifikátor uvnitř kodu, zatímco „String Token“ představuje jakýkoli jiný řetězec. „Dot Token“ sdružuje tokeny pro výraz, v němž se pomocí operátoru „.“ přistupuje k atributům. „Statement Token“ představuje libovolný výrok, „Assignment Token“ představuje přiřazovací výraz a třída „Expression Token“ libovolný jiný výraz.
+
+\subsubsection{\label{SEC:Intro}Zpracování identifikátorů}
+Kódy (resp. syntaktické stromy) jednotlivých funkcí se projdou, a naleznou se identifikátory, jež se nachází v mapě identifikátorů elementů (id atributy elementů), a tyto identifikátory se v kódu nahradí skutečným názvem elementu uvnitř výsledné GUI aplikace.
+\subsubsection{\label{SEC:Intro}Dynamická kontrola typů a přiřazování hodnot}
+Jelikož bude do atributů některých typů umožněno ukládat reference na objekty různého typu a pomocí této reference bude možné přistupovat k atributu daného objektu, nemůže být zaručeno, že atribut, ke kterému se aplikace snaží přistoupit, je v daném objektu přítomen. Proto bude potřeba za běhu výsledné GUI aplikace (využívající kód na výstupu překladače) kontrolovat přítomnost takového atributu.\\
+Uvažujme kód z obrázku níže(viz.). Z kódu je zřejmé, že u atributu ref budepotřeba zkontrolovat, zda má objekt referovaný tímto atributem atribut ref2 a objekt referovaný ref2 obsahuje ref3.
+
+\begin{lstlisting}[frame=single,caption=Pseudokód problematického použití operátoru "." v přiřazovacím výroku. ]
+ref1 = ref1.ref2.ref3 = ref1.ref2.ref3
+\end{lstlisting}
+Oproti nahrazení identifikátoru názvem elementu nestačí pouze nahradit část textového řetězce ve výrazu. Vzhledem k tomu, že kromě ověření existence atributu bude potřeba daný atribut i získat pro další zpracování, bude nutné kód rozdělit do jednotlivých částí a každý operátor tečky nahradit voláním funkce pro získání (resp. nastavení) hodnoty atributu a kontrolou existence daného atributu.  Jak je znázorněno v kódu viz.
+\begin{lstlisting}[frame=single,caption=Řešení v pseudokódu problematického použití operátoru "." v přiřazovacím výroku. ]
+if(not CheckExistence(ref1, "ref2"))
+	ReportException
+var1 = ref1.Get("ref2");
+if(not CheckExistence(var1, "ref3"))
+	ReportException
+var2 = var1.Get("ref3");
+
+if(not CheckExistence(ref1, "ref2"))
+	ReportException
+var3 = ref1.Get("ref2");
+if(not CheckExistence(var3, "ref3"))
+	ReportException
+var3.Set("ref3",var2);
+
+Set("ref1",var2)
+\end{lstlisting}
+Díky možnosti zřetězit za sebou několik operátoru přiřazení, je potřeba rozdělit výraz na jednotlivé l-hodnoty a r-hodnoty a podle nich vybrat zda bude použit funkce pro získání nebo nastavení atributu, neboli l-hodnoty se nastaví tzv. setterem (tj. metoda pro nastavení atributu) a r-hodnoty se získají pomocí tzv. getteru (tj. metoda pro získání hodnoty atributu). Operátor "." pro přístup k atributu se zpravidla nahradí getterem, jedinou výjimku tvoří nejpravější operátor "." u nějaké l-hodnoty, neboli operátor "." nacházející se nejblíže nalevo od nějakého operátoru přiřazení.
+
+\subsection{\label{SEC:Intro}Výstup}
+Poslední blok se postará o výpis do výstupních souborů. Pro každý zpracovaný vstupní soubor se vytvoří hlavičkový soubor s deklarací struktur a hlaviček funkcí. Každý soubor bude mít vlastní inicializační funkci pro inicializaci hierarchie a počátečnímu přiřazení hodnot a ukazatelů na potřebné funkce.\\
+Pro každý GUI element, kterému je pomocí příkazu přidán nový atribut, se definuje nový typ struktury, která dědí z původního typu struktury. Každý přidaný atribut se deklaruje v nové struktuře, spolu s ukazatelem na funkci, která bude sloužit k jeho updatování. Pro každou takovou strukturu se také vytvoří funkce, které takovou strukturu alokují a inicializují, přičemž se v dané funkci zavolá funkce pro inicializaci struktury, ze které se dědí.\\
+Pro všechny elementy se vytvoří funkce pro jejich update, která slouží k updatování hodnot v atributech elementů. Pro každý atribut, jemuž je přiřazena nějaká hodnota v CQML souborech, bude definována funkce pro jeho update danou hodnotou. Ukazatel na danou funkci, bude přiřazena v inicializační funkci daného souboru, do členské proměnné struktury určené pro daný atribut.\\
+
+
+
+\section{\label{SEC:Intro}Implementace}
+
+\subsection{\label{SEC:Intro}Zpracování vstupu}
+Pomocí generátoru Bison byl podle gramatiky jazyka CQML vytvořen parser. Pro vygenerování lexikálního analyzátoru byl použit FLEX. Zdrojový kód parseru a lexikálního analyzátoru je pak použit v překladači.
+Po spuštění program načte výchozí typy GUI elementů, uloží si jejich názvy a seznam jejich atributů, včetně jejich typů a výchozích hodnot, do instancí třídy „ClassContainer“.\\
+Program na vstupu přijímá jméno souboru, se zdrojovým kódem v jazyce CQML. Pokud daný soubor existuje, je otevřen a jeho obsah je předán parseru. Pokud parser detekuje syntaktickou chybu ve zdrojovém souboru, vypíše chybu a program se ukončí. Výstupem parseru je syntaktický strom. V první fázi se ve stromu vyhledají příkazy pro import elementu z jiných souborů. Totéž program cyklicky provede pro všechny soubory, z nichž se elementy importují.
+
+\subsection{\label{SEC:Intro}Konstrukce a zpracování pomocných struktur}
+Následně je vytvořen orientovaný graf vzájemných závislostí mezi jednotlivými soubory, kde každý vrchol představuje soubor a každá hrana představuje vazbu mezi soubory, zatímco počátečním vrcholem hrany je vrchol představující soubor, do něhož je element importován, a koncovým vrcholem je vrchol představující soubor, z nějž byl element importován. Pomocí algoritmu prohledávání do hloubky je zjištěno, zda se v grafu nachází cyklus. Pokud se v grafu nachází cyklus, je vypsána chybová hláška a program se ukončí.\\
+Jelikož je graf acyklický, pak každý vrchol představuje komponentu a tak lze jednotlivé vrcholy grafu a tudíž i soubory topologicky seřadit. Soubory (resp. vrcholy v grafu) jsou seřazeny pomocí Tarjanova algoritmu. Syntaktické stromy jednotlivých seřazených souborů jsou postupně zpracovány následujícím způsobem.\\
+Během průchodu stromem se postupně alokují instance třídy Element, přičemž každá instance představuje určitý element v hierarchii GUI. Každému elementu je přiřazen jeho typ a seznam jeho potomků resp. elementů, které se v hierarchii nachází níže. Dále je každému elementu, u nějž jsou definované změny některých z jejich atributů, přiřazena množina dvojic názvů atributů a jejich hodnot. Hodnotou v tomto případě nemusí být konstanta, ale i výraz v jazyce C, jehož výpočtem se získá daná hodnota ve vygenerovaném zdrojovém kódu. Atributu může být také přiřazen kód celé funkce nejen samostatný výraz, v tomto případě by daná funkce vracela hodnotu atributu. Kód v jazyce C je ve formě syntaktického stromu předán funkci „SourceToHandler“ (jedná-li se o celou funkci) nebo „ExpressionToHandler“ (jedná-li se pouze o výraz). Výstupem obou funkcí je instance třídy „SourceHandler“, která zdrojový kód v podobě posloupnosti tokenů, způsobem popsaným v kapitole (viz.). V tomto případě není tokenem myšlen pouze symbol či řetězec v syntaktickém stromu, jenž je výstupem parseru, ale i struktura obsahující pomocná data (např. informace o tom zda bude token nahrazen něčím jiným).\\
+Dále program vytvoří mapu identifikátorů, pro všechny elementy, u nichž byl nastaven atribut „id“. Tento atribut musí mít unikátní hodnotu, pokud je v souboru více než jeden element nastaven na stejnou hodnotu atributu „id“, dojde k chybě. Pro každý soubor se uchovává jedna mapa identifikátorů.\\
+Každému elementu je podle jeho specifikovaného typu přiřazen ukazatel na instanci „ClassContainer“. Pokud byly nějakému elementu přiřazeny nové atributy (pomocí klíčového slova property), bude muset být ve výstupním kódu daný element reprezentován speciální třídou, tudíž se vytvoří nová instance „ClassContainer“, do které jsou mimo výchozích atributů přidány i atributy nové. Všechny nové atributy musí být buď nějakého výchozího typu, nebo musí typem nějakého importovaného či výchozího elementu, jinak dojde k chybě.
+
+\subsection{\label{SEC:Intro}Zpracování kódu v jazyce C}
+Vzhledem k tomu, že se lze v částech, které jsou napsané v jazyce C, odkazovat na jiné elementy pomocí jejich identifikátorů „id“, je nutné analyzovat výrazy a nahradit ve výsledném kódu identifikátory referencemi na dané elementy. To je vyřešeno projitím všech tokenů, jež obsahují identifikátor, a vyhledáním příslušného identifikátoru v mapě identifikátorů (pro právě zpracovávaný soubor). Je-li identifikátor nalezen, pak se k příslušnému tokenu zapíše, že má být ve výstupu nahrazen referencí na identifikovaný element.\\
+Následně se v kódu zpracují všechny operátory „.“ pro přístup k atributu tak, že se každý takový operátor nahradí voláním funkce pro nastavení nebo získání hodnoty atributu. V případě, že se operátor „.“ nachází nejblíže nalevo od operátoru přiřazení, nahradí se funkcí pro nastavení (setterm), v opačném případě funkcí pro získání hodnoty (getterem), jako je tomu (viz.). Pro ukládání výsledků těchto funkcí se používají pomocné proměnné. Vzhledem k tomu, že se mohou tyto operátory nacházet uvnitř výrazů, je celý řetězec operátorů „.“ nahrazen až názvem proměnné, ve které je uložen výsledek posledního z nich a volání funkcí, jež jejich funkčnost nahrazuje, se připojí před začátek výroku, ve kterém se nachází. Začátek výroku je symbolizován specifickým tokenem, a tudíž se volání funkcí připojí k němu v podobě datové struktury udávající typ funkce a jména pomocných proměnných, což bude použito při generování výstupu.
+
+
+\subsection{\label{SEC:Intro}Výstup}
+Na závěr jsou pro každý zpracovaný soubor vytvořeny tři výstupní soubory, jejichž názvy jsou zakončeny „.h“, „.c“, „outer.h“. 
+Do prvního souboru ("*.h") jsou zapsány hlavičky konstruktorů hlavní komponenty a také definice této komponenty, respektive struktury, jenž ji reprezentuje, tudíž se do těla struktury vypíší členské proměnné (reprezentujících GUI elementy v komponeně). Pro každý nový typ definovaný ve zpracovávaném souboru (reprezentovaný instancí třídy „ClassContainer“) se vytvoří totéž, přičemž do těla struktury se jako členské proměnné vypíší atributy třídy, avšak první členskou proměnnou bude proměnná typu struktury, jenž představuje element, z něhož tento nový element vychází (tímto se realizuje dědičnost v jazyce C).\\
+Do druhého souboru ("*.c") jsou zapsány definice všech vygenerovaných funkcí. Každý atribut má také přidělenou funkci, která se stará o jeho update. Struktura obsahující atribut obsahuje i ukazatel na danou funkci. Do těla takové funkce je zapsán kód výrazu nebo funkce, přiřazený danému atributu v CQML souboru, který byl upraven a nyní je uložen v instanci třídy „SourceHandler“ příslušící danému atributu.\\
+Každá struktura má definovány dva konstruktory, jeden inicializuje instanci struktury, přiřadí každému atributu počáteční hodnotu a všem ukazatelům na funkce příslušnou funkci, a druhý alokuje paměť pro danou strukturu a poté zavolá první konstruktor. Jelikož jazyk C nepodporuje konstruktory struktur, je zde pojmem konstruktor myšlena funkce pro vytvoření instance struktury.\\
+Do třetího souboru ("*outer.h") jsou jsou zapsány pouze hlavička konstruktoru hlavní komponenty souboru a deklarace struktury představující hlavní komponentu. Tento soubor slouží k začlenění do souboru, jež danou komponentu bude používat.\\
+Jakmile jsou takto zpracovány všechny vstupní soubory, vytvoří se poslední výstupní soubor, ve kterém se definuje hlavní inicializační funkce, ve které se vytvoří instance hlavní komponenty GUI (komponenta prvního souboru, který byl programu zadán), a také funkce pro volající update této komponenty.\\
+
+
+\section{\label{SEC:Intro}Závěr}
+
+
+
+
+%%%% -------------------------------------------------------- 
+\section{\label{SEC:Description}Popis algoritmu}
+%\section{\label{SEC:Description}Algorithm Description}
+
+V první části této práce bylo nutné implementovat konstrukci kd-stromu. Pro konstrukci stromu byla využita metoda typu shora dolů. Nejprve jsou všechny trojúhelníky umístěny do kořenového uzlu, následně je rozhodnuto, zda tento uzel rozdělit a pokud ano, tak se vytvoří dva potomci tohoto uzlu a každému z těchto potomků jsou přiřazeny trojúhelníky, které jimi procházejí, tento postup se rekurzivně opakuje i pro potomky, dokud není rozhodnuto, že uzel není třeba dále dělit. \\
+
+Aby tento algoritmus mohl fungovat, je potřeba určit tzv. ukončující podmínky, podle kterých se rozhodne, zda uzel dělit a dále je třeba rozhodnout podle jaké dělící roviny se uzel rozdělí nebo se stane listem. Mezi nejjednodušší ukončující podmínky patří určení maximální hloubky kd-stromu nebo minimálního počtu trojúhelníků v listu, uzel se tak nerozdělí pokud má hloubku rovnou maximální hloubce stromu nebo je počet trojúhelníků v něm menší nebo roven určenému minimu. Vzhledem k tomu, že vykreslované scény mohou mít různé počty trojúhelníků, bylo by nutné nastavovat maximální hloubku pro každou scénu zvlášť, proto je maximální hloubka odvozena od velikosti scény. A to podle vzorce\\
+\begin{center}
+$d_{max}=k_1log_2(N)+k_2$
+\end{center}
+kde $k_1=1.2$ a $k_2=2.0$ jsou konstanty a $N$ je počet trojúhelníků ve scéně. Uvedené hodnoty jsou převzaty z práce \cite{BittnerHavran}.\\
+
+Dalším problémem je výběr dělící roviny, jelikož způsobů jak rozdělit kvádr je v každé z jeho os nekonečně mnoho je třeba vybrat vhodné kandidáty. Během konstrukce stromu je pro každý trojúhelník vytvořeno jeho obalové těleso v podobě osově zarovnaného kvádru. Roviny náležící stěnám tohoto kvádru jsou vybrány zařazeny do množiny kandidátů, tito kandidáti jsou dostateční, poněvadž pokud bychom posouvali potenciální dělící rovinu, tak se počet trojúhelníků na jedné a druhé straně této roviny změní pouze při vstupu nebo opuštění osově zarovnaného kvádru trojúhelníka. Aby se nemuselo pro každého kandidáta   testovat, které trojúhelníky jsou od něj nalevo nebo napravo, je použit iterativní algoritmus, který při postupném posouvání dělicí roviny přesouvá zleva doprava resp. zprava doleva jen trojúhelníky přes jejichž obalová tělesa přejel. Tudíž ve chvíli kdy posouvaná rovina narazí na kandidátní rovinu jsou trojúhelníky nalevo a napravo od ní určené.\cite{WaldHavran}\\
+
+Z rovin, které jsou kandidáty, je následně nutné vybrat nejlepší z nich. Pro to je použita tzv. Surface Area Heuristic (zkráceně SAH). Pomocí této heuristiky lze odhadnout výpočetní náročnost průchodu paprsku uzlem, před a po rozdělení. Jako dělicí rovinu vybereme tu, prokterou výjde odhadovaná cena nejnižší. Hodnota SAH se vypočte následujícím vzorcem\\
+\begin{center}
+$C_{new}=C_{TS}+p_LN_LC_i+p_RN_RC_i$
+\end{center}
+kde $C_{TS}$ je cena za průchod uzlem, $p_L$ a $p_R$ jsou provděpodobnosti, že paprsek projde levým nebo pravým potomkem za předpokladu, že paprsek prošel rodičem, $C_i$ je cena za incidenční operaci a $N_L$ respektive $N_R$ je počet objektů v levém respektive pravém potomku.\\
+V této práci je použita hodnota pro minimální kvalitu rozdělení $r_{qmin}$, která pokud je vyšší než hodnota $r_q$ kvality vypočteného rozdělení jež se spočítá jako poměr nové ceny ku ceně před rozdělením, tak je rozdělení považováno za neúspěšné.  Jelikož se může kvalita zhoršit jen přechodně, je zavedená hodnota $F_{max}$, která určuje maximální počet neúspěšných rozdělení, než se přestane uzel dělit. Velikost, aby se nemusela hodnota nastavovat ručně $F_{max}$, tak se vypočte ze vzorce\\
+\begin{center}
+$F_{max}=K_1^{fail}+K_2^{fail}d_{max}$
+\end{center}
+kde $K_1^{fail}=1.0$ a $K_2^{fail}=0.2$ jsou konstanty a dmax je maximální hloubka stromu. Jako hodnota $r_{qmin}$ byla zvolena hodnota $0.75$. Hodnoty těchto konstant jsou převzaty z práce \cite{BittnerHavran}. Metoda, která takto v závislosti na velikosti scény vypočítá ukončovací podmínky (hodnoty $F_{max}$ a $d_{max}$), je nazývána Automatic Termination Criteria (zkráceně ATC).\\
+
+Při dělení uzlů se může stát, že některý z trojúhelníků bude protnut dělící rovinou, muselo by se tak na něj odkazovat v obou listech. Jelikož se může stát, že obalový osově zarovnaný kvádr trojuhelníka zasahuje do uzlu, ale samotný trojuhelník jím neprochází, použije se metoda dokonalého řezu (perfect split), k oříznutí obalového tělesa. Spočítají se průsečíky stran trojuhelníka s dělící rovinou a poté se zmenší obalový kvádr, aby obaloval pouze část trojuhelníka nacházející se v daném uzlu (viz. obrázek ~\ref{fig:fig1}).  Pokud se obalový kvádr po zmenšení nenachází uvnitř uzlu, dojde k odstranění trojúhelníka z něj. Této operaci odstranění zbytečných referencí uvnitř litsu se také říká prořezávání listů za běhu (on-the-fly leaf prunning). \cite{Improv}\\
+\begin{figure*}[!ht]
+\begin{center}
+  \includegraphics[width=0.3\textwidth]{tris}
+\caption{{\label{fig:fig1}}Dokonalý řez.}
+\end{center}
+\end{figure*}
+\\
+
+V další části práce bylo nutné implementovat algoritmus pro průchod paprsku kd-stromem. Nejprve se vypočítají průsečíky obalového kvádru celé scény s paprskem, které jsou dále předány rekurzivní funkci pro průchod uzly stromu. Pomocí vypočtených průsečíků s obalovým kvádrem scény, směru paprsku a průsečíkem paprsku s dělící rovinou je určeno, který z potomků bude navštíven jako další nebo budou-li navštíveny oba, a který z nich první. Pokud algoritmus vstoupí do neprázdného listu otestuje paprsek na průsečík s trojúhelníky v něm, pokud průsečík nalezne, tak algoritmus nebude procházet žádné uzly, které se nacházejí ve směru paprsku za nalezeným průsečíkem. Jakmile algoritmus projde všechny přijatelné uzly, vrátí index trojúhelníka a průsečík, podle čehož se vypočítá barva vrhaného paprsku.\\
+
+Vykreslení obrázku scény se provede tak, že se spočítá inverzní matice kamery, s jejíž pomocí se pro každý pixel vypočítá počátek a směr paprsku. Pro každý paprsek se pak vypočte jeho barva a ta se přiřadí pixelu.\\
+
+Jelikož se může trojúhelník nacházet ve více listech, mohlo by dojít k vícenásobnému testu průsečíku s týmž paprskem, aby se tomuto zamezilo, je použit tzv. inverzní mailboxing, tj. že při průchodu paprsku stromem, si paprsek uchovává, indexy posledních několika trojuhelníků s nimiž byl testován na průsečík, k tomu je využita malá konzervativní cache s konstantním přístupem k prvku v ní uloženém. Tímto způsobem se eliminuje velká část duplicitních výpočtů a tak lze upravit vzorec pro výpočet hodnoty SAH odečtením duplicitní práce \cite{Mailbox}
+\begin{center}
+$C_{new}=C_{TS}+p_LN_LC_i+p_RN_RC_i-p_{LR}N_{LR}C_i$
+\end{center}
+kde $p_{LR}$ je pravděpodobnost že paprsek prochází objema potomky a $N_{LR}$ je počet trojúhelníků jež se nachází v obou potomcích současně.\\
+
+Díky automatickému výpočtu ukončovacích podmínek $d_{max}$ a $F_{max}$ není jejich zadávání vyžadováno od uživatele a algoritmus tak na vstupu potřebuju pouze data scény, aby mohl zkonstruovat strom a scénu vykreslit.
+
+
+
+
+
+
+%\url{http://www.ctan.org/tex-archive/macros/latex/contrib/algorithm2e/algorithm2e.pdf}
+
+
+
+%\input{rec.tex}
+
+
+%%%% -------------------------------------------------------- 
+\section{\label{SEC:Pitfalls}Potíže při implementaci}
+%\section{\label{SEC:Pitfalls}Implementation details}
+
+Původně jsem použil algoritmus pro průchod kd-stromem, který spočíval v tom, že se pro každý uzel počítal jeho obalový kvádr dělením obalového kvádru jeho rodiče, a při průchodu každým uzlem se počítali průsečíky s ním. Během profilování se ukázalo, že v části pro vrhání paprsku tráví program nejvíce času ve funkci pro výpočet průsečíku paprsku s obalovým kvádrem, tudíž jsem byl nucen algoritmus pro průchod kd-stromem předělat. Implementací algoritmu z \cite{Havran} jsem dosáhl přibližně čtyřnásobného zrychlení.
+
+Dalším problémem byla nemožnost otestovat program na modelu draka s více než sedmi miliony trojúhelníky, jelikož můj počítač neměl dostatečně velkou paměť. Zavedením možnosti určit horní omezení hloubky stromu v konfiguračním souboru a odstraněním obalových těles, které se původně ukládaly do listů vedle ukazatelů na trojúhelníky, jež měly obalovat se mi podařilo otestovat scénu s drakem uvnitř vývojového prostředí, avšak při spuštění mimo něj se program stále hroutil kvůli nedostatku paměti, příčinu tohoto problému se mi nepodařilo odhalit.
+
+Nejdelší čas mi zabral debugging druhého algoritmu  pro průchod paprsku kd-stromem, jelikož jsem věděl, že strom je sestavený korektně z výstupu prvního (pomalejšího) algoritmu, proto jsem během debuggingu dočasně sloučil oba algoritmy do jednoho a následně porovnával průchod navrhnutý prvním i druhým algoritmem současně.
+Celkový čas strávený nad touto semestrální prací odhaduji na 65 až 75 hodin.
+
+%%%% -------------------------------------------------------- 
+\section{\label{SEC:Results}Naměřené výsledky}
+%\section{\label{SEC:Results}Results}
+
+V tabulce \ref{tab:tab1} jsou uvedeny naměřené hodnoty z testů pro několik scén. Při konstrukci kd-stromů byla použita metoda ATC, při dělení uzlů bylo použito metody dokonalého řezu (perfect split) s úpravou obalových těles trojuhelníků a prořezávání listů (leaf prunning). Během renderování obrázků bylo použita 32-položková cache pro inverzní mailboxing. Vzhledem k nedostatku paměti byla omezena maximální hloubka stromu na 26 pro scénu dragon a jelikož se pro scénu této velikosti nepodařilo program spustit mimo vývojové prostředí jsou časy naměřené u této scény pomalejší, než by byli, kdyby měření probíhalo jako u ostatních scén (tj. mimo vývojové prostředí).\\
+\begin{table*}[b]\footnotesize
+\begin{center}
+\begin{tabular}{| c |  c | c || r | r | r || r | r | r | r |}
+\hline
+          &         &        & Avg. & empty &   non   & \#trav. & \#isect. &  build & render \\
+scene & tris & resolution & leaf    &    leaves   & empty  & steps    &    tests   & time   & time \\
+          &           &       &  [tris]  &     & leaves  & $[per~ray]$     &   $[per~ray]$   & [s]  & [s] \\
+\hline
+\hline
+Armadillo & 346k & $800\times800$ & 	1.61 &  354k & 496k &  15.9 & 0.75 & 6.57 & 0.94 \\ \hline
+A10 & 219k  & $800\times800$ & 	3.07 &  130k & 287k &  5.92 & 0.28 & 5.72 & 0.42 \\ \hline
+City & 68k  & $800\times800$ & 		3.52 &  36k & 77k &  39.8 & 3.54 & 1.58 & 2.12 \\ \hline
+Sibenik & 80k & $800\times800$ & 	3.26 &  39k & 67k &  48.3 & 3.99 & 1.33 & 3.14 \\ \hline
+FForest & 174k & $800\times800$ &	4.6 &  62k & 140k &  47.2 & 3.6 & 4.79 & 2.96 \\ \hline
+Teapots & 200k &  $800\times800$ & 	3.52 &  88k & 216k &  40 & 2 & 5.32 & 1.95 \\ \hline
+Conference & 200k &  $800\times800$ & 4.94 &  82k & 206k &  41.1 & 4.2 & 6.03 & 2.23 \\ \hline
+Dragon & 7.22M  & $800\times800$ & 	4.84 &  1.56M & 4.39M & 14.8 & 1.83 & 315.6 & 1.14 \\ \hline
+\end{tabular}
+\end{center}
+\vspace*{0mm}
+\caption{{\label{tab:tab1}} Měření za použití všech implementovaných metod pro zlepšení kd-stromu.}
+\vspace*{0mm}
+\label{shadowtable}
+\end{table*}
+
+V tabulkách \ref{tab:tab2} a \ref{tab:tab3} jsou naměřené hodnoty srovnávající postupné použití různých metod pro zlepšování kd-stromu a zrychlení renderování. V levé části tabulky \ref{tab:tab2} je pro konstrukci použita pouze metoda ATC, v pravé části tabulky jsou hodnoty naměřené po přidání metody dokonalého řezu s ořezáváním obalových těles trojúhelníků. V levé části tabulky \ref{tab:tab3} jsou měření po přidání prořezávání listů (zahazování zbytečných odkazů na trojúhelníky), v pravé části téže tabulky byla konstrukce provedena totožným způsobem, ale byl pro urychlení renderování přidán inverzní mailboxing realizovaný pomocí 32-položkové cache. Z měření je patrné, že přidáním inverzního mailboxingu došlo pouze k nepatrnému zlepšení rychlosti renderingu (řádově jednotky procent), přestože došlo k v některých případech ke snížení testů na průsečíky až o desítky procent. Větší časové úspory bylo dosaženo zlepšením konstrukce samotného kd-stromu pomocí metod dokonalého řezu s ořezáním obalových kvádrů trojúhelníků a odstraněním zbytečných referencí na trojúhelníky v listech.\\
+
+Výsledný program byl testován na počítači s procesorem Intel Core 2 Duo P8600 s taktovací frekvencí 2.4 GHz, vyrovnávací paměť L2 cache o velikosti 3MB, přičemž k testování byol použito jen jedno jádro procesoru. Velikost hlavní paměti počítače je 3GB. Počítač běží na operačním systému Windows 7 (32-bit)  a jako kompilátor byl použit Microsoft 32-bit C/C++ Optimizing Compiler for 80x86 verze 16.0.40219.01.\\
+
+
+
+\begin{table*}[t]\footnotesize
+\begin{center}
+\begin{tabular}{| c |  c || c | c | r | r || c | c | r | r | r}
+\hline
+\multicolumn{2}{|c||}{} & \multicolumn{4}{|c||}{ATC only} &  \multicolumn{4}{|c|}{+Split clipping}  \\
+\hline
+          &         &  build       & render  & inter. &   trav.   & build     & render  & inter. &   trav.   \\
+scene & tris & time & time    &  tests   & steps  &  time & time    &  tests   & steps \\
+          &           &    [s]   &  [s]  &      &      &  [s]    & [s]  &  & \\
+\hline
+\hline
+Armadillo & 346k & 6.13 & 0.99   &  	1.24M		& 10.5M & 6.49	&0.97	 & 1.14M & 10.2M 	\\ \hline
+A10 & 219k  & 5.89 & 0.5  &   		861k		& 3.94M & 5.9	&0.43  & 483k & 3.8M	\\ \hline
+City & 68k  &  1.57 & 2.83  & 		10.9M		& 28.7M & 1.62	&2.32	 & 5.09M	& 25.3M \\ \hline
+Sibenik & 80k &  1.3 & 3.39  &		 6.88M	& 31.6M & 1.37	&3.29	 & 6.58M & 31M	\\ \hline
+FForest & 174k & 4.83 & 3.42  & 		 11.9M	& 31.5M & 4.8	&3.11	 & 7.24M & 30.3M	\\ \hline
+Teapots & 200k & 5.12 &  2.17  & 	 4.01M	& 27.6M & 5.34	&2.01	& 2.97M & 26M	\\ \hline
+Conference & 283k & 7.01 &  2.98  & 	 12.6M	& 30.6M & 6.5	&2.3	& 6.82M & 26.7M	\\ \hline
+
+\end{tabular}
+\end{center}
+\vspace*{0mm}
+\caption{{\label{tab:tab2}}Měření za použití ATC a ořezávání obalových kvádrů trojúhelníků.}
+\vspace*{0mm}
+\label{shadowtable}
+\end{table*}
+
+\begin{table*}[t]\footnotesize
+\begin{center}
+\begin{tabular}{| c |  c || c | c | r | r || c | c | r | r | r}
+\hline
+\multicolumn{2}{|c||}{} & \multicolumn{4}{|c||}{+ Leaf prunning} &  \multicolumn{4}{|c|}{+Inv. mailboxing}  \\
+\hline
+          &         &  build       & render  & inter. &   trav.   & build     & render  & inter. &   trav.   \\
+scene & tris & time & time    &  tests   & steps  &  time & time    &  tests   & steps \\
+          &           &    [s]   &  [s]  &      &      &  [s]    & [s]  &  & \\
+\hline
+\hline
+Armadillo & 346k & 6.57 & 0.96   &  	1.12M		& 10.2M & 6.57	&0.94	 & 957k & 10.2M 	\\ \hline
+A10 & 219k  & 5.72 & 0.43  &   		464k		& 3.78M & 5.72	&0.42  & 360k & 3.78M	\\ \hline
+City & 68k  &  1.58 & 2.21  & 		5M		& 25.5M & 1.58	&2.12	 & 4.53M	& 25.5M \\ \hline
+Sibenik & 80k &  1.33 & 3.15  &		 6.55M	& 30.9M & 1.33	&3.14	 & 6.29M & 30.9M	\\ \hline
+FForest & 174k & 4.79 & 3.03  & 		 6.52M	& 30.2M & 4.79	&2.96	 & 5.66M & 30.2M	\\ \hline
+Teapots & 200k & 5.32 &  1.99  & 	 2.87M	& 25.6M & 5.32	&1.95	& 2.56M & 25.6M	\\ \hline
+Conference & 283k & 6.03 &  2.29  & 	 6.71M	& 26.3M & 6.03	&2.23	& 5.42M & 26.3M	\\ \hline
+
+\end{tabular}
+\end{center}
+\vspace*{0mm}
+\caption{{\label{tab:tab3}}Měření s prořezáváním listů a inverzním mailboxingem s 32-položkovou cache.}
+\vspace*{0mm}
+\label{shadowtable}
+\end{table*}
+
+\clearpage
+%%%% -------------------------------------------------------- 
+\section{\label{SEC:Conclusion}Závěr}
+%\section{\label{SEC:Conclusion}Conclusion}
+
+V této části uvedete závěr, doporučení pro opakování implementace této
+semestrální práce, omezení implementace či co se nepodařilo.
+
+Výsledkem této práce je program, který přečte scénu ve formátu .obj a její konfigurační soubor ve formátu .view nebo .conf, zkonstruuje pro ni akcelerační strukturu v podobě kd-stromu a scénu následně vykreslí pomocí metody vrhání paprsku.
+Oproti původnímu zadání se pro hledání rozdělovací roviny během dělení listu nepoužívá vzorkování, ale metoda, která postupně posouvá dělící rovinu přes trojúhelníky ve scéně.\\
+Tato práce byla pro mne cenou zkušeností a ukázala mi praktické využití akceleračních struktur ve 3D grafice. Pro budoucí opakování této implementace bych doporučil nepokoušet se nezačít implementovat vlastní algoritmy bez důkladného prostudování algoritmů z dostupné literatury, ať už se jedná o průchod kd-stromem nebo jeho konstrukci.
+
+%%%% -------------------------------------------------------- 
+
+%\section*{\label{SEC:ACK}Acknowledgment}
+
+
+%******************************************************************
+% Tady nasleduje seznam literatury a to bud s pouzitim
+% rucne usporadaneho seznamu ci s pouzitim system bibtex (prikaz
+% \bibliographystyle{alpha} a \bibliography{dpgreport.bib}
+
+%\bibliographystyle{abbrv}
+%\bibliographystyle{alpha}
+%\bibliography{dpgreport.bib}
+
+% Druha moznost - rucne usporadany seznam literatury
+\label{SEC:Reference}
+%\section{Reference}
+\renewcommand\bibname{References}
+\begin{thebibliography}{10}
+
+\bibitem[1]{Mailbox}
+Warrent A. Hunt - Corrections to the Surface Area Metric with Respect to Mail-Boxing, 2008
+
+\bibitem[2]{BittnerHavran}
+Vlastimil Havran and Jiri Bittner - On Improving kd-trees for Ray Shooting, 2002
+
+\bibitem[3]{Improv}
+Alexei Soupikov, Maxim Shevstov, Alexander Kapustin - Improving Kd-tree Quality at a Reasonable Construction Cost, 2008.
+
+\bibitem[4]{WaldHavran}
+I. Wald, V. Havran - On building fast kd-trees for ray tracing, and on doing that in O(N log N), 2006
+
+\bibitem[5]{Havran}
+ V. Havran -  Heuristic Ray Shooting Algorithms, 2000
+
+
+\end{thebibliography}
+
+
+
+\begin{figure*}[!ht]
+\begin{center}
+  \includegraphics[width=0.7\textwidth]{dragon}
+\caption{{\label{fig:fig2}}Drak (7.22M trojuhelníků)}
+\end{center}
+\end{figure*}
+
+\begin{figure*}[!ht]
+\begin{center}
+  \includegraphics[width=0.5\textwidth]{A10}
+  \includegraphics[width=0.3\textwidth]{armadillo}
+\caption{{\label{fig:fig3}}A10 (219k trojúhelníků), Pásovec (346k trojúhelníků)}
+\end{center}
+\end{figure*}
+
+\begin{figure*}[!ht]
+\begin{center}
+  \includegraphics[width=0.4\textwidth]{sibenik}
+  \includegraphics[width=0.4\textwidth]{fforest}
+\caption{{\label{fig:fig4}}Katedrála Sibenik (80k trojúhelníků), Pohádkový les (174k trojúhelníků)}
+\end{center}
+\end{figure*}
+
+\end{document}
