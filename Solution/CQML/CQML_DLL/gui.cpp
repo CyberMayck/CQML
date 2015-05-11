@@ -190,13 +190,7 @@ namespace CQMLGUI
 		{
 			pressedElements[i]->MouseReleased(x,y,button);
 		}
-		/*int i;
-		int processed=0;
-		for(i=0;i<childrenCount;i++)
-		{
-			processed+=children[i]->MouseReleased(x,y,button);
-		}
-		return processed;*/
+		pressedElements.clear();
 	}
 
 	int Element::MouseMoved(int x, int y, int relx, int rely)

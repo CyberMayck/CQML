@@ -120,8 +120,6 @@ bool checkAcyclicity(int n, bool * visited, vector<int>* &neighbours)
 
 PerfectHashData * makePerfectHash(vector<string> & strs, int cnt)
 {
-	int * T1=new int[cnt];
-	int * T2=new int[cnt];
 	int n=3*cnt; // or alphabet size
 	bool *visited= new bool[n];
 	vector<int>*neighbours;
@@ -136,6 +134,8 @@ PerfectHashData * makePerfectHash(vector<string> & strs, int cnt)
 		if(max<strs[i].length())
 			max=strs[i].length();
 	}
+	int * T1=new int[max];
+	int * T2=new int[max];
 
 	int hhh=0;
 	int treshold=100;
