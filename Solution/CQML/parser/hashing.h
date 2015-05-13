@@ -11,6 +11,7 @@ struct PerfectHashData
 	int * g;
 	int m;
 	int n;
+	int maxT;
 };
 
 PerfectHashData * makePerfectHash(string * strs, int cnt);

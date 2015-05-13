@@ -166,17 +166,17 @@ void printHandlerAssignment()
 				}
 				if(!handler->isProperty)
 				{
-					fprintf(file_class_source, "\t_QML_element%d->Custom%s=_QML_element%d_%s;\n",i,handler->name,i,handler->name);
-					fprintf(file_class_source, "\t_QML_element%d->Custom%s_context=acQML_Context((CQMLGUI::Component*)this,(CQMLGUI::Element*)_QML_element%d);\n",i,handler->name,i);
+					fprintf(file_class_source, "\t_CQML_element%d->Custom%s=_CQML_element%d_%s;\n",i,handler->name,i,handler->name);
+					fprintf(file_class_source, "\t_CQML_element%d->Custom%s_context=acCQML_Context((CQMLGUI::Component*)this,(CQMLGUI::Element*)_CQML_element%d);\n",i,handler->name,i);
 				}
 				else
 				{
 					PropertyAndType * prop=	elements[i].classContainer->CheckExistence(handler->name);
 					if(prop!=0)
 					{
-							fprintf(file_class_source, "\t((%s*)_QML_element%d)->%s_context",prop->cont->className.c_str(),i,handler->name);
-							fprintf(file_class_source, "  = acQML_Context((CQMLGUI::Component*)this,(CQMLGUI::Element*)_QML_element%d);\n",i);
-							fprintf(file_class_source, "\t((%s*)_QML_element%d)->%s_Update",prop->cont->className.c_str(),i,handler->name);
+							fprintf(file_class_source, "\t((%s*)_CQML_element%d)->%s_context",prop->cont->className.c_str(),i,handler->name);
+							fprintf(file_class_source, "  = acCQML_Context((CQMLGUI::Component*)this,(CQMLGUI::Element*)_CQML_element%d);\n",i);
+							fprintf(file_class_source, "\t((%s*)_CQML_element%d)->%s_Update",prop->cont->className.c_str(),i,handler->name);
 							fprintf(file_class_source, "  = Update_E%d_%s;\n",i,handler->name);
 					}
 				}
@@ -218,8 +218,8 @@ void printHandlers()
 							str+=", ";
 						}
 					}
-					//fprintf(file_class_source, "static %s _QML_element%d_%s(CQMLGUI::QML_Context * context, CQMLGUI::QMLEvent Event)\n{\n",i,handler->name,str.c_str());
-					fprintf(file_class_source, "static %s _QML_element%d_%s(CQMLGUI::QML_Context * context, %s)\n{\n",ht->returnType.c_str(),i,handler->name,str.c_str());
+					//fprintf(file_class_source, "static %s _CQML_element%d_%s(CQMLGUI::CQML_Context * context, CQMLGUI::CQMLEvent Event)\n{\n",i,handler->name,str.c_str());
+					fprintf(file_class_source, "static %s _CQML_element%d_%s(CQMLGUI::CQML_Context * context, %s)\n{\n",ht->returnType.c_str(),i,handler->name,str.c_str());
 				
 					string hSrc;
 					handler->source->Print(hSrc);
@@ -234,10 +234,10 @@ void printHandlers()
 						PropertyAndType * prop=	elements[i].classContainer->CheckExistence(handler->name);
 						if(prop!=0)
 						{
-							fprintf(file_class_source, "static void Update_E%d_%s(CQMLGUI::QML_Context *);\n",i,handler->name);
-							fprintf(file_class_source, "static %s Handler_E%d_%s(CQMLGUI::QML_Context *);\n",prop->type.c_str(),i,handler->name);
+							fprintf(file_class_source, "static void Update_E%d_%s(CQMLGUI::CQML_Context *);\n",i,handler->name);
+							fprintf(file_class_source, "static %s Handler_E%d_%s(CQMLGUI::CQML_Context *);\n",prop->type.c_str(),i,handler->name);
 						
-							fprintf(file_class_source, "static void Update_E%d_%s(CQMLGUI::QML_Context *context)\n",i,handler->name);
+							fprintf(file_class_source, "static void Update_E%d_%s(CQMLGUI::CQML_Context *context)\n",i,handler->name);
 							fprintf(file_class_source, "{\n");
 
 
@@ -249,7 +249,7 @@ void printHandlers()
 							fprintf(file_class_source, "}\n");
 
 
-							fprintf(file_class_source, "static %s Handler_E%d_%s(CQMLGUI::QML_Context *context)\n",prop->type.c_str(),i,handler->name);
+							fprintf(file_class_source, "static %s Handler_E%d_%s(CQMLGUI::CQML_Context *context)\n",prop->type.c_str(),i,handler->name);
 							fprintf(file_class_source, "{\n");
 							string str="";
 							handler->source->Print(str);
@@ -296,9 +296,9 @@ void printAttributes()
 					if(prop->cont)
 					{
 						if(att->name2==0)
-							fprintf(file_class_source, "\t((CQMLGUI::%s*)self->_QML_element%d)->%s=",prop->cont->className.c_str(),i,att->name);
+							fprintf(file_class_source, "\t((CQMLGUI::%s*)self->_CQML_element%d)->%s=",prop->cont->className.c_str(),i,att->name);
 						else
-							fprintf(file_class_source, "\t((CQMLGUI::%s*)self->_QML_element%d)->%s.%s=",prop->cont->className.c_str(),i,att->name,att->name2);
+							fprintf(file_class_source, "\t((CQMLGUI::%s*)self->_CQML_element%d)->%s.%s=",prop->cont->className.c_str(),i,att->name,att->name2);
 					}
 				}
 				else
@@ -368,8 +368,8 @@ void classDeclaration(const char* rootName, int treeInd)
 				fprintf(file_class_header,"\t%s * %s;\n",prop->typeName,prop->name);
 			else
 				fprintf(file_class_header,"\t%s %s;\n",prop->typeName,prop->name);
-			fprintf(file_class_header,"\tQML_Context * %s_context;\n",prop->name);
-			fprintf(file_class_header,"\tvoid (* %s_Update)(QML_Context*);\n",prop->name);
+			fprintf(file_class_header,"\tCQML_Context * %s_context;\n",prop->name);
+			fprintf(file_class_header,"\tvoid (* %s_Update)(CQML_Context*);\n",prop->name);
 		}
 		fprintf(file_class_header,"\tvirtual void Update();\n");
 		fprintf(file_class_header,"VariantRef Get(const char* s);\n");
@@ -491,7 +491,7 @@ void rootElementDeclaration(const char * rootName)
 	//fprintf(file_class_header,"GUI_Element base;\n"); //no base
 	for(int i=0;i<elementCount;i++)
 	{
-		fprintf(file_class_header, "\t%s* _QML_element%d;\n",elements[i].classContainer->className.c_str(),i);
+		fprintf(file_class_header, "\t%s* _CQML_element%d;\n",elements[i].classContainer->className.c_str(),i);
 	}
 	fprintf(file_class_header,"};\n");
 	//fprintf(file_class_header,"Root%s* acGUI_Root%s();\n",rootName,rootName);
@@ -519,11 +519,11 @@ void rootElementAllocation(const char * rootName, int treeInd)
 		////fprintf(file_class_source,"pointer->original=cGUI_Root();\n",elements[i].origClassName);
 		//fprintf(file_class_source,"\t*pointer=cGUI_Root%s((CQMLGUI::Element *)pointer);\n",rootName);
 		
-		//fprintf(file_class_source, "mGUI_Element_InsertChild((GUI_Element*)pointer, (GUI_Element*)pointer->_QML_element0);\n");
+		//fprintf(file_class_source, "mGUI_Element_InsertChild((GUI_Element*)pointer, (GUI_Element*)pointer->_CQML_element0);\n");
 		//fprintf(file_class_source,"return pointer;\n");
 
-		//fprintf(file_class_source,"\treturn (CQMLGUI::Root%s*)pointer->_QML_element0;\n",rootName);
-		fprintf(file_class_source,"\treturn pointer->_QML_element0;\n",rootName);
+		//fprintf(file_class_source,"\treturn (CQMLGUI::Root%s*)pointer->_CQML_element0;\n",rootName);
+		fprintf(file_class_source,"\treturn pointer->_CQML_element0;\n",rootName);
 			
 
 		fprintf(file_class_source,"}\n");
@@ -548,13 +548,13 @@ void rootElementConstructor(const char * rootName, int treeInd)
 			if(elements[i].hasCustomClass)
 			{
 				const char *nam= importPathToName[imports[importToKeyMaps[treeInd][std::string(elements[i].importName)]].path].c_str();
-				//fprintf(file_class_source, "\t_QML_element%d = (CQMLGUI::Element*)CQMLGUI::acGUI_Root%s();\n",i,nam);
+				//fprintf(file_class_source, "\t_CQML_element%d = (CQMLGUI::Element*)CQMLGUI::acGUI_Root%s();\n",i,nam);
 				
 				//fprintf(file_class_source, "\t%s;\n",elements[i].name);
 
-				fprintf(file_class_source, "\t_QML_element%d = CQMLGUI::ac%s();\n",i,elements[i].name);
+				fprintf(file_class_source, "\t_CQML_element%d = CQMLGUI::ac%s();\n",i,elements[i].name);
 				fprintf(file_class_source, "\ttmp=CQMLGUI::acGUI_Root%s();\n",nam);
-				fprintf(file_class_source, "\tCopyChildren(_QML_element%d,tmp);\n",i);
+				fprintf(file_class_source, "\tCopyChildren(_CQML_element%d,tmp);\n",i);
 				fprintf(file_class_source, "\ttmp=tmp->root;\n",i);
 
 				//copy intrails
@@ -563,11 +563,11 @@ void rootElementConstructor(const char * rootName, int treeInd)
 				{
 					for(unsigned int j=0;j<parCont->props.size();j++)
 					{
-						fprintf(file_class_source, "\t_QML_element%d->%s=((CQMLGUI::Root%s*)tmp)->_QML_element0->%s;\n",i,parCont->props[j].name.c_str(),nam,parCont->props[j].name.c_str());
-						fprintf(file_class_source, "\t_QML_element%d->%s_Update=((CQMLGUI::Root%s*)tmp)->_QML_element0->%s_Update;\n",i,parCont->props[j].name.c_str(),nam,parCont->props[j].name.c_str());
-						fprintf(file_class_source, "\t_QML_element%d->%s_context=((CQMLGUI::Root%s*)tmp)->_QML_element0->%s_context;\n",i,parCont->props[j].name.c_str(),nam,parCont->props[j].name.c_str());
-						fprintf(file_class_source, "\tif(_QML_element%d->%s_context)\n",i,parCont->props[j].name.c_str());
-						fprintf(file_class_source, "\t\t_QML_element%d->%s_context->self=_QML_element%d;\n",i,parCont->props[j].name.c_str(),i);
+						fprintf(file_class_source, "\t_CQML_element%d->%s=((CQMLGUI::Root%s*)tmp)->_CQML_element0->%s;\n",i,parCont->props[j].name.c_str(),nam,parCont->props[j].name.c_str());
+						fprintf(file_class_source, "\t_CQML_element%d->%s_Update=((CQMLGUI::Root%s*)tmp)->_CQML_element0->%s_Update;\n",i,parCont->props[j].name.c_str(),nam,parCont->props[j].name.c_str());
+						fprintf(file_class_source, "\t_CQML_element%d->%s_context=((CQMLGUI::Root%s*)tmp)->_CQML_element0->%s_context;\n",i,parCont->props[j].name.c_str(),nam,parCont->props[j].name.c_str());
+						fprintf(file_class_source, "\tif(_CQML_element%d->%s_context)\n",i,parCont->props[j].name.c_str());
+						fprintf(file_class_source, "\t\t_CQML_element%d->%s_context->self=_CQML_element%d;\n",i,parCont->props[j].name.c_str(),i);
 					}
 					//parCont->handlers
 				}
@@ -580,41 +580,41 @@ void rootElementConstructor(const char * rootName, int treeInd)
 						//if(!handler->isProperty)
 						
 						{
-							fprintf(file_class_source, "\t_QML_element%d->%s=((CQMLGUI::Root%s*)tmp)->_QML_element0->%s;\n",i,handler->name.c_str(),nam,handler->name.c_str());
+							fprintf(file_class_source, "\t_CQML_element%d->%s=((CQMLGUI::Root%s*)tmp)->_CQML_element0->%s;\n",i,handler->name.c_str(),nam,handler->name.c_str());
 							
-							fprintf(file_class_source, "\t_QML_element%d->%s_context=((CQMLGUI::Root%s*)tmp)->_QML_element0->%s_context;\n",i,handler->name.c_str(),nam,handler->name.c_str());
-							fprintf(file_class_source, "\tif(_QML_element%d->%s_context)\n",i,handler->name.c_str());
+							fprintf(file_class_source, "\t_CQML_element%d->%s_context=((CQMLGUI::Root%s*)tmp)->_CQML_element0->%s_context;\n",i,handler->name.c_str(),nam,handler->name.c_str());
+							fprintf(file_class_source, "\tif(_CQML_element%d->%s_context)\n",i,handler->name.c_str());
 						
-							fprintf(file_class_source, "\t\t_QML_element%d->%s_context->self=_QML_element%d;\n",i,handler->name.c_str(),i);
+							fprintf(file_class_source, "\t\t_CQML_element%d->%s_context->self=_CQML_element%d;\n",i,handler->name.c_str(),i);
 						
-							//fprintf(file_class_source, "\t_QML_element%d->Custom%s=_QML_element%d_%s;\n",i,handler->name,i,handler->name);
-							//fprintf(file_class_source, "\t_QML_element%d->Custom%s_context=acQML_Context((CQMLGUI::Component*)this,(CQMLGUI::Element*)_QML_element%d);\n",i,handler->name,i);
+							//fprintf(file_class_source, "\t_CQML_element%d->Custom%s=_CQML_element%d_%s;\n",i,handler->name,i,handler->name);
+							//fprintf(file_class_source, "\t_CQML_element%d->Custom%s_context=acCQML_Context((CQMLGUI::Component*)this,(CQMLGUI::Element*)_CQML_element%d);\n",i,handler->name,i);
 						}
 					}
 					parCont=parCont->GetAncestor();
 				}
 				//
 
-				fprintf(file_class_source, "\tdelete ((CQMLGUI::Root%s*)tmp)->_QML_element0;\n",nam);
-				fprintf(file_class_source, "\t((CQMLGUI::Root%s*)tmp)->_QML_element0=_QML_element%d;\n",nam,i);
+				fprintf(file_class_source, "\tdelete ((CQMLGUI::Root%s*)tmp)->_CQML_element0;\n",nam);
+				fprintf(file_class_source, "\t((CQMLGUI::Root%s*)tmp)->_CQML_element0=_CQML_element%d;\n",nam,i);
 			}
 			else
 			{
 				const char *nam= importPathToName[imports[importToKeyMaps[treeInd][std::string(elements[i].importName)]].path].c_str();
-				//fprintf(file_class_source, "\t_QML_element%d = (CQMLGUI::Element*)CQMLGUI::acGUI_Root%s();\n",i,nam);
-				fprintf(file_class_source, "\t_QML_element%d = CQMLGUI::acGUI_Root%s();\n",i,nam);
+				//fprintf(file_class_source, "\t_CQML_element%d = (CQMLGUI::Element*)CQMLGUI::acGUI_Root%s();\n",i,nam);
+				fprintf(file_class_source, "\t_CQML_element%d = CQMLGUI::acGUI_Root%s();\n",i,nam);
 			}
 		}
 		else
-			fprintf(file_class_source, "\t_QML_element%d = CQMLGUI::ac%s();\n",i,elements[i].name);
-		fprintf(file_class_source, "\t_QML_element%d->root=(CQMLGUI::Element*)this;\n",i);
+			fprintf(file_class_source, "\t_CQML_element%d = CQMLGUI::ac%s();\n",i,elements[i].name);
+		fprintf(file_class_source, "\t_CQML_element%d->root=(CQMLGUI::Element*)this;\n",i);
 	}
 	for(int i=0;i<elementCount;i++)
 	{
-	//	fprintf(file, "_QML_element%d = (GUI_Element*)acGUI_%s();\n",i,elements[i].name);
+	//	fprintf(file, "_CQML_element%d = (GUI_Element*)acGUI_%s();\n",i,elements[i].name);
 		for(int j=0;j<elements[i].childrenCount;j++)
 		{
-			fprintf(file_class_source, "\tmGUI_Element_InsertChild((CQMLGUI::Element*)_QML_element%d, (CQMLGUI::Element*)_QML_element%d);\n",i,elements[i].children[j]->id);
+			fprintf(file_class_source, "\tmGUI_Element_InsertChild((CQMLGUI::Element*)_CQML_element%d, (CQMLGUI::Element*)_CQML_element%d);\n",i,elements[i].children[j]->id);
 		}
 	}
 
@@ -624,18 +624,18 @@ void rootElementConstructor(const char * rootName, int treeInd)
 
 	for(int i=0;i<rootElementCount;i++)
 	{
-		//fprintf(file, "mGUI_Element_InsertChild((GUI_Element*)root, (GUI_Element*)_QML_element%d);\n",rootElements[i]);
+		//fprintf(file, "mGUI_Element_InsertChild((GUI_Element*)root, (GUI_Element*)_CQML_element%d);\n",rootElements[i]);
 	}
 
 	printHandlerAssignment();
 
-	//fprintf(file,"_QML_Update();\n}\n");
-	//fprintf(file,"void _QML_Update()\n{\n");
+	//fprintf(file,"_CQML_Update();\n}\n");
+	//fprintf(file,"void _CQML_Update()\n{\n");
 	//printAttributes();
 
-	//fprintf(file_class_source,"self->base.Update=_QML_Update;\n"); //
+	//fprintf(file_class_source,"self->base.Update=_CQML_Update;\n"); //
 	printElementUpdaterAssignments();
-	fprintf(file_class_source,"\t_QML_Update((CQMLGUI::Element *)_QML_element0);\n");
+	fprintf(file_class_source,"\t_CQML_Update((CQMLGUI::Element *)_CQML_element0);\n");
 
 	
 	//fprintf(file_class_source,"self->base.root=pointer;\n");
@@ -649,7 +649,7 @@ void rootElementUpdater(const char * rootName, int treeInd)
 {
 	fprintf(file_class_source, "\n //rootElementUpdater() \n");
 
-	fprintf(file_class_source,"static void _QML_Update(CQMLGUI::Element *s)\n{\n\tCQMLGUI::Root%s * self=(CQMLGUI::Root%s *)s;\n",rootName,rootName);
+	fprintf(file_class_source,"static void _CQML_Update(CQMLGUI::Element *s)\n{\n\tCQMLGUI::Root%s * self=(CQMLGUI::Root%s *)s;\n",rootName,rootName);
 	//fprintf(file_class_source,"\tmGUI_Element_Update((CQMLGUI::Element *)self);\n");
 	fprintf(file_class_source,"\ts->Update();\n");
 	//printAttributes(); // original
@@ -704,8 +704,8 @@ void printAttributeUpdatersHeaders()
 					{
 						if(att->name2==0)
 						{
-							fprintf(file_class_source, "static void Update_E%d_%s(CQMLGUI::QML_Context *);\n",i,att->name);
-							if(att->handler!=0) fprintf(file_class_source, "static %s Handler_E%d_%s(CQMLGUI::QML_Context *);\n",prop->type.c_str(),i,att->name);
+							fprintf(file_class_source, "static void Update_E%d_%s(CQMLGUI::CQML_Context *);\n",i,att->name);
+							if(att->handler!=0) fprintf(file_class_source, "static %s Handler_E%d_%s(CQMLGUI::CQML_Context *);\n",prop->type.c_str(),i,att->name);
 						}
 						else
 						{
@@ -716,8 +716,8 @@ void printAttributeUpdatersHeaders()
 							}
 							if(prop2!=0)
 							{
-								fprintf(file_class_source, "static void Update_E%d_%s_%s(CQMLGUI::QML_Context *);\n",i,att->name,att->name2);
-								if(att->handler!=0) fprintf(file_class_source, "static %s Handler_E%d_%s_%s(CQMLGUI::QML_Context *);\n",prop2->type.c_str(),i,att->name,att->name2);
+								fprintf(file_class_source, "static void Update_E%d_%s_%s(CQMLGUI::CQML_Context *);\n",i,att->name,att->name2);
+								if(att->handler!=0) fprintf(file_class_source, "static %s Handler_E%d_%s_%s(CQMLGUI::CQML_Context *);\n",prop2->type.c_str(),i,att->name,att->name2);
 							}
 						}
 					}
@@ -763,16 +763,16 @@ void printAttributeUpdaters()
 					{
 						if(att->name2==0)
 						{
-							fprintf(file_class_source, "\t((%s*)_QML_element%d)->%s_context",prop->cont->className.c_str(),i,att->name);
-							fprintf(file_class_source, "  = acQML_Context((CQMLGUI::Component*)this,(CQMLGUI::Element*)_QML_element%d);\n",i);
-							fprintf(file_class_source, "\t((%s*)_QML_element%d)->%s_Update",prop->cont->className.c_str(),i,att->name);
+							fprintf(file_class_source, "\t((%s*)_CQML_element%d)->%s_context",prop->cont->className.c_str(),i,att->name);
+							fprintf(file_class_source, "  = acCQML_Context((CQMLGUI::Component*)this,(CQMLGUI::Element*)_CQML_element%d);\n",i);
+							fprintf(file_class_source, "\t((%s*)_CQML_element%d)->%s_Update",prop->cont->className.c_str(),i,att->name);
 							fprintf(file_class_source, "  = Update_E%d_%s;\n",i,att->name);
 						}
 						else
 						{
-							fprintf(file_class_source, "\t((%s*)_QML_element%d)->%s.%s_context",prop->cont->className.c_str(),i,att->name,att->name2);
-							fprintf(file_class_source, "  = acQML_Context((CQMLGUI::Component*)this,(CQMLGUI::Element*)(_QML_element%d));\n",i);
-							fprintf(file_class_source, "\t((%s*)_QML_element%d)->%s.%s_Update",prop->cont->className.c_str(),i,att->name,att->name2);
+							fprintf(file_class_source, "\t((%s*)_CQML_element%d)->%s.%s_context",prop->cont->className.c_str(),i,att->name,att->name2);
+							fprintf(file_class_source, "  = acCQML_Context((CQMLGUI::Component*)this,(CQMLGUI::Element*)(_CQML_element%d));\n",i);
+							fprintf(file_class_source, "\t((%s*)_CQML_element%d)->%s.%s_Update",prop->cont->className.c_str(),i,att->name,att->name2);
 							fprintf(file_class_source, "  = Update_E%d_%s_%s;\n",i,att->name,att->name2);
 						}
 					}
@@ -912,25 +912,25 @@ void makeMainSource()
 	{
 		fprintf(file,"#include \"qml_includes.h\"\n");
 		fprintf(file,"struct ClassHashTable;\n");
-		fprintf(file,"void _QML_Start();\n");
-		fprintf(file,"void _QML_Update();\n");
-		fprintf(file,"void _QML_Draw();\n");
+		fprintf(file,"void _CQML_Start();\n");
+		fprintf(file,"void _CQML_Update();\n");
+		fprintf(file,"void _CQML_Draw();\n");
 
 		fprintf(file,"void InitHashTabs(ClassHashTable *& hashTabs);\n");
 		fclose(file);
 	}
 	
 	fopen_s(&file,"parser_output.cpp","w");
-	fprintf(file,"#include \"output0outer.h\"\n#include\"parser_output.h\"\n#include \"qml_includes.h\"\n");
-	fprintf(file,"void _QML_Update();\n");
-	fprintf(file,"void _QML_ClassTabsInit();\n");
-	fprintf(file,"void _QML_Draw();\n");
+	fprintf(file,"#include \"output0.h\"\n#include\"parser_output.h\"\n#include \"qml_includes.h\"\n");
+	fprintf(file,"void _CQML_Update();\n");
+	fprintf(file,"void _CQML_ClassTabsInit();\n");
+	fprintf(file,"void _CQML_Draw();\n");
 	fprintf(file,"CQMLGUI::Element* root;\n");
 
-	fprintf(file,"\nvoid _QML_Start()\n{\n\tSetInitHashTabs(&InitHashTabs);\n\tQMLInitHashes();\n\troot = (CQMLGUI::Element*) CQMLGUI::acGUI_Rootoutput0();\n\tCQMLGUI::SetRoot(root);\n\t_QML_Update();\n}\n");
-	//fprintf(file,"\nvoid _QML_Update()\n{\n\troot->Update();\n}\n");
-	fprintf(file,"\nvoid _QML_Update()\n{\n\tCQMLGUI::PreUpdate();\n\troot->Update();\n\tCQMLGUI::PostUpdate();\n}\n");
-	fprintf(file,"\nvoid _QML_Draw()\n{\n\tCQMLGUI::PreDraw();\n\troot->Draw();\n\tCQMLGUI::PostDraw();\n}\n");
+	fprintf(file,"\nvoid _CQML_Start()\n{\n\tSetInitHashTabs(&InitHashTabs);\n\tCQMLInitHashes();\n\troot = (CQMLGUI::Element*) CQMLGUI::acGUI_Rootoutput0();\n\tCQMLGUI::SetRoot(root);\n\t_CQML_Update();\n}\n");
+	//fprintf(file,"\nvoid _CQML_Update()\n{\n\troot->Update();\n}\n");
+	fprintf(file,"\nvoid _CQML_Update()\n{\n\tCQMLGUI::PreUpdate();\n\troot->Update();\n\tCQMLGUI::PostUpdate();\n}\n");
+	fprintf(file,"\nvoid _CQML_Draw()\n{\n\tCQMLGUI::PreDraw();\n\troot->Draw();\n\tCQMLGUI::PostDraw();\n}\n");
 
 	
 	fprintf(file,"// print default constructors;\n");
@@ -1059,7 +1059,7 @@ void makeMainSource()
 	
 	//PrintClassInfos(file,elementTreeCnt);
 	
-	/*fprintf(file,"void _QML_ClassTabsInit()\n");
+	/*fprintf(file,"void _CQML_ClassTabsInit()\n");
 	fprintf(file,"{\n");
 	PrintClassTabs(file,elementTreeCnt);
 	fprintf(file,"}\n");*/
@@ -1177,7 +1177,7 @@ void printAttributesBodies()
 				{
 					if(att->name2==0)
 					{
-						fprintf(file_class_source, "static void Update_E%d_%s(CQMLGUI::QML_Context *context)\n",i,att->name);
+						fprintf(file_class_source, "static void Update_E%d_%s(CQMLGUI::CQML_Context *context)\n",i,att->name);
 						fprintf(file_class_source, "{\n");
 						// add dynamic check //todo
 
@@ -1202,7 +1202,7 @@ void printAttributesBodies()
 
 						if(att->handler!=0)
 						{
-							fprintf(file_class_source, "static %s Handler_E%d_%s(CQMLGUI::QML_Context *context)\n",prop->type.c_str(),i,att->name);
+							fprintf(file_class_source, "static %s Handler_E%d_%s(CQMLGUI::CQML_Context *context)\n",prop->type.c_str(),i,att->name);
 							fprintf(file_class_source, "{\n");
 							string str="";
 							att->handler->Print(str);
@@ -1213,7 +1213,7 @@ void printAttributesBodies()
 					}
 					else
 					{
-						fprintf(file_class_source, "static void Update_E%d_%s_%s(CQMLGUI::QML_Context *context)\n",i,att->name,att->name2);
+						fprintf(file_class_source, "static void Update_E%d_%s_%s(CQMLGUI::CQML_Context *context)\n",i,att->name,att->name2);
 						fprintf(file_class_source, "{\n");
 						// add dynamic check
 						//att->handler->CheckerPrint(file_class_source);
@@ -1246,7 +1246,7 @@ void printAttributesBodies()
 							if(prop2!=0)
 							{
 
-								fprintf(file_class_source, "static %s Handler_E%d_%s_%s(CQMLGUI::QML_Context *context)\n",prop2->type.c_str(),i,att->name,att->name2);
+								fprintf(file_class_source, "static %s Handler_E%d_%s_%s(CQMLGUI::CQML_Context *context)\n",prop2->type.c_str(),i,att->name,att->name2);
 								fprintf(file_class_source, "{\n");
 								string str="";
 								att->handler->Print(str);
@@ -1291,7 +1291,7 @@ void printElementUpdaterAssignments()
 	{
 		for(int i=0;i<elementCount;i++)
 		{
-			//fprintf(file_class_source,"\t((CQMLGUI::Element *)_QML_element%d)->CustomUpdate=Update_E%d;\n",i,i);
+			//fprintf(file_class_source,"\t((CQMLGUI::Element *)_CQML_element%d)->CustomUpdate=Update_E%d;\n",i,i);
 		}
 	}
 }
@@ -1311,36 +1311,14 @@ void PrintTypesUnion(FILE* f)
 
 void makeSource(std::string name, int treeInd)
 {
-	//ParserList* list;
-	//int i;
 	std::string name1 = name+std::string(".h");
 	std::string name2 = name+std::string(".cpp");
-	std::string name3 = name+std::string("outer.h");
 
+	fopen_s(&file_class_header,name1.c_str(),"w");
+	fopen_s(&file_class_source,name2.c_str(),"w");
 
-	//files=new FILE*[3*elementTreeCnt];
-	//for(int i=0;i<elementTreeCnt;i++)
-	{
-		//file = fopen("parser_output.cpp","w");
-		//file_class_header= fopen("custom_classes.h","w");
-		//file_class_source= fopen("custom_classes.cpp","w");
-
-		//file = fopen("parser_output.cpp","w");
-		fopen_s(&file_class_header,name1.c_str(),"w");
-		fopen_s(&file_class_source,name2.c_str(),"w");
-		fopen_s(&file,name3.c_str(),"w");
-
-		//makeSource(elementTrees[i]);
-	}
-	//list=(ParserList*)l;
-
-	//printf("\n");
-	//return;
-	//file = fopen("parser_output.cpp","w");
-	//file_class_header= fopen("custom_classes.h","w");
-	//file_class_source= fopen("custom_classes.cpp","w");
 	fprintf(file_class_header,"#pragma once\n");
-	fprintf(file,"#pragma once\n");
+//	fprintf(file,"#pragma once\n");
 
 	fprintf(file_class_header,"#include \"qml_includes.h\"\n");
 	fprintf(file_class_source,"#include \"%s\"\n\n#include \"qml_includes.h\"\n",name1.c_str());
@@ -1348,7 +1326,6 @@ void makeSource(std::string name, int treeInd)
 	{
 		if(imports[i].treeInd==treeInd)
 		{
-			//fprintf(file_class_source,"#include \"%souter.h\"\n",importPathToName[imports[i].path].c_str());
 			fprintf(file_class_header,"#include \"%s.h\"\n",importPathToName[imports[i].path].c_str());
 		}
 	}
@@ -1362,32 +1339,25 @@ void makeSource(std::string name, int treeInd)
 		}
 	}
 
-	//fprintf(file, "GUI_Element* root;\n");
 	id=0;
-
-	//fprintf(file,"#include \"custom_classes.h\"\n#include \"qml_includes.h\"\n\nvoid _QML_Update();\n");
 
 	classDeclaration(name.c_str(), treeInd);
 
 	
-	//fprintf(file,"typedef struct GUI_Root%s GUI_Root%s;\n\n",name.c_str(),name.c_str());
-	//fprintf(file,"GUI_Root%s* acGUI_Root%s();\n",name.c_str(),name.c_str());
+	//fprintf(file,"namespace CQMLGUI{\n");
+	//fprintf(file,"struct %s;\n\n",elements[0].name);
 	
-	fprintf(file,"namespace CQMLGUI{\n");
-	fprintf(file,"struct %s;\n\n",elements[0].name);
-	//fprintf(file,"struct Root%s;\n\n",name.c_str());
-	fprintf(file,"%s* acGUI_Root%s();\n",elements[0].name,name.c_str());
-	//fprintf(file,"Root%s* acGUI_Root%s();\n",name.c_str(),name.c_str());
+	//fprintf(file,"%s* acGUI_Root%s();\n",elements[0].name,name.c_str());
 	//here
 
+	//fprintf(file, "\n}\n");
 	rootElementDeclaration(name.c_str());
-	fprintf(file, "\n}\n");
 	
 	bool cycle=detectCycle(graphNodes);
 	sortTopologically(graphNodes);
 	
 	
-	fprintf(file_class_source,"static void _QML_Update(CQMLGUI::Element *s);\n\n");
+	fprintf(file_class_source,"static void _CQML_Update(CQMLGUI::Element *s);\n\n");
 
 	printHandlers();
 	
@@ -1415,7 +1385,7 @@ void makeSource(std::string name, int treeInd)
 	
 	fprintf(file_class_header,"};");
 
-	fclose(file);
+	//fclose(file);
 	fclose(file_class_header);
 	fclose(file_class_source);
 }
@@ -1625,7 +1595,7 @@ bool processDots(SrcNode * node, int treeInd,int currentElementId, int graphInd,
 	{
 		curId=idMaps[treeInd][identifiers[0]];
 		
-		sprintf_s(str,256,"(*((GUI_Rootoutput%d*)context->root)->_QML_element%d)",treeInd,curId);
+		sprintf_s(str,256,"(*((GUI_Rootoutput%d*)context->root)->_CQML_element%d)",treeInd,curId);
 		// start from ID
 		for(int i=1;i<cnt;i++)
 		{
@@ -1650,7 +1620,7 @@ bool processDots(SrcNode * node, int treeInd,int currentElementId, int graphInd,
 	else
 	{
 		PropertyAndType * prop=elements[curId].classContainer->CheckExistence(identifiers[0]);
-		sprintf_s(str,256,"(*((CQMLGUI::Rootoutput%d*)context->root)->_QML_element%d)",treeInd,curId);
+		sprintf_s(str,256,"(*((CQMLGUI::Rootoutput%d*)context->root)->_CQML_element%d)",treeInd,curId);
 		if(prop!=0)
 		{
 			//start from this
@@ -1707,8 +1677,8 @@ void processRefs(SrcNode * node, int treeInd, int currentElementId, int graphInd
 			curId=idMaps[treeInd][std::string(node->text)];
 			
 			free(node->text);
-			//sprintf_s(str,256,"(*((CQMLGUI::Rootoutput%d *)context->root)->_QML_element%d)",treeInd,curId);
-			sprintf_s(str,256,"(*((CQMLGUI::Rootoutput%d*)context->root)->_QML_element%d)",treeInd,curId);
+			//sprintf_s(str,256,"(*((CQMLGUI::Rootoutput%d *)context->root)->_CQML_element%d)",treeInd,curId);
+			sprintf_s(str,256,"(*((CQMLGUI::Rootoutput%d*)context->root)->_CQML_element%d)",treeInd,curId);
 			//sprintf(str,"(*self->localGroup->members[%d])",otherId);
 			node->text=new char[strlen(str)+1];
 			strcpy_s(node->text,strlen(str)+1,str);
@@ -1719,7 +1689,7 @@ void processRefs(SrcNode * node, int treeInd, int currentElementId, int graphInd
 			ClassContainer * cont=elements[currentElementId].classContainer;
 			PropertyAndType * prop=cont->CheckExistence(std::string(node->text));
 			
-			sprintf_s(str,256,"(*((CQMLGUI::Rootoutput%d*)context->root)->_QML_element%d)",treeInd,curId);
+			sprintf_s(str,256,"(*((CQMLGUI::Rootoutput%d*)context->root)->_CQML_element%d)",treeInd,curId);
 			if(prop!=0)
 			{
 				// ap
@@ -1904,8 +1874,8 @@ void processSrcReferences(SrcNode * node, int treeInd, int currentId, bool leftM
 			{
 				int otherId=idMaps[treeInd][std::string(node->text)];
 				free(node->text);
-				sprintf_s(str,256,"(*((CQMLGUI::Rootoutput%d*)context->root)->_QML_element%d)",treeInd,otherId);
-				//sprintf_s(str,256,"(*((CQMLGUI::Rootoutput%d *)context->root)->_QML_element%d)",treeInd,otherId);
+				sprintf_s(str,256,"(*((CQMLGUI::Rootoutput%d*)context->root)->_CQML_element%d)",treeInd,otherId);
+				//sprintf_s(str,256,"(*((CQMLGUI::Rootoutput%d *)context->root)->_CQML_element%d)",treeInd,otherId);
 				//sprintf(str,"(*self->localGroup->members[%d])",otherId);
 				node->text=new char[strlen(str)+1];
 				strcpy_s(node->text,strlen(str)+1,str);
@@ -1925,7 +1895,7 @@ void processSrcReferences(SrcNode * node, int treeInd, int currentId, bool leftM
 				if(strcmp("parent",node->text)==0)
 				{
 					free(node->text);
-					sprintf_s(str,256,"(*((CQMLGUI::Rootoutput%d*)context->root)->_QML_element%d->parent)",treeInd,currentId);
+					sprintf_s(str,256,"(*((CQMLGUI::Rootoutput%d*)context->root)->_CQML_element%d->parent)",treeInd,currentId);
 					//sprintf(str,"(*self->localGroup->members[%d]->parent)",currentId);
 					node->text=new char[strlen(str)+1];
 					strcpy_s(node->text,strlen(str)+1,str);
@@ -1937,10 +1907,10 @@ void processSrcReferences(SrcNode * node, int treeInd, int currentId, bool leftM
 					if(prop!=0)
 					{
 						//
-						sprintf_s(str,256,"((%s*)((CQMLGUI::Rootoutput%d *)context->root)->_QML_element%d)->%s",prop->cont->className.c_str(),treeInd,currentId,node->text);
+						sprintf_s(str,256,"((%s*)((CQMLGUI::Rootoutput%d *)context->root)->_CQML_element%d)->%s",prop->cont->className.c_str(),treeInd,currentId,node->text);
 							string checkStr=string("((CQMLGUI::Rootoutput")
 							+std::to_string(static_cast<long long>(treeInd))
-							+string(" *)context->root)->_QML_element")
+							+string(" *)context->root)->_CQML_element")
 							+std::to_string(static_cast<long long>(currentId));
 						Checker checker;//(checkStr,string(node->text));
 						checker.SetStartName(checkStr);
@@ -2067,7 +2037,7 @@ bool processSrcDots(SrcNode * node, int treeInd,int currentElementId, int graphI
 								
 	//string checkStr=string("((GUI_Rootoutput")
 	//		+std::to_string(static_cast<long long>(treeInd))
-	//		+string(" *)context->root)->_QML_element");
+	//		+string(" *)context->root)->_CQML_element");
 	
 			
 	Checker checker;//(checkStr,string(node->text));
@@ -2112,7 +2082,7 @@ bool processSrcDots(SrcNode * node, int treeInd,int currentElementId, int graphI
 			{
 				completeName=string("((CQMLGUI::Rootoutput")
 					+std::to_string(static_cast<long long>(treeInd))
-					+string(" *)context->root)->_QML_element")
+					+string(" *)context->root)->_CQML_element")
 					+std::to_string(static_cast<long long>(treeInd));
 
 				prevElement=false;
@@ -2225,7 +2195,7 @@ bool processSrcDots(SrcNode * node, int treeInd,int currentElementId, int graphI
 			//
 			check.AddCheck(identifiers[0]);
 
-			completeStr=std::string("(((GUI_Rootoutput")+std::to_string(static_cast<long long>(treeInd))+std::string(" *)((GUI_Element*)self)->root)->_QML_element")+std::to_string(static_cast<long long>(curId))+std::string(")");
+			completeStr=std::string("(((GUI_Rootoutput")+std::to_string(static_cast<long long>(treeInd))+std::string(" *)((GUI_Element*)self)->root)->_CQML_element")+std::to_string(static_cast<long long>(curId))+std::string(")");
 
 		}
 	}*/
@@ -2249,7 +2219,7 @@ bool processSrcDots(SrcNode * node, int treeInd,int currentElementId, int graphI
 				if(prop!=0)
 				{
 					//
-					completeStr=std::string("(((GUI_Rootoutput")+std::to_string(static_cast<long long>(treeInd))+std::string(" *)((GUI_Element*)self)->root)->_QML_element")+std::to_string(static_cast<long long>(curId))+std::string(")");
+					completeStr=std::string("(((GUI_Rootoutput")+std::to_string(static_cast<long long>(treeInd))+std::string(" *)((GUI_Element*)self)->root)->_CQML_element")+std::to_string(static_cast<long long>(curId))+std::string(")");
 					//
 					prevElement=false;
 					prevTypeName=prop->type;
@@ -2360,9 +2330,9 @@ bool processSrcDots(SrcNode * node, int treeInd,int currentElementId, int graphI
 
 	//
 	//if(startInd==1)
-	//	attribs=std::string("(*((GUI_Rootoutput")+std::to_string(static_cast<long long>(treeInd))+std::string(" *)((GUI_Element*)self)->root)->_QML_element")+std::to_string(static_cast<long long>(curId))+std::string(")")+attribs;
+	//	attribs=std::string("(*((GUI_Rootoutput")+std::to_string(static_cast<long long>(treeInd))+std::string(" *)((GUI_Element*)self)->root)->_CQML_element")+std::to_string(static_cast<long long>(curId))+std::string(")")+attribs;
 	//else
-	//	attribs=std::string("(*(GUI_")+std::string(elements[curId].name)+std::string("*)((GUI_Rootoutput")+std::to_string(static_cast<long long>(treeInd))+std::string(" *)((GUI_Element*)self)->root)->_QML_element")+std::to_string(static_cast<long long>(curId))+std::string(")")+attribs;
+	//	attribs=std::string("(*(GUI_")+std::string(elements[curId].name)+std::string("*)((GUI_Rootoutput")+std::to_string(static_cast<long long>(treeInd))+std::string(" *)((GUI_Element*)self)->root)->_CQML_element")+std::to_string(static_cast<long long>(curId))+std::string(")")+attribs;
 		
 	//attribs
 	//node->text=new char[attribs.length()+1];
@@ -2745,7 +2715,7 @@ void processTree(ParserList* elementTree, int treeInd)
 			if(t!=0 && h!=0)
 			{
 					//assert(false);
-				perror("handler and property has same name\n");
+				printf("handler and property has same name\n");
 				exit(-1);
 			}
 

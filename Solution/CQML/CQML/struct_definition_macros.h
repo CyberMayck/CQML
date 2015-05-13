@@ -17,13 +17,13 @@ using namespace std;
 #endif
     /* property factory macros */
 	#define PROP_FACTORY_DECL_MVAR4(t, n, d, c) t n;
-	#define PROP_FACTORY_DECL_VAR4(t, n, d, c) t n; QML_Context * n##_context; void (* n##_Update)(QML_Context*);
+	#define PROP_FACTORY_DECL_VAR4(t, n, d, c) t n; CQML_Context * n##_context; void (* n##_Update)(CQML_Context*);
     #define PROP_FACTORY_ASSIGN_DEFAULT4(t, n, d, c) self->n = d;
     #define PROP_FACTORY_HAVE_STRCMP4(t, n, d, c) if(strcmp(name, #n) == 0) return 1;
     #define PROP_FACTORY_FROM_STRING4(t, n, d, c) if(strcmp(name, #n) == 0) { string_to_##t(value, &self->n); return 1; }
     #define PROP_FACTORY_DUMP_VAR4(t, n, d, c) t##_to_string(self->n, buffer, buffer_size); printf("%s = %s [%s]\n", #n, buffer, c);
 
-	#define PROP_FACTORY_DECL_FUNC3P(t, n, d, ...) t (*n)(__VA_ARGS__); QML_Context * n##_context;
+	#define PROP_FACTORY_DECL_FUNC3P(t, n, d, ...) t (*n)(__VA_ARGS__); CQML_Context * n##_context;
 	#define PROP_FACTORY_DECL_METH3P(t, n, d, ...) CQML_API virtual t n(__VA_ARGS__);
 	#define PROP_FACTORY_DECL_METHV3P(t, n, d, ...) CQML_API virtual t n(__VA_ARGS__);
      
@@ -86,8 +86,8 @@ using namespace std;
 	ME(int, MouseScrolled, 0, int, int, int, int) \
 	MEV(int, KeyPressed, 0, int) \
 	MEV(int, KeyReleased, 0, int) \
-	M(void, CustomKeyPressed, 0, QML_Context*, QMLKeyboardEvent EVENT) \
-	M(void, CustomKeyReleased, 0, QML_Context*, QMLKeyboardEvent EVENT) \
+	M(void, CustomKeyPressed, 0, CQML_Context*, CQMLKeyboardEvent EVENT) \
+	M(void, CustomKeyReleased, 0, CQML_Context*, CQMLKeyboardEvent EVENT) \
 
 
 
@@ -109,13 +109,13 @@ using namespace std;
 	MEV(int, MouseClicked, 0, int, int, int) \
 	MEV(int, MouseMoved, 0, int, int, int, int) \
 	MEV(int, MouseScrolled, 0, int, int, int, int) \
-	M(void, CustomMouseClicked, 0, QML_Context*, QMLMouseEvent EVENT) \
-	M(void, CustomMousePressed, 0, QML_Context*, QMLMouseEvent EVENT) \
-	M(void, CustomMouseReleased, 0, QML_Context*, QMLMouseEvent EVENT) \
-	M(void, CustomMouseMoved, 0, QML_Context*, QMLMouseEvent EVENT) \
-	M(void, CustomMouseEntered, 0, QML_Context*, QMLMouseEvent EVENT) \
-	M(void, CustomMouseExited, 0, QML_Context*, QMLMouseEvent EVENT) \
-	M(void, CustomMouseScrolled, 0, QML_Context*, QMLMouseEvent EVENT)
+	M(void, CustomMouseClicked, 0, CQML_Context*, CQMLMouseEvent EVENT) \
+	M(void, CustomMousePressed, 0, CQML_Context*, CQMLMouseEvent EVENT) \
+	M(void, CustomMouseReleased, 0, CQML_Context*, CQMLMouseEvent EVENT) \
+	M(void, CustomMouseMoved, 0, CQML_Context*, CQMLMouseEvent EVENT) \
+	M(void, CustomMouseEntered, 0, CQML_Context*, CQMLMouseEvent EVENT) \
+	M(void, CustomMouseExited, 0, CQML_Context*, CQMLMouseEvent EVENT) \
+	M(void, CustomMouseScrolled, 0, CQML_Context*, CQMLMouseEvent EVENT)
 
 #define STRUCT_TEXT(MF, F, M, ME, MEV, INHERIT)\
 	INHERIT(F, M, STRUCT_RECTANGLE)\
@@ -123,7 +123,7 @@ using namespace std;
 	MEV(void, DefaultUpdate, 0) \
 	MEV(void, Update, 0) \
 	MEV(void, Init, 0) \
-	F(Color, text_color, 0, "text color")\
+	F(Color, textColor, 0, "text color")\
 	F(string, text, "", "text color")\
 	F(Font, font, 0, "font style")
 
@@ -135,7 +135,7 @@ using namespace std;
 	MEV(int, MouseClicked, 0, int, int, int) \
 	MEV(int, KeyPressed, 0, int) \
 	MEV(int, KeyReleased, 0, int) \
-	M(void, InputChange, 0, QML_Context*, QMLKeyboardEvent EVENT) \
+	M(void, InputChange, 0, CQML_Context*, CQMLKeyboardEvent EVENT) \
 	MEV(void, Draw, 0) 
 
 #define STRUCT_IMAGE(MF, F, M, ME, MEV, INHERIT)\

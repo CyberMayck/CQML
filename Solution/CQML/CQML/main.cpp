@@ -337,7 +337,7 @@ void GUIMainLoop()
 int InputHandling()
 {
 	SDL_Event sdlEvent;
-	CQMLGUI::QMLEvent qmlEvent;
+	CQMLGUI::CQMLEvent qmlEvent;
 
 	while (SDL_PollEvent(&sdlEvent)) {
 	switch (sdlEvent.type)
@@ -346,21 +346,21 @@ int InputHandling()
 			return 1;
 			break;
 		case SDL_KEYDOWN:
-			qmlEvent.EventType=QML_KEY_EVENT;
+			qmlEvent.EventType=CQML_KEY_EVENT;
 			qmlEvent.keyEvent.action=KEY_PRESSED;
 			qmlEvent.keyEvent.key=sdlEvent.key.keysym.sym;
 			CQMLGUI::PushEvent(qmlEvent);
 
 			break;
 		case SDL_KEYUP:
-			qmlEvent.EventType=QML_KEY_EVENT;
+			qmlEvent.EventType=CQML_KEY_EVENT;
 			qmlEvent.keyEvent.action=KEY_RELEASED;
 			qmlEvent.keyEvent.key=sdlEvent.key.keysym.sym;
 			CQMLGUI::PushEvent(qmlEvent);
 
 			break;
 		case SDL_MOUSEBUTTONDOWN:
-			qmlEvent.EventType=QML_MOUSE_EVENT;
+			qmlEvent.EventType=CQML_MOUSE_EVENT;
 			qmlEvent.mouseEvent.action=MOUSE_BUTTON_PRESSED;
 			qmlEvent.mouseEvent.button=sdlEvent.button.button;
 			qmlEvent.mouseEvent.x=sdlEvent.button.x;
@@ -369,7 +369,7 @@ int InputHandling()
 			
 			break;
 		case SDL_MOUSEBUTTONUP:
-			qmlEvent.EventType=QML_MOUSE_EVENT;
+			qmlEvent.EventType=CQML_MOUSE_EVENT;
 			qmlEvent.mouseEvent.action=MOUSE_BUTTON_RELEASED;
 			qmlEvent.mouseEvent.button=sdlEvent.button.button;
 			qmlEvent.mouseEvent.x=sdlEvent.button.x;
@@ -378,7 +378,7 @@ int InputHandling()
 
 			break;
 		case SDL_MOUSEMOTION:
-			qmlEvent.EventType=QML_MOUSE_EVENT;
+			qmlEvent.EventType=CQML_MOUSE_EVENT;
 			qmlEvent.mouseEvent.action=MOUSE_MOVEMENT;
 			qmlEvent.mouseEvent.x=sdlEvent.motion.x;
 			qmlEvent.mouseEvent.y=sdlEvent.motion.y;
@@ -388,7 +388,7 @@ int InputHandling()
 
 			break;
 		case SDL_MOUSEWHEEL:
-			qmlEvent.EventType=QML_MOUSE_EVENT;
+			qmlEvent.EventType=CQML_MOUSE_EVENT;
 			qmlEvent.mouseEvent.action=MOUSE_WHEEL_SCROLLED;
 			qmlEvent.mouseEvent.x=sdlEvent.wheel.x;
 			qmlEvent.mouseEvent.y=sdlEvent.wheel.y;
@@ -404,7 +404,7 @@ int InputHandling()
 
 void Update()
 {
-	_QML_Update();
+	_CQML_Update();
 
 }
 
@@ -414,7 +414,7 @@ void Redraw()
 		SDL_SetRenderDrawColor(SDLRenderer,0,0,0,255);
 		SDL_RenderClear(SDLRenderer);
 
-		_QML_Draw();
+		_CQML_Draw();
 
 		SDL_Rect sdlRect;
 		sdlRect.x=10;
@@ -439,14 +439,14 @@ int main()
 	
 	SDLInit(0,0);
 
-	_QML_Init();
+	_CQML_Init();
 	InitSDLDrawer();
 	InitSDLResourceManager();
-	_QML_Start();
+	_CQML_Start();
 
 	int w;
 	int h;
-	CQMLGUI::GetQMLWindow(w,h);
+	CQMLGUI::GetCQMLWindow(w,h);
 
 #ifdef USESDL
 	SDL_Event sdlEvent;

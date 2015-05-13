@@ -122,9 +122,9 @@ Element
 		font.family : "Tahoma";
 		font.size : 12;
 		text : "You win";
-		text_color.red : 1;
-		text_color.green : 0;
-		text_color.blue : 1;
+		textColor.red : 1;
+		textColor.green : 0;
+		textColor.blue : 1;
 	};
 	Rectangle
 	{

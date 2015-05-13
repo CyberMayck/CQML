@@ -135,55 +135,55 @@ Variant::~Variant()
 
 
 
-VariantRef::VariantRef(int& a, void (**r)(CQMLGUI::QML_Context*))
+VariantRef::VariantRef(int& a, void (**r)(CQMLGUI::CQML_Context*))
 {
 	value.v_int=&a;
 	typeID=TYPE_INT;
 	updaterP=r;
 }
-VariantRef::VariantRef(long& a, void (**r)(CQMLGUI::QML_Context*))
+VariantRef::VariantRef(long& a, void (**r)(CQMLGUI::CQML_Context*))
 {
 	value.v_long=&a;
 	typeID=TYPE_LONG;
 	updaterP=r;
 }
-VariantRef::VariantRef(long long& a, void (**r)(CQMLGUI::QML_Context*))
+VariantRef::VariantRef(long long& a, void (**r)(CQMLGUI::CQML_Context*))
 {
 	value.v_long_long=&a;
 	typeID=TYPE_LONG_LONG;
 	updaterP=r;
 }
-VariantRef::VariantRef(unsigned int& a, void (**r)(CQMLGUI::QML_Context*))
+VariantRef::VariantRef(unsigned int& a, void (**r)(CQMLGUI::CQML_Context*))
 {
 	value.v_unsigned_int=&a;
 	typeID=TYPE_UNSIGNED_INT;
 	updaterP=r;
 }
-VariantRef::VariantRef(unsigned long& a, void (**r)(CQMLGUI::QML_Context*))
+VariantRef::VariantRef(unsigned long& a, void (**r)(CQMLGUI::CQML_Context*))
 {
 	value.v_unsigned_long=&a;
 	typeID=TYPE_UNSIGNED_LONG;
 	updaterP=r;
 }
-VariantRef::VariantRef(unsigned long long& a, void (**r)(CQMLGUI::QML_Context*))
+VariantRef::VariantRef(unsigned long long& a, void (**r)(CQMLGUI::CQML_Context*))
 {
 	value.v_unsigned_long_long=&a;
 	typeID=TYPE_UNSIGNED_LONG_LONG;
 	updaterP=r;
 }
-VariantRef::VariantRef(float& a, void (**r)(CQMLGUI::QML_Context*))
+VariantRef::VariantRef(float& a, void (**r)(CQMLGUI::CQML_Context*))
 {
 	value.v_float=&a;
 	typeID=TYPE_FLOAT;
 	updaterP=r;
 }
-VariantRef::VariantRef(double& a, void (**r)(CQMLGUI::QML_Context*))
+VariantRef::VariantRef(double& a, void (**r)(CQMLGUI::CQML_Context*))
 {
 	value.v_double=&a;
 	typeID=TYPE_DOUBLE;
 	updaterP=r;
 }
-VariantRef::VariantRef(long double& a, void (**r)(CQMLGUI::QML_Context*))
+VariantRef::VariantRef(long double& a, void (**r)(CQMLGUI::CQML_Context*))
 {
 	value.v_long_double=&a;
 	typeID=TYPE_LONG_DOUBLE;
@@ -194,25 +194,25 @@ VariantRef::VariantRef(long double& a, void (**r)(CQMLGUI::QML_Context*))
 	value.v_string=new std::string(a);
 	typeID=TYPE_STRING;
 }*/
-VariantRef::VariantRef(std::string& a, void (**r)(CQMLGUI::QML_Context*))
+VariantRef::VariantRef(std::string& a, void (**r)(CQMLGUI::CQML_Context*))
 {
 	value.v_string=&std::string(a);
 	typeID=TYPE_STRING;
 	updaterP=r;
 }
-VariantRef::VariantRef(void *& a, void (**r)(CQMLGUI::QML_Context*))
+VariantRef::VariantRef(void *& a, void (**r)(CQMLGUI::CQML_Context*))
 {
 	value.v_r_void = &a;
 	typeID=TYPE_VOID_PTR;
 	updaterP=r;
 }
-VariantRef::VariantRef(CQMLObject ** a, void (**r)(CQMLGUI::QML_Context*))
+VariantRef::VariantRef(CQMLObject ** a, void (**r)(CQMLGUI::CQML_Context*))
 {
 	value.v_r_CQMLObject = a;
 	typeID=TYPE_CQMLOBJECT;
 	updaterP=r;
 }
-VariantRef::VariantRef(CQMLObject* a, void (**r)(CQMLGUI::QML_Context*))
+VariantRef::VariantRef(CQMLObject* a, void (**r)(CQMLGUI::CQML_Context*))
 {
 	value.v_CQMLObject = a;
 	typeID=TYPE_CQMLOBJECT_VALUE;
@@ -234,7 +234,7 @@ VariantRef VariantRef::Get(const char * s)
 	}
 	return (*value.v_r_CQMLObject)->Get(s);
 }
-void VariantRef::SetUpdater(void (*r)(CQMLGUI::QML_Context*))
+void VariantRef::SetUpdater(void (*r)(CQMLGUI::CQML_Context*))
 {
 	if(updaterP!=0)
 		(*updaterP)=r;

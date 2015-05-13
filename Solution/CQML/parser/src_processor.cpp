@@ -196,13 +196,13 @@ void SourceIdToken::PrintZeroUpdaters(string& dest)
 	if(this->isElement)
 	{
 		//dest+="(*((CQMLGUI::Rootoutput"+INTTOSTR(this->fileId)+"*)context->root)->"+
-		//"_QML_element"+INTTOSTR(this->elementId)+")";
+		//"_CQML_element"+INTTOSTR(this->elementId)+")";
 	}
 	else if(this->isVar)
 	{
 		//dest+="_QVar"+INTTOSTR(this->variableId);
 		dest+="(*((CQMLGUI::Rootoutput"+INTTOSTR(this->fileId)+"*)context->root)->"+
-			"_QML_element"+INTTOSTR(this->elementId)+")."+this->str+"_Update=0;\n";
+			"_CQML_element"+INTTOSTR(this->elementId)+")."+this->str+"_Update=0;\n";
 	}
 }
 void SourceIdToken::Print(string& dest)
@@ -211,13 +211,13 @@ void SourceIdToken::Print(string& dest)
 	if(this->isElement)
 	{
 		dest+="(((CQMLGUI::Rootoutput"+INTTOSTR(this->fileId)+"*)context->root)->"+
-		"_QML_element"+INTTOSTR(this->elementId)+")";
+		"_CQML_element"+INTTOSTR(this->elementId)+")";
 	}
 	else if(this->isVar)
 	{
 		//dest+="_QVar"+INTTOSTR(this->variableId);
 		dest+="(*((CQMLGUI::Rootoutput"+INTTOSTR(this->fileId)+"*)context->root)->"+
-			"_QML_element"+INTTOSTR(this->elementId)+")."+this->str;
+			"_CQML_element"+INTTOSTR(this->elementId)+")."+this->str;
 	}
 	else
 		dest+=str;
@@ -228,7 +228,7 @@ void SourceDotToken::PrintZeroUpdaters(string& dest)
 	if(this->isVarReplaced)
 	{
 		dest+="(*((CQMLGUI::Rootoutput"+INTTOSTR(this->fileId)+"*)context->root)->"+
-			"_QML_element"+INTTOSTR(this->variableId)+")";
+			"_CQML_element"+INTTOSTR(this->variableId)+")";
 		bool wasStatic=true;
 		for(unsigned int i=0;i<this->isStatic.size();i++)
 		{
@@ -269,7 +269,7 @@ void SourceDotToken::Print(string& dest)
 	if(this->isVarReplaced)
 	{
 		dest+="(*((CQMLGUI::Rootoutput"+INTTOSTR(this->fileId)+"*)context->root)->"+
-			"_QML_element"+INTTOSTR(this->variableId)+")";
+			"_CQML_element"+INTTOSTR(this->variableId)+")";
 		bool wasStatic=true;
 		for(unsigned int i=0;i<this->isStatic.size();i++)
 		{
@@ -371,7 +371,7 @@ void SourceIdToken::Process(int treeInd, int currentElementId, SourceStatementTo
 		fileId=treeInd;
 		elementId=idMaps[treeInd][this->str];
 		isElement=true;
-		//sprintf(str,"(*((GUI_Rootoutput%d *)context->root)->_QML_element%d)",treeInd,curId);
+		//sprintf(str,"(*((GUI_Rootoutput%d *)context->root)->_CQML_element%d)",treeInd,curId);
 	}
 	else
 	{
@@ -464,18 +464,16 @@ void SourceDotToken::Process(int treeInd, int currentElementId, SourceStatementT
 				if(prevIsPrimitive)//cont==0)
 				{
 					// error primitive type
-					printf("primitive doesnt have members");
-					getchar();
-					exit(0);
+					printf("primitive type doesnt have members");
+					exit(-1);
 				}
 				//check existence
 				PropertyAndType * prop=cont->CheckExistence(identifiers[i]->GetId());
 
 				if(prop==0)
 				{
-					printf("primitive doesnt have members");
-					getchar();
-					exit(0);
+					printf("nonexistent attribute %d",identifiers[i]->GetId().c_str());
+					exit(-1);
 					//error does not exist
 				}
 				string typeName=prop->type;
@@ -535,8 +533,7 @@ void SourceDotToken::Process(int treeInd, int currentElementId, SourceStatementT
 				{
 					//error
 					printf("element has no parent\n");
-					getchar();
-					exit(0);
+					exit(-1);
 				}
 			}
 			else
@@ -564,16 +561,17 @@ void SourceDotToken::Process(int treeInd, int currentElementId, SourceStatementT
 				if(prevIsPrimitive)//cont==0)
 				{
 					// error primitive type
-					printf("primitive does doesnt have mmbers");
-					getchar();
-					exit(0);
+					printf("primitive does doesnt have members");
+					exit(-1);
 				}
 				//check existence
 				PropertyAndType * prop=cont->CheckExistence(identifiers[i]->GetId());
 
-				if(prop!=0)
+				if(prop==0)
 				{
 					//error does not exist
+					printf("nonexistent attribute %d",identifiers[i]->GetId().c_str());
+					exit(-1);
 				}
 				string typeName=prop->type;
 
@@ -707,7 +705,7 @@ void GetterFromElement::Print(string& dest)
 {
 	dest+=string("QEGET(")
 		+"(*((CQMLGUI::Rootoutput"+INTTOSTR(fileId)+"*)context->root)->"
-		+"_QML_element"+INTTOSTR(elementId)+")"
+		+"_CQML_element"+INTTOSTR(elementId)+")"
 		+","
 		+"\""+propName+"\""
 		+","
@@ -732,7 +730,7 @@ void SetterFromElement::Print(string& dest)
 {
 	dest+=string("QESET(")
 		+"(*((CQMLGUI::Rootoutput"+INTTOSTR(fileId)+"*)context->root)->"
-		+"_QML_element"+INTTOSTR(elementId)+")"
+		+"_CQML_element"+INTTOSTR(elementId)+")"
 		+","
 		+"\""+propName+"\""
 		+","

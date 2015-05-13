@@ -199,7 +199,7 @@ void makeMainSource()
 	PrintDefaultValueTypeAssignment(file);
 	//PrintClassHashTabs(file,0);
 	
-	/*fprintf(file,"void _QML_ClassTabsInit()\n");
+	/*fprintf(file,"void _CQML_ClassTabsInit()\n");
 	fprintf(file,"{\n");
 	PrintClassTabs(file,elementTreeCnt);
 	fprintf(file,"}\n");*/

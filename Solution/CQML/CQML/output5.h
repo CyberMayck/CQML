@@ -8,7 +8,7 @@ struct Rootoutput5
 	:Component
 {
 	Rootoutput5();
-	MouseAreaCustom3* _QML_element0;
+	MouseAreaCustom3* _CQML_element0;
 };
 MouseAreaCustom3* acGUI_Rootoutput5();
 Rootoutput5 cGUI_Rootoutput5();

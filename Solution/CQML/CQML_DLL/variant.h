@@ -9,7 +9,7 @@ struct CQMLObject;
 struct Variant;
 namespace CQMLGUI
 {
-	struct QML_Context;
+	struct CQML_Context;
 };
 
 	// enum here
@@ -35,20 +35,20 @@ enum type_variant
 struct VariantRef
 {
 	CQML_API VariantRef();
-	CQML_API VariantRef(int&, void (**r)(CQMLGUI::QML_Context*));
-	CQML_API VariantRef(long&, void (**r)(CQMLGUI::QML_Context*));
-	CQML_API VariantRef(long long&, void (**r)(CQMLGUI::QML_Context*));
-	CQML_API VariantRef(unsigned int&, void (**r)(CQMLGUI::QML_Context*));
-	CQML_API VariantRef(unsigned long&, void (**r)(CQMLGUI::QML_Context*));
-	CQML_API VariantRef(unsigned long long&, void (**r)(CQMLGUI::QML_Context*));
-	CQML_API VariantRef(float&, void (**r)(CQMLGUI::QML_Context*));
-	CQML_API VariantRef(double&, void (**r)(CQMLGUI::QML_Context*));
-	CQML_API VariantRef(long double&, void (**r)(CQMLGUI::QML_Context*));
+	CQML_API VariantRef(int&, void (**r)(CQMLGUI::CQML_Context*));
+	CQML_API VariantRef(long&, void (**r)(CQMLGUI::CQML_Context*));
+	CQML_API VariantRef(long long&, void (**r)(CQMLGUI::CQML_Context*));
+	CQML_API VariantRef(unsigned int&, void (**r)(CQMLGUI::CQML_Context*));
+	CQML_API VariantRef(unsigned long&, void (**r)(CQMLGUI::CQML_Context*));
+	CQML_API VariantRef(unsigned long long&, void (**r)(CQMLGUI::CQML_Context*));
+	CQML_API VariantRef(float&, void (**r)(CQMLGUI::CQML_Context*));
+	CQML_API VariantRef(double&, void (**r)(CQMLGUI::CQML_Context*));
+	CQML_API VariantRef(long double&, void (**r)(CQMLGUI::CQML_Context*));
 	//CQML_API VariantRef(const char*);
-	CQML_API VariantRef(std::string&, void (**r)(CQMLGUI::QML_Context*));
-	CQML_API VariantRef(void*&, void (**r)(CQMLGUI::QML_Context*));
-	CQML_API VariantRef(CQMLObject*, void (**r)(CQMLGUI::QML_Context*));
-	CQML_API VariantRef(CQMLObject**, void (**r)(CQMLGUI::QML_Context*));
+	CQML_API VariantRef(std::string&, void (**r)(CQMLGUI::CQML_Context*));
+	CQML_API VariantRef(void*&, void (**r)(CQMLGUI::CQML_Context*));
+	CQML_API VariantRef(CQMLObject*, void (**r)(CQMLGUI::CQML_Context*));
+	CQML_API VariantRef(CQMLObject**, void (**r)(CQMLGUI::CQML_Context*));
 	long typeID;
 	union
 	{
@@ -66,10 +66,10 @@ struct VariantRef
 		CQMLObject* v_CQMLObject;
 		CQMLObject** v_r_CQMLObject;
 	} value;
-	void (**updaterP)(CQMLGUI::QML_Context*);
+	void (**updaterP)(CQMLGUI::CQML_Context*);
 
 	CQML_API VariantRef Get(const char *);
-	CQML_API void SetUpdater(void (*r)(CQMLGUI::QML_Context*));
+	CQML_API void SetUpdater(void (*r)(CQMLGUI::CQML_Context*));
 
 	CQML_API const VariantRef& operator=(const Variant & rhs);
 	CQML_API const VariantRef& operator+=(const Variant & rhs);

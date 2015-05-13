@@ -210,6 +210,7 @@ PerfectHashData * makePerfectHash(vector<string> & strs, int cnt)
 	data->T2=T2;
 	data->n=n;
 	data->m=m;
+	data->maxT=max;
 
 	delete[] edges;
 	delete[] visited;

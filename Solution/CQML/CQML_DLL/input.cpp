@@ -60,11 +60,11 @@ void SetRoot(void* p)
 {
 	root=(Element*)p;
 }
-QMLEventQueue * eventQueue;
+CQMLEventQueue * eventQueue;
 
-QMLEventQueue * MakeQueue()
+CQMLEventQueue * MakeQueue()
 {
-	QMLEventQueue * queue = (QMLEventQueue*)malloc(sizeof(QMLEventQueue));
+	CQMLEventQueue * queue = (CQMLEventQueue*)malloc(sizeof(CQMLEventQueue));
 	queue->headNode=0;
 	queue->headNode2=0;
 	queue->tailNode=0;
@@ -81,11 +81,11 @@ void SwapActiveQueue()
 	unlock();
 }
 
-int PushEvent(QMLEvent inputEvent)
+int PushEvent(CQMLEvent inputEvent)
 {
 
-	QMLEventQueueNode * newNode;
-	newNode=(QMLEventQueueNode*)malloc(sizeof(QMLEventQueueNode));
+	CQMLEventQueueNode * newNode;
+	newNode=(CQMLEventQueueNode*)malloc(sizeof(CQMLEventQueueNode));
 	newNode->nextNode=0;
 	newNode->nodeEvent=inputEvent;
 
@@ -103,16 +103,16 @@ int PushEvent(QMLEvent inputEvent)
 	return 1;
 }
 
-QMLEvent PopEvent()
+CQMLEvent PopEvent()
 {
-	QMLEventQueueNode * firstNode;
-	QMLEvent nodeEvent;
+	CQMLEventQueueNode * firstNode;
+	CQMLEvent nodeEvent;
 	//lock();
 	firstNode=eventQueue->headNode2;
 	if(firstNode==0)
 	{
 		//unlock();
-		nodeEvent.EventType=QML_INVALID_EVENT;
+		nodeEvent.EventType=CQML_INVALID_EVENT;
 		return nodeEvent;
 	}
 
@@ -125,7 +125,7 @@ QMLEvent PopEvent()
 }
 
 
-void ProcessMouseEvent(QMLMouseEvent * mouseEvent)
+void ProcessMouseEvent(CQMLMouseEvent * mouseEvent)
 {
 //	int a;
 	switch(mouseEvent->action)
@@ -148,7 +148,7 @@ void ProcessMouseEvent(QMLMouseEvent * mouseEvent)
 	}
 }
 
-void ProcessKeyboardEvent(QMLKeyboardEvent * keyEvent)
+void ProcessKeyboardEvent(CQMLKeyboardEvent * keyEvent)
 {
 	switch(keyEvent->action)
 	{
@@ -161,13 +161,13 @@ void ProcessKeyboardEvent(QMLKeyboardEvent * keyEvent)
 	}
 }
 
-void ProcessEvent(QMLEvent * processedEvent)
+void ProcessEvent(CQMLEvent * processedEvent)
 {
-	if(processedEvent->EventType==QML_KEY_EVENT)
+	if(processedEvent->EventType==CQML_KEY_EVENT)
 	{
 		ProcessKeyboardEvent(&processedEvent->keyEvent);
 	}
-	else if(processedEvent->EventType==QML_MOUSE_EVENT)
+	else if(processedEvent->EventType==CQML_MOUSE_EVENT)
 	{
 		ProcessMouseEvent(&processedEvent->mouseEvent);
 	}
@@ -176,12 +176,12 @@ void ProcessEvent(QMLEvent * processedEvent)
 
 void processEvents()
 {
-	QMLEvent node;
+	CQMLEvent node;
 	SwapActiveQueue();
 	while(1)
 	{
 		node=PopEvent();
-		if(node.EventType!=QML_INVALID_EVENT)
+		if(node.EventType!=CQML_INVALID_EVENT)
 		{
 			ProcessEvent(&node);
 		}
@@ -189,15 +189,15 @@ void processEvents()
 	}
 }
 
-void QMLInitInput()
+void CQMLInitInput()
 {
 	eventQueue=MakeQueue();
 	InitQueueThreadsafe();
 }
 
-QMLEvent MakeEvent()
+CQMLEvent MakeEvent()
 {
-	QMLEvent Event;
+	CQMLEvent Event;
 	Event.EventType=-1;
 	Event.mouseEvent.action=0;
 	Event.mouseEvent.button=0;

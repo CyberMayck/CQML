@@ -89,7 +89,7 @@ namespace CQMLGUI
 		return;
 	}
 
-	void GetQMLWindow(int &w,int &h)
+	void GetCQMLWindow(int &w,int &h)
 	{
 		w=root->width;
 		h=root->height;
@@ -134,7 +134,7 @@ namespace CQMLGUI
 		}
 		if(processed==0 && CustomKeyPressed!=0)
 		{
-			QMLKeyboardEvent e;
+			CQMLKeyboardEvent e;
 			e.action=KEY_PRESSED;
 			e.key=key;
 			CustomKeyPressed(CustomKeyPressed_context, e);
@@ -174,7 +174,7 @@ namespace CQMLGUI
 		}
 		if(processed==0 && CustomKeyReleased!=0)
 		{
-			QMLKeyboardEvent e;
+			CQMLKeyboardEvent e;
 			e.action=KEY_RELEASED;
 			e.key=key;
 			CustomKeyReleased(CustomKeyReleased_context, e);
@@ -186,11 +186,12 @@ namespace CQMLGUI
 	{
 		if(!enabled)
 			return 0;
-		for(int i=0;i<pressedElements.size();i++)
+		for(unsigned int i=0;i<pressedElements.size();i++)
 		{
 			pressedElements[i]->MouseReleased(x,y,button);
 		}
 		pressedElements.clear();
+		return 0;
 	}
 
 	int Element::MouseMoved(int x, int y, int relx, int rely)
@@ -283,7 +284,7 @@ namespace CQMLGUI
 		{
 			if(CustomMouseClicked!=0)
 			{
-				QMLMouseEvent e;
+				CQMLMouseEvent e;
 				e.x=x;
 				e.y=y;
 				e.button=button;
@@ -325,7 +326,7 @@ namespace CQMLGUI
 			lastPressed=this;
 			if(CustomMousePressed!=0)
 			{
-				QMLMouseEvent e;
+				CQMLMouseEvent e;
 				e.x=x;
 				e.y=y;
 				e.button=button;
@@ -356,7 +357,7 @@ namespace CQMLGUI
 			
 		if(CustomMouseReleased!=0)
 		{
-			QMLMouseEvent e;
+			CQMLMouseEvent e;
 			e.x=x;
 			e.y=y;
 			e.button=button;
@@ -368,7 +369,7 @@ namespace CQMLGUI
 
 			if(CustomMouseClicked!=0)
 			{
-				QMLMouseEvent e;
+				CQMLMouseEvent e;
 				e.x=x;
 				e.y=y;
 				e.button=button;
@@ -407,7 +408,7 @@ namespace CQMLGUI
 			{
 				//if(!(x1<xold && xold<x1+w && y1<yold && yold<y1+h))
 				{
-					QMLMouseEvent e;
+					CQMLMouseEvent e;
 					e.x=x;
 					e.y=y;
 					e.relativeX=relx;
@@ -417,7 +418,7 @@ namespace CQMLGUI
 			}
 			if(CustomMouseMoved!=0)
 			{
-				QMLMouseEvent e;
+				CQMLMouseEvent e;
 				e.x=x;
 				e.y=y;
 				e.relativeX=relx;
@@ -432,7 +433,7 @@ namespace CQMLGUI
 			{
 				//if(x1<xold && xold<x1+w && y1<yold && yold<y1+h)
 				{
-					QMLMouseEvent e;
+					CQMLMouseEvent e;
 					e.x=x;
 					e.y=y;
 					e.relativeX=relx;
@@ -464,7 +465,7 @@ namespace CQMLGUI
 		{
 			if(CustomMouseScrolled!=0)
 			{
-				QMLMouseEvent e;
+				CQMLMouseEvent e;
 				e.x=x;
 				e.y=y;
 				e.relativeX=relx;
@@ -495,7 +496,7 @@ namespace CQMLGUI
 		h=height;
 
 	
-		drawer->DrawText(x,y,w,h,text.c_str(),resourceManager.fonts[font.family+"__"+std::to_string(font.size)],this->text_color.red,text_color.green, text_color.blue);
+		drawer->DrawText(x,y,w,h,text.c_str(),resourceManager.fonts[font.family+"__"+std::to_string(font.size)],this->textColor.red,textColor.green, textColor.blue);
 	
 		//draw kids
 		CQMLGUI::Element::Draw();
@@ -583,7 +584,7 @@ namespace CQMLGUI
 		h=height;
 
 	
-		drawer->DrawText(x,y,w,h,text.c_str(),resourceManager.fonts[font.family+"__"+std::to_string(font.size)],this->text_color.red,text_color.green, text_color.blue);
+		drawer->DrawText(x,y,w,h,text.c_str(),resourceManager.fonts[font.family+"__"+std::to_string(font.size)],this->textColor.red,textColor.green, textColor.blue);
 	
 		//draw kids
 		CQMLGUI::Element::Draw();
@@ -666,10 +667,10 @@ namespace CQMLGUI
 	}
 
 
-	QML_Context * acQML_Context(CQMLGUI::Component * g, CQMLGUI::Element * e)
+	CQML_Context * acCQML_Context(CQMLGUI::Component * g, CQMLGUI::Element * e)
 	{
-		QML_Context * context;
-		context = (QML_Context *)malloc(sizeof(context));
+		CQML_Context * context;
+		context = (CQML_Context *)malloc(sizeof(context));
 		context->root=g;
 		context->self=e;
 		return context;

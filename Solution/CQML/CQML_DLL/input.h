@@ -3,9 +3,9 @@
 
 #include "dll_export.h"
 
-#define QML_KEY_EVENT			(0)
-#define QML_MOUSE_EVENT			(1)
-#define QML_INVALID_EVENT		(-1)
+#define CQML_KEY_EVENT			(0)
+#define CQML_MOUSE_EVENT			(1)
+#define CQML_INVALID_EVENT		(-1)
 //#define QUIT_EVENT  		(2)
 
 
@@ -20,7 +20,7 @@
 namespace CQMLGUI
 {
 
-struct QMLMouseEvent
+struct CQMLMouseEvent
 {
 	int action;
 	int button;
@@ -30,46 +30,46 @@ struct QMLMouseEvent
 	int relativeY;
 };
 
-struct QMLKeyboardEvent
+struct CQMLKeyboardEvent
 {
 	int action;
 	int key;
 };
 
-struct QMLEvent
+struct CQMLEvent
 {
 	int EventType;
 
 	union
 	{
-		QMLMouseEvent mouseEvent;
-		QMLKeyboardEvent keyEvent;
+		CQMLMouseEvent mouseEvent;
+		CQMLKeyboardEvent keyEvent;
 	};
 };
 
-struct QMLEventQueueNode
+struct CQMLEventQueueNode
 {
-	QMLEvent nodeEvent;
-	QMLEventQueueNode * nextNode;
+	CQMLEvent nodeEvent;
+	CQMLEventQueueNode * nextNode;
 };
 
-struct QMLEventQueue
+struct CQMLEventQueue
 {
-	QMLEventQueueNode * headNode;
-	QMLEventQueueNode * tailNode;
-	QMLEventQueueNode * headNode2;
+	CQMLEventQueueNode * headNode;
+	CQMLEventQueueNode * tailNode;
+	CQMLEventQueueNode * headNode2;
 };
 
-//extern QMLEventQueue * eventQueue;
+//extern CQMLEventQueue * eventQueue;
 CQML_API void SetRoot(void*);
-CQML_API QMLEventQueue* MakeQueue();
-CQML_API int PushEvent(QMLEvent);
-CQML_API QMLEvent PopEvent();
+CQML_API CQMLEventQueue* MakeQueue();
+CQML_API int PushEvent(CQMLEvent);
+CQML_API CQMLEvent PopEvent();
 CQML_API void SwapActiveQueue();
 CQML_API void InitQueueThreadsafe();
 CQML_API void processEvents();
-CQML_API void QMLInitInput();
-CQML_API QMLEvent MakeEvent();
+CQML_API void CQMLInitInput();
+CQML_API CQMLEvent MakeEvent();
 
 };
 

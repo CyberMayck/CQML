@@ -10,12 +10,12 @@ struct Rootoutput0
 	:Component
 {
 	Rootoutput0();
-	Rectangle* _QML_element0;
-	MouseAreaCustom3* _QML_element1;
-	MouseAreaCustom3* _QML_element2;
-	MouseAreaCustom3* _QML_element3;
-	Rectangle* _QML_element4;
-	Rectangle* _QML_element5;
+	Rectangle* _CQML_element0;
+	MouseAreaCustom3* _CQML_element1;
+	MouseAreaCustom3* _CQML_element2;
+	MouseAreaCustom3* _CQML_element3;
+	Rectangle* _CQML_element4;
+	Rectangle* _CQML_element5;
 };
 Rectangle* acGUI_Rootoutput0();
 Rootoutput0 cGUI_Rootoutput0();

@@ -65,6 +65,9 @@ int h(const char * s, int n,int m, int * T1, int *T2, int*g)
 int GetHash(long classID, const char* name)
 {
 	ClassHashTable * hashTab=&classHashTables[classID];
+	int len=strlen(name);
+	if(len>hashTab->maxT)
+		return -1;
 	int index= h(name,hashTab->n,hashTab->m,hashTab->T1,hashTab->T2,hashTab->g);
 	if(strcmp(hashTab->keys[index],name)==0)
 	{
@@ -102,7 +105,7 @@ void SetInitHashTabs(void (*fptr)(ClassHashTable*&))
 	InitHashTabs=fptr;
 }
 
-void QMLInitHashes()
+void CQMLInitHashes()
 {
 	InitHashTabs(classHashTables);
 	int a=1;

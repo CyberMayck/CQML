@@ -7,7 +7,7 @@
 	struct Component;
 	struct Element;
 	
-struct QML_Context
+struct CQML_Context
 {
 	Component * root;
 	Element * self;

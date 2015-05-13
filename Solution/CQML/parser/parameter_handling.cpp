@@ -347,6 +347,7 @@ void PrintHashTab(FILE * file, int classID, PerfectHashData * data)
 {
 	fprintf(file,"data=&hashTabs[%d];\n",classID);
 	fprintf(file,"InitHashTab(data,%d,%d);\n",data->n,data->m);
+	fprintf(file,"data->maxT=%d;\n",data->maxT);
 	for(int i=0;i<data->m;i++)
 	{
 		fprintf(file,"data->keys[%d]=(char *)malloc(sizeof(char) * %d);\n",i,data->keys[i].length()+1);

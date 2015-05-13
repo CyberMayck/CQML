@@ -125,8 +125,8 @@ CQMLGUI::Anchor::Anchor()
 CQMLGUI::Text::Text()
 {
 	classID=7;
-	text_color_Update=0;
-	text_color_context=0;
+	textColor_Update=0;
+	textColor_context=0;
 	text="";
 	text_Update=0;
 	text_context=0;
@@ -397,7 +397,7 @@ VariantRef CQMLGUI::Text::Get(const char* s)
 	switch(hash)
 	{
 	case 0:
-		return VariantRef((CQMLObject*)&text_color,&text_color_Update);
+		return VariantRef((CQMLObject*)&textColor,&textColor_Update);
 	case 1:
 		return VariantRef(text,&text_Update);
 	case 2:
@@ -435,7 +435,7 @@ VariantRef CQMLGUI::TextInput::Get(const char* s)
 	switch(hash)
 	{
 	case 0:
-		return VariantRef((CQMLObject*)&text_color,&text_color_Update);
+		return VariantRef((CQMLObject*)&textColor,&textColor_Update);
 	case 1:
 		return VariantRef(text,&text_Update);
 	case 2:
@@ -560,12 +560,12 @@ void Text::Update()
 {
 	if(!enabled)
 		return;
-	if(text_color_Update)text_color_Update(text_color_context);
+	if(textColor_Update)textColor_Update(textColor_context);
 	else
 	{
-		if(text_color.red_Update)text_color.red_Update(text_color.red_context);
-		if(text_color.green_Update)text_color.green_Update(text_color.green_context);
-		if(text_color.blue_Update)text_color.blue_Update(text_color.blue_context);
+		if(textColor.red_Update)textColor.red_Update(textColor.red_context);
+		if(textColor.green_Update)textColor.green_Update(textColor.green_context);
+		if(textColor.blue_Update)textColor.blue_Update(textColor.blue_context);
 	}
 	if(text_Update)text_Update(text_context);
 	if(font_Update)font_Update(font_context);
@@ -615,6 +615,7 @@ void InitDefaultHashTabs(ClassHashTable * hashTabs)
 ClassHashTable * data;
 data=&hashTabs[0];
 InitHashTab(data,9,3);
+data->maxT=5;
 data->keys[0]=(char *)malloc(sizeof(char) * 4);
 strcpy_s(data->keys[0],4,"red");
 data->keys[1]=(char *)malloc(sizeof(char) * 6);
@@ -625,10 +626,14 @@ strcpy_s(data->keys[2],5,"blue");
 data->T1[0]=8;
 data->T1[1]=7;
 data->T1[2]=7;
+data->T1[3]=7;
+data->T1[4]=3;
 
 data->T2[0]=2;
 data->T2[1]=6;
 data->T2[2]=5;
+data->T2[3]=8;
+data->T2[4]=0;
 
 data->g[0]=0;
 data->g[1]=0;
@@ -643,6 +648,7 @@ data->g[8]=0;
 
 data=&hashTabs[1];
 InitHashTab(data,15,5);
+data->maxT=7;
 data->keys[0]=(char *)malloc(sizeof(char) * 8);
 strcpy_s(data->keys[0],8,"capital");
 data->keys[1]=(char *)malloc(sizeof(char) * 7);
@@ -659,12 +665,16 @@ data->T1[1]=2;
 data->T1[2]=7;
 data->T1[3]=6;
 data->T1[4]=8;
+data->T1[5]=2;
+data->T1[6]=11;
 
 data->T2[0]=9;
 data->T2[1]=3;
 data->T2[2]=7;
 data->T2[3]=11;
 data->T2[4]=5;
+data->T2[5]=6;
+data->T2[6]=3;
 
 data->g[0]=0;
 data->g[1]=0;
@@ -685,12 +695,17 @@ data->g[14]=0;
 
 data=&hashTabs[2];
 InitHashTab(data,3,1);
+data->maxT=3;
 data->keys[0]=(char *)malloc(sizeof(char) * 4);
 strcpy_s(data->keys[0],4,"src");
 
 data->T1[0]=0;
+data->T1[1]=2;
+data->T1[2]=1;
 
 data->T2[0]=1;
+data->T2[1]=1;
+data->T2[2]=0;
 
 data->g[0]=0;
 data->g[1]=0;
@@ -699,6 +714,7 @@ data->g[2]=0;
 
 data=&hashTabs[3];
 InitHashTab(data,18,6);
+data->maxT=7;
 data->keys[0]=(char *)malloc(sizeof(char) * 2);
 strcpy_s(data->keys[0],2,"x");
 data->keys[1]=(char *)malloc(sizeof(char) * 2);
@@ -718,6 +734,7 @@ data->T1[2]=16;
 data->T1[3]=17;
 data->T1[4]=6;
 data->T1[5]=2;
+data->T1[6]=11;
 
 data->T2[0]=10;
 data->T2[1]=14;
@@ -725,6 +742,7 @@ data->T2[2]=14;
 data->T2[3]=10;
 data->T2[4]=3;
 data->T2[5]=1;
+data->T2[6]=10;
 
 data->g[0]=0;
 data->g[1]=0;
@@ -748,6 +766,7 @@ data->g[17]=0;
 
 data=&hashTabs[4];
 InitHashTab(data,27,9);
+data->maxT=11;
 data->keys[0]=(char *)malloc(sizeof(char) * 12);
 strcpy_s(data->keys[0],12,"borderColor");
 data->keys[1]=(char *)malloc(sizeof(char) * 7);
@@ -776,6 +795,8 @@ data->T1[5]=18;
 data->T1[6]=2;
 data->T1[7]=26;
 data->T1[8]=5;
+data->T1[9]=6;
+data->T1[10]=20;
 
 data->T2[0]=3;
 data->T2[1]=17;
@@ -786,6 +807,8 @@ data->T2[5]=11;
 data->T2[6]=3;
 data->T2[7]=17;
 data->T2[8]=10;
+data->T2[9]=24;
+data->T2[10]=21;
 
 data->g[0]=0;
 data->g[1]=0;
@@ -818,6 +841,7 @@ data->g[26]=0;
 
 data=&hashTabs[5];
 InitHashTab(data,18,6);
+data->maxT=7;
 data->keys[0]=(char *)malloc(sizeof(char) * 2);
 strcpy_s(data->keys[0],2,"x");
 data->keys[1]=(char *)malloc(sizeof(char) * 2);
@@ -837,6 +861,7 @@ data->T1[2]=3;
 data->T1[3]=7;
 data->T1[4]=13;
 data->T1[5]=15;
+data->T1[6]=5;
 
 data->T2[0]=16;
 data->T2[1]=10;
@@ -844,6 +869,7 @@ data->T2[2]=5;
 data->T2[3]=15;
 data->T2[4]=11;
 data->T2[5]=15;
+data->T2[6]=17;
 
 data->g[0]=0;
 data->g[1]=0;
@@ -867,6 +893,7 @@ data->g[17]=1;
 
 data=&hashTabs[6];
 InitHashTab(data,12,4);
+data->maxT=6;
 data->keys[0]=(char *)malloc(sizeof(char) * 4);
 strcpy_s(data->keys[0],4,"top");
 data->keys[1]=(char *)malloc(sizeof(char) * 7);
@@ -880,11 +907,15 @@ data->T1[0]=1;
 data->T1[1]=5;
 data->T1[2]=2;
 data->T1[3]=2;
+data->T1[4]=9;
+data->T1[5]=0;
 
 data->T2[0]=2;
 data->T2[1]=0;
 data->T2[2]=10;
 data->T2[3]=10;
+data->T2[4]=8;
+data->T2[5]=11;
 
 data->g[0]=0;
 data->g[1]=0;
@@ -902,8 +933,9 @@ data->g[11]=0;
 
 data=&hashTabs[7];
 InitHashTab(data,36,12);
-data->keys[0]=(char *)malloc(sizeof(char) * 11);
-strcpy_s(data->keys[0],11,"text_color");
+data->maxT=11;
+data->keys[0]=(char *)malloc(sizeof(char) * 10);
+strcpy_s(data->keys[0],10,"textColor");
 data->keys[1]=(char *)malloc(sizeof(char) * 5);
 strcpy_s(data->keys[1],5,"text");
 data->keys[2]=(char *)malloc(sizeof(char) * 5);
@@ -938,7 +970,6 @@ data->T1[7]=34;
 data->T1[8]=26;
 data->T1[9]=10;
 data->T1[10]=2;
-data->T1[11]=-842150451;
 
 data->T2[0]=0;
 data->T2[1]=30;
@@ -951,7 +982,6 @@ data->T2[7]=16;
 data->T2[8]=23;
 data->T2[9]=29;
 data->T2[10]=35;
-data->T2[11]=-842150451;
 
 data->g[0]=0;
 data->g[1]=0;
@@ -962,7 +992,7 @@ data->g[5]=9;
 data->g[6]=0;
 data->g[7]=0;
 data->g[8]=0;
-data->g[9]=5;
+data->g[9]=11;
 data->g[10]=1;
 data->g[11]=11;
 data->g[12]=0;
@@ -971,7 +1001,7 @@ data->g[14]=0;
 data->g[15]=0;
 data->g[16]=0;
 data->g[17]=0;
-data->g[18]=0;
+data->g[18]=6;
 data->g[19]=0;
 data->g[20]=7;
 data->g[21]=0;
@@ -993,8 +1023,9 @@ data->g[35]=0;
 
 data=&hashTabs[8];
 InitHashTab(data,36,12);
-data->keys[0]=(char *)malloc(sizeof(char) * 11);
-strcpy_s(data->keys[0],11,"text_color");
+data->maxT=11;
+data->keys[0]=(char *)malloc(sizeof(char) * 10);
+strcpy_s(data->keys[0],10,"textColor");
 data->keys[1]=(char *)malloc(sizeof(char) * 5);
 strcpy_s(data->keys[1],5,"text");
 data->keys[2]=(char *)malloc(sizeof(char) * 5);
@@ -1018,31 +1049,29 @@ strcpy_s(data->keys[10],8,"visible");
 data->keys[11]=(char *)malloc(sizeof(char) * 8);
 strcpy_s(data->keys[11],8,"enabled");
 
-data->T1[0]=13;
-data->T1[1]=29;
-data->T1[2]=28;
-data->T1[3]=35;
-data->T1[4]=8;
-data->T1[5]=15;
-data->T1[6]=5;
-data->T1[7]=9;
-data->T1[8]=27;
-data->T1[9]=34;
+data->T1[0]=15;
+data->T1[1]=4;
+data->T1[2]=2;
+data->T1[3]=8;
+data->T1[4]=24;
+data->T1[5]=10;
+data->T1[6]=11;
+data->T1[7]=25;
+data->T1[8]=12;
+data->T1[9]=29;
 data->T1[10]=26;
-data->T1[11]=-842150451;
 
-data->T2[0]=11;
-data->T2[1]=0;
-data->T2[2]=17;
-data->T2[3]=20;
-data->T2[4]=26;
-data->T2[5]=13;
-data->T2[6]=0;
-data->T2[7]=33;
-data->T2[8]=7;
-data->T2[9]=1;
-data->T2[10]=25;
-data->T2[11]=-842150451;
+data->T2[0]=28;
+data->T2[1]=27;
+data->T2[2]=6;
+data->T2[3]=3;
+data->T2[4]=2;
+data->T2[5]=26;
+data->T2[6]=29;
+data->T2[7]=18;
+data->T2[8]=12;
+data->T2[9]=30;
+data->T2[10]=3;
 
 data->g[0]=0;
 data->g[1]=0;
@@ -1052,38 +1081,39 @@ data->g[4]=0;
 data->g[5]=0;
 data->g[6]=0;
 data->g[7]=0;
-data->g[8]=8;
-data->g[9]=0;
+data->g[8]=3;
+data->g[9]=8;
 data->g[10]=0;
 data->g[11]=0;
 data->g[12]=6;
-data->g[13]=8;
+data->g[13]=0;
 data->g[14]=0;
-data->g[15]=5;
+data->g[15]=7;
 data->g[16]=0;
 data->g[17]=0;
 data->g[18]=0;
-data->g[19]=10;
-data->g[20]=5;
-data->g[21]=9;
+data->g[19]=0;
+data->g[20]=0;
+data->g[21]=0;
 data->g[22]=0;
-data->g[23]=4;
+data->g[23]=1;
 data->g[24]=0;
 data->g[25]=0;
-data->g[26]=0;
-data->g[27]=0;
-data->g[28]=2;
+data->g[26]=2;
+data->g[27]=2;
+data->g[28]=0;
 data->g[29]=0;
-data->g[30]=0;
-data->g[31]=3;
-data->g[32]=0;
-data->g[33]=0;
+data->g[30]=9;
+data->g[31]=0;
+data->g[32]=11;
+data->g[33]=1;
 data->g[34]=0;
-data->g[35]=7;
+data->g[35]=0;
 
 
 data=&hashTabs[9];
 InitHashTab(data,21,7);
+data->maxT=7;
 data->keys[0]=(char *)malloc(sizeof(char) * 4);
 strcpy_s(data->keys[0],4,"img");
 data->keys[1]=(char *)malloc(sizeof(char) * 2);
@@ -1099,47 +1129,48 @@ strcpy_s(data->keys[5],8,"visible");
 data->keys[6]=(char *)malloc(sizeof(char) * 8);
 strcpy_s(data->keys[6],8,"enabled");
 
-data->T1[0]=5;
-data->T1[1]=11;
-data->T1[2]=7;
-data->T1[3]=10;
-data->T1[4]=4;
-data->T1[5]=11;
-data->T1[6]=4;
+data->T1[0]=4;
+data->T1[1]=8;
+data->T1[2]=4;
+data->T1[3]=14;
+data->T1[4]=17;
+data->T1[5]=3;
+data->T1[6]=11;
 
-data->T2[0]=13;
-data->T2[1]=1;
-data->T2[2]=20;
-data->T2[3]=0;
-data->T2[4]=15;
-data->T2[5]=12;
-data->T2[6]=19;
+data->T2[0]=8;
+data->T2[1]=0;
+data->T2[2]=8;
+data->T2[3]=2;
+data->T2[4]=11;
+data->T2[5]=10;
+data->T2[6]=9;
 
 data->g[0]=0;
 data->g[1]=0;
-data->g[2]=0;
+data->g[2]=2;
 data->g[3]=0;
 data->g[4]=0;
 data->g[5]=0;
-data->g[6]=0;
+data->g[6]=6;
 data->g[7]=0;
 data->g[8]=0;
 data->g[9]=0;
-data->g[10]=6;
+data->g[10]=0;
 data->g[11]=0;
-data->g[12]=1;
+data->g[12]=0;
 data->g[13]=0;
 data->g[14]=0;
-data->g[15]=3;
-data->g[16]=4;
-data->g[17]=4;
-data->g[18]=0;
-data->g[19]=5;
-data->g[20]=0;
+data->g[15]=4;
+data->g[16]=0;
+data->g[17]=5;
+data->g[18]=4;
+data->g[19]=0;
+data->g[20]=3;
 
 
 data=&hashTabs[10];
 InitHashTab(data,33,11);
+data->maxT=12;
 data->keys[0]=(char *)malloc(sizeof(char) * 11);
 strcpy_s(data->keys[0],11,"leftBorder");
 data->keys[1]=(char *)malloc(sizeof(char) * 13);
@@ -1163,63 +1194,65 @@ strcpy_s(data->keys[9],8,"visible");
 data->keys[10]=(char *)malloc(sizeof(char) * 8);
 strcpy_s(data->keys[10],8,"enabled");
 
-data->T1[0]=30;
-data->T1[1]=18;
-data->T1[2]=19;
-data->T1[3]=29;
-data->T1[4]=27;
-data->T1[5]=19;
-data->T1[6]=14;
-data->T1[7]=32;
+data->T1[0]=2;
+data->T1[1]=16;
+data->T1[2]=16;
+data->T1[3]=4;
+data->T1[4]=2;
+data->T1[5]=10;
+data->T1[6]=22;
+data->T1[7]=10;
 data->T1[8]=0;
-data->T1[9]=8;
-data->T1[10]=17;
+data->T1[9]=28;
+data->T1[10]=30;
+data->T1[11]=5;
 
-data->T2[0]=2;
-data->T2[1]=29;
-data->T2[2]=20;
-data->T2[3]=16;
-data->T2[4]=26;
-data->T2[5]=29;
-data->T2[6]=28;
-data->T2[7]=26;
-data->T2[8]=32;
-data->T2[9]=4;
-data->T2[10]=7;
+data->T2[0]=16;
+data->T2[1]=8;
+data->T2[2]=9;
+data->T2[3]=24;
+data->T2[4]=15;
+data->T2[5]=25;
+data->T2[6]=22;
+data->T2[7]=13;
+data->T2[8]=13;
+data->T2[9]=29;
+data->T2[10]=22;
+data->T2[11]=1;
 
 data->g[0]=0;
 data->g[1]=0;
 data->g[2]=0;
-data->g[3]=9;
+data->g[3]=0;
 data->g[4]=0;
 data->g[5]=0;
 data->g[6]=0;
 data->g[7]=0;
-data->g[8]=0;
-data->g[9]=7;
-data->g[10]=3;
-data->g[11]=6;
-data->g[12]=2;
+data->g[8]=8;
+data->g[9]=5;
+data->g[10]=0;
+data->g[11]=0;
+data->g[12]=0;
 data->g[13]=0;
-data->g[14]=0;
+data->g[14]=4;
 data->g[15]=0;
 data->g[16]=0;
-data->g[17]=8;
-data->g[18]=0;
-data->g[19]=4;
-data->g[20]=0;
-data->g[21]=0;
-data->g[22]=0;
+data->g[17]=0;
+data->g[18]=9;
+data->g[19]=0;
+data->g[20]=8;
+data->g[21]=10;
+data->g[22]=6;
 data->g[23]=0;
 data->g[24]=0;
 data->g[25]=1;
-data->g[26]=10;
+data->g[26]=0;
 data->g[27]=0;
-data->g[28]=9;
-data->g[29]=0;
+data->g[28]=0;
+data->g[29]=3;
 data->g[30]=0;
 data->g[31]=0;
-data->g[32]=0;
+data->g[32]=7;
 
 
 }

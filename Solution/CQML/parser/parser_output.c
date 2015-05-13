@@ -1,17 +1,17 @@
 #include "output0outer.h"
 
 #include "qml_includes.h"
-void _QML_Update();
-void _QML_ClassTabsInit();
+void _CQML_Update();
+void _CQML_ClassTabsInit();
 GUI_Element* root;
 
-void _QML_Init()
+void _CQML_Init()
 {
 	root = (GUI_Element*) acGUI_Rootoutput0();
-	_QML_Update();
+	_CQML_Update();
 }
 
-void _QML_Update()
+void _CQML_Update()
 {
 	root->Update(root);
 }
