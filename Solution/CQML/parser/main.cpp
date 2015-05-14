@@ -893,21 +893,11 @@ bool detectCycle(std::vector<GraphNode*> &graphNodes)
 
 
 FILE **files;
-//FILE *files;
-//FILE *files;
 
 
 void makeMainSource()
 {
-	
-	fopen_s(&file,"alltypes.h","w");
-	if(file)
-	{
-		PrintTypesUnion(file);
-		fclose(file);
-	}
-
-	fopen_s(&file,"parser_output.h","w");
+	fopen_s(&file,"cqml_output/parser_output.h","w");
 	if(file)
 	{
 		fprintf(file,"#include \"qml_includes.h\"\n");
@@ -920,7 +910,7 @@ void makeMainSource()
 		fclose(file);
 	}
 	
-	fopen_s(&file,"parser_output.cpp","w");
+	fopen_s(&file,"cqml_output/parser_output.cpp","w");
 	fprintf(file,"#include \"output0.h\"\n#include\"parser_output.h\"\n#include \"qml_includes.h\"\n");
 	fprintf(file,"void _CQML_Update();\n");
 	fprintf(file,"void _CQML_ClassTabsInit();\n");
@@ -1313,9 +1303,9 @@ void makeSource(std::string name, int treeInd)
 {
 	std::string name1 = name+std::string(".h");
 	std::string name2 = name+std::string(".cpp");
-
-	fopen_s(&file_class_header,name1.c_str(),"w");
-	fopen_s(&file_class_source,name2.c_str(),"w");
+	
+	fopen_s(&file_class_header,(string("cqml_output/")+name1).c_str(),"w");
+	fopen_s(&file_class_source,(string("cqml_output/")+name2).c_str(),"w");
 
 	fprintf(file_class_header,"#pragma once\n");
 //	fprintf(file,"#pragma once\n");
@@ -2833,10 +2823,32 @@ bool processFile(const char * name)
 	return true;
 }
 
-void PrintHelp()
+void printOutputListFile(int cnt)
 {
-	printf("first param is input filename");
+	FILE * hFile;
+	fopen_s(&hFile,"outputfiles.txt","w");
+	if(hFile)
+	{
+		fprintf(hFile, "parser_output.cpp\n");
+		for(int i=0;i<cnt;i++)
+		{
+			fprintf(hFile, "output%d.cpp\n",i);
+		}
+		fclose(hFile);
+	}
+	
+	fopen_s(&hFile,"outputheaders.txt","w");
+	if(hFile)
+	{
+		fprintf(hFile, "parser_output.h\n");
+		for(int i=0;i<cnt;i++)
+		{
+			fprintf(hFile, "output%d.h\n",i);
+		}
+		fclose(hFile);
+	}
 }
+
 
 int main(int argc, char ** argv)
 {
@@ -2929,20 +2941,7 @@ int main(int argc, char ** argv)
 	}
 	makeMainSource();
 
-	//for(int i=0;)
-	
-
-    //yyrestart(srcFile);
-	
-	//if(yyparse())
-	{
-		a=1;//eror
-	}
-	//processTree(elementTree);
-	//makeSource();
-	//fclose(srcFile);
-	printf("\n%d\n",compInd);
-	//scanf("%d",&a);
+	printOutputListFile(elementTreeCnt);
 
 	return 0;
 }

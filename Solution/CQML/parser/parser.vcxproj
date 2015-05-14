@@ -64,17 +64,11 @@
   <ItemGroup>
     <ClCompile Include="checker.cpp" />
     <ClCompile Include="cqml_grammar.tab.c" />
-    <ClCompile Include="custom_classes.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
     <ClCompile Include="elements.cpp" />
     <ClCompile Include="hashing.cpp" />
     <ClCompile Include="lex.yy.c" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="parameter_handling.cpp" />
-    <ClCompile Include="parser_output.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
     <ClCompile Include="parser_tree.cpp" />
     <ClCompile Include="src_apendix.cpp" />
     <ClCompile Include="src_processor.cpp" />
@@ -83,9 +77,6 @@
     <ClInclude Include="..\CQML\struct_definition_macros.h" />
     <ClInclude Include="checker.h" />
     <ClInclude Include="cqml_grammar.tab.h" />
-    <ClInclude Include="custom_classes.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-    </ClInclude>
     <ClInclude Include="elements.h" />
     <ClInclude Include="hashing.h" />
     <ClInclude Include="parameter_handling.h" />

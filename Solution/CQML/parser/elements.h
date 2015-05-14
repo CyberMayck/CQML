@@ -96,5 +96,4 @@ public:
 	SourceHandler * source;
 	vector<Checker> checkers;
 
-	void CheckerPrint(FILE *);
 };
