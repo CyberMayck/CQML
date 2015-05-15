@@ -5,17 +5,34 @@
 using namespace std;
 InternalResourceManager resourceManager;
 
+/**
+ * Sets resource manager interface
+ * 
+ *
+ * @param pointer to instane of interface
+ *
+ * @return 1
+ */
 int SetResourceManager(ResourceManagerIface *m)
 {
 	resourceManager.manager= m;
 	return 1;
 }
 
+
+/**
+ * Constructor.
+ * Initializes internal resource manager.
+ */
 InternalResourceManager::InternalResourceManager()
 {
 	manager=0;
 }
 
+/**
+ * Loads all queued images
+ * 
+ */
 void InternalResourceManager::LoadImages()
 {
 	for(unsigned int i=0;i<imageLoadQueue.size();i++)
@@ -26,19 +43,18 @@ void InternalResourceManager::LoadImages()
 		}
 		else
 		{
-		//	int width=0;
-		//	int height=0;
-		//	void * image=manager->LoadImage(txt.c_str());
 			ImageData  img= manager->LoadImage(txt.c_str());
-		//	ImageData img;
-			//img.width=width;
-			//img.height=height;
-			//img.img=image;
+
 			images[txt]=img;
 		}
 	}
 	imageLoadQueue.clear();
 }
+
+/**
+ * Loads all queued fonts.
+ * 
+ */
 void InternalResourceManager::LoadFonts()
 {
 	for(unsigned int i=0;i<fontLoadQueue.size();i++)
@@ -59,6 +75,15 @@ void InternalResourceManager::LoadFonts()
 	fontSizeLoadQueue.clear();
 }
 
+/**
+ * Creates load request for font
+ * 
+ *
+ * @param font name
+ * @param font size
+ *
+ * @return 1
+ */
 int InternalResourceManager::TryLoadFont(string txt, int size)
 {
 	fontLoadQueue.push_back(txt);
@@ -66,6 +91,14 @@ int InternalResourceManager::TryLoadFont(string txt, int size)
 	return 1;
 }
 
+/**
+ * Creates load request for image
+ * 
+ *
+ * @param image path
+ *
+ * @return 1
+ */
 int InternalResourceManager::TryLoadImage(string path)
 {
 	imageLoadQueue.push_back(path);

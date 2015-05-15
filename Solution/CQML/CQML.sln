@@ -11,6 +11,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CQML_DLL", "CQML_DLL\CQML_D
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CQML_lib_preprocessor", "CQML_lib_preprocessor\CQML_lib_preprocessor.vcxproj", "{389EBC20-6D1D-4CE4-BE24-908347322138}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ParserLoader", "ParserLoader\ParserLoader.vcxproj", "{0365655B-1FF2-4AB7-B7AB-6F0A66AA835D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -37,6 +39,10 @@ Global
 		{389EBC20-6D1D-4CE4-BE24-908347322138}.Debug|Win32.Build.0 = Debug|Win32
 		{389EBC20-6D1D-4CE4-BE24-908347322138}.Release|Win32.ActiveCfg = Release|Win32
 		{389EBC20-6D1D-4CE4-BE24-908347322138}.Release|Win32.Build.0 = Release|Win32
+		{0365655B-1FF2-4AB7-B7AB-6F0A66AA835D}.Debug|Win32.ActiveCfg = Debug|Win32
+		{0365655B-1FF2-4AB7-B7AB-6F0A66AA835D}.Debug|Win32.Build.0 = Debug|Win32
+		{0365655B-1FF2-4AB7-B7AB-6F0A66AA835D}.Release|Win32.ActiveCfg = Release|Win32
+		{0365655B-1FF2-4AB7-B7AB-6F0A66AA835D}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

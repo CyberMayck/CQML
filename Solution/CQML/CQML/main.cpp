@@ -1,23 +1,8 @@
-//#define USECAIRO
-#define SET_FLAG(x,flag)	(x|flag)
-#define UNSET_FLAG(x,flag)	(x&(~flag))
-#define FLAG(x,flag)		(x&flag)
-
-
-#define USESDL
-
-#ifdef USECAIRO
-#define LIBCAIRO_EXPORTS
-
-#include <cairo/cairo-win32.h>
-#endif
-
-#ifdef USESDL
 #include "SDL/SDL.h"
 #undef main
 #include "SDL/SDL_TTF.h"
 #include "SDL/SDL_image.h"
-#endif
+
 
 #include<stdio.h>
 #include<stdlib.h>
@@ -28,27 +13,25 @@
 
 
 
-#ifdef USESDL
-//SDL_Surface*    Surf_Display;
+
 SDL_Window*  SDLWindow;
 SDL_Renderer* SDLRenderer;
 TTF_Font *fntCourier;
 SDL_Texture *strTex;
 
 
-struct SDL_Drawer
-	: DrawIFace
-{
-
-};
 
 
-
-
-void SDLInit(int w, int h)
+/**
+ * Initializes SDL
+ * 
+ *
+ * @param 
+ */
+void SDLInit()
 {
 	SDL_Init(SDL_INIT_EVERYTHING);
-	//SDL_CreateWindow("CQML SDL TEST", 5, 5, 800, 600,SDL_WINDOW_OPENGL);
+
 
 	TTF_Init();
 	int flags=IMG_INIT_JPG|IMG_INIT_PNG|IMG_INIT_TIF;
@@ -57,114 +40,64 @@ void SDLInit(int w, int h)
 		printf("IMG_Init: Failed to init required jpg and png and tif support!\n");
 		printf("IMG_Init: %s\n", IMG_GetError());
 	}
-	//fntCourier = TTF_OpenFont( "c64.ttf", 12 );
-	//FILE* f= fopen("c64.ttf","r");
 
-	//Surf_Display = SDL_SetVideoMode(640, 480, 32, SDL_HWSURFACE | SDL_DOUBLEBUF);
-	
-}
-#endif
-
-#ifdef USECAIRO
-cairo_surface_t *surface;
-cairo_t *cr;
-
-void CairoInit()
-{
-	
-surface = cairo_image_surface_create (CAIRO_FORMAT_ARGB32, 480, 360);
-cr = cairo_create (surface);
-}
-
-void CairoEnd()
-{
-cairo_destroy (cr);
-cairo_surface_write_to_png(surface, "out.png");
-cairo_surface_destroy(surface);
-}
-#endif
-
-
-
-
-
-
-void DrawRectangle(int x,int y,int w,int h,float r, float g, float b)
-{
-#ifdef USESDL
-	SDL_Rect sdlRect;
-#endif
-#ifdef USECAIRO
-	cairo_set_line_width (cr, 2);
-	cairo_set_source_rgb (cr, 0, 0, 0);
-	cairo_rectangle (cr, x, y, w, h);
-	cairo_stroke (cr);
-#endif
-#ifdef USESDL
-	sdlRect.x=x;
-	sdlRect.y=y;
-	sdlRect.w=w;
-	sdlRect.h=h;
-	
-	SDL_SetRenderDrawColor(SDLRenderer,r,g,b,255);
-	SDL_RenderDrawRect(SDLRenderer, &sdlRect);
-#endif
 }
 
 
-void DrawRectangleFilled(int x,int y,int w,int h,float r, float g, float b)
-{
-#ifdef USESDL
-	SDL_Rect sdlRect;
-#endif
-#ifdef USESDL
-	sdlRect.x=x;
-	sdlRect.y=y;
-	sdlRect.w=w;
-	sdlRect.h=h;
-	
-	SDL_SetRenderDrawColor(SDLRenderer,r,g,b,255);
-	SDL_RenderFillRect(SDLRenderer, &sdlRect);
-#endif
-}
-
-
-#ifdef USESDL
-
+/**
+ * Resource managing interface.
+ */
 struct SDLResourceManager
 	: ResourceManagerIface
 {
+	
+/**
+ * Loads font.
+ */
 	virtual void* LoadFont(const char * fontStr, int fontSize)
 	{
-		TTF_Font *fnt = TTF_OpenFont( (string(fontStr)+".ttf").c_str(), fontSize );
-		//printf("TTF_OpenFont: %s\n", TTF_GetError());
+		TTF_Font *fnt = TTF_OpenFont( fontStr, fontSize );
+		if(!fnt)
+			printf("TTF_OpenFont: %s\n", TTF_GetError());
 		return fnt;
 	}
+	
+/**
+ * Loads image data.
+ */
 	virtual ImageData LoadImage(const char *  path)
 	{
 		SDL_Surface *image;
 		string strPath=path;
-		//int i=strPath.length()-1;
-		//for(;i>=0;i--)
-		{
-		//	if(strPath[i]=='.');
-		}
+		ImageData data;
 		image=IMG_Load(path);
 		if(!image)
 		{
 			printf("IMG_Load: %s\n", IMG_GetError());
 			// handle error
+			data.img=0;
+			data.width=0;
+			data.height=0;
 		}
-		ImageData data;
-		data.img=image;
-		data.width=image->w;
-		data.height=image->h;
+		else
+		{
+			data.img=image;
+			data.width=image->w;
+			data.height=image->h;
+		}
 		return data;
 	}
 };
+
+/**
+ * Drawing Interface
+ */
 struct SDLDrawer
 	: DrawIFace
 {
+/**
+ * Draws rectangle.
+ */
 	virtual void DrawRectangle(int x,int y,int w,int h,float r, float g, float b)
 	{
 		SDL_Rect sdlRect;
@@ -176,6 +109,9 @@ struct SDLDrawer
 		SDL_SetRenderDrawColor(SDLRenderer,r,g,b,255);
 		SDL_RenderDrawRect(SDLRenderer, &sdlRect);
 	}
+/**
+ * Draws filled rectangle.
+ */
 	virtual void DrawFilledRectangle(int x,int y,int w,int h,float r, float g, float b)
 	{
 		SDL_Rect sdlRect;
@@ -187,6 +123,9 @@ struct SDLDrawer
 		SDL_SetRenderDrawColor(SDLRenderer,r,g,b,255);
 		SDL_RenderFillRect(SDLRenderer, &sdlRect);
 	}
+/**
+ * Draws rectangle with border.
+ */
 	virtual void DrawFilledBorderedRectangle(int x,int y,int w,int h,float r, float g, float b, float border, float br, float bg, float bb)
 	{
 		SDL_Rect sdlRect;
@@ -205,14 +144,12 @@ struct SDLDrawer
 		SDL_SetRenderDrawColor(SDLRenderer,r,g,b,255);
 		SDL_RenderFillRect(SDLRenderer, &sdlRect);
 	}
-	virtual void DrawLine(int x1,int y1,int x2,int y2,float r, float g, float b){}
-	virtual void DrawPoint(int x,int y,float r, float g, float b){}
-	virtual void DrawArc(int x,int y,int w,int h, float angle1, float angle2, float r, float g, float b){}
-	virtual void DrawFilledArc(int x,int y,int w,int h, float angle1, float angle2, float r, float g, float b){}
-
+	
+/**
+ * Draws text.
+ */
 	virtual void DrawText(int x, int y, int w, int h, const char* text, void* font, float r, float g, float b)
 	{
-
 		SDL_Rect sdlRect;
 		sdlRect.x=x;
 		sdlRect.y=y;
@@ -223,6 +160,8 @@ struct SDLDrawer
 		SDL_Texture * strTex;
 		SDL_Color clrFg = {r*255,g*255,b*255,0};
 		
+		if(font==0)
+			return;
 		TTF_Font *fnt=(TTF_Font *)font;
 		if(!font)
 			return;
@@ -231,14 +170,19 @@ struct SDLDrawer
 		SDL_QueryTexture(strTex, 0, 0, &sdlRect.w, &sdlRect.h);
 		SDL_RenderCopy(SDLRenderer, strTex, NULL, &sdlRect);
 		
-		//printf("TTF_OpenFont: %s\n", TTF_GetError());
+
 		SDL_FreeSurface(sText);
 		SDL_RenderCopy(SDLRenderer, strTex, NULL, &sdlRect);
 		SDL_DestroyTexture(strTex);
 	}
+/**
+ * Draws Image.
+ */
 	void DrawImage(int x, int y, int w, int h, void* image)
 	{
 		SDL_Rect sdlRect;
+		if(image==0)
+			return;
 		SDL_Surface * imgSurf = (SDL_Surface *)image;
 		SDL_Texture * imgTex=SDL_CreateTextureFromSurface(SDLRenderer, imgSurf);
 		sdlRect.x=x;
@@ -249,13 +193,18 @@ struct SDLDrawer
 		SDL_RenderCopy(SDLRenderer, imgTex, NULL, &sdlRect);
 		SDL_DestroyTexture(imgTex);
 	}
+/**
+ * Draws segment of an image.
+ */
 	virtual void DrawImageSegment(int x, int y, int w, int h, void* image, int iX, int iY, int iW, int iH)
 	{
 		SDL_Rect sdlRect;
 		SDL_Rect sdlSrcRect;
+		if(image==0)
+			return;
 		SDL_Surface * imgSurf = (SDL_Surface *)image;
 		SDL_Texture * imgTex=SDL_CreateTextureFromSurface(SDLRenderer, imgSurf);
-		//std::cout << SDL_GetError() << endl;;
+
 		sdlRect.x=x;
 		sdlRect.y=y;
 		sdlRect.w=w;
@@ -270,28 +219,23 @@ struct SDLDrawer
 	}
 };
 
+/**
+ * Initializes and sets SDL drawing interface.
+ */
 void InitSDLDrawer()
 {
 	DrawIFace * drawer=new SDLDrawer();
-//	drawer->DrawRectangle=DrawRectangle;
-//	drawer->DrawFilledRectangle=DrawRectangleFilled;
 	SetDrawIFace(drawer);
 }
 
+/**
+ * Initializes and sets resource management interface.
+ */
 void InitSDLResourceManager()
 {
 	ResourceManagerIface * man= new SDLResourceManager();
 	SetResourceManager(man);
 }
-
-#endif
-
-//GUI_Element ** drawQueue;
-//GUI_Element ** updateQueue;
-CQMLGUI::Element ** allElements;
-int allElementCount;
-int * drawQueue;
-int * updateQueue;
 
 void Update();
 void Redraw();
@@ -304,12 +248,11 @@ clock_t t;
 float timey;
 int fps;
 
-void PrintMeMyFriend(char * str)
-{
-	printf("Print: %s\n",str);
-}
 
-
+/**
+ * Main loop.
+ * Runs main gui loop and calls update and draw functions.
+ */
 void GUIMainLoop()
 {
 	int quit;
@@ -320,7 +263,6 @@ void GUIMainLoop()
 	while(quit==0)
 	{
 		quit=InputHandling();
-		//printf("quit %d\n",quit);
 		Update();
 
 		Redraw();
@@ -329,11 +271,17 @@ void GUIMainLoop()
 		fps=1/timey;
 		prevTime=t;
 		t=clock();
-	printf("%d fps\n",fps);
-
+		
+		//cout << fps << "fps" << endl;
 	}
 }
 
+/**
+ * Input handling function.
+ * Processes use input.
+ *
+ * @return 1 if application is supposed quit. 0 otherwise
+ */
 int InputHandling()
 {
 	SDL_Event sdlEvent;
@@ -402,15 +350,22 @@ int InputHandling()
 	return 0;
 }
 
+/**
+ * Update.
+ * Calls GUI update function.
+ */
 void Update()
 {
 	_CQML_Update();
 
 }
 
+/**
+ * Redraw.
+ * Draws GUI.
+ */
 void Redraw()
 {
-
 		SDL_SetRenderDrawColor(SDLRenderer,0,0,0,255);
 		SDL_RenderClear(SDLRenderer);
 
@@ -430,14 +385,17 @@ void Redraw()
 		SDL_RenderPresent(SDLRenderer);
 }
 
+/**
+ * Main function.
+ * Initializes libraries and calls main loop.
+ *
+ * @return returns 0
+ */
 int main()
 {
 	int quit=0;
-#ifdef USECAIRO
-	CairoInit();
-#endif
 	
-	SDLInit(0,0);
+	SDLInit();
 
 	_CQML_Init();
 	InitSDLDrawer();
@@ -448,59 +406,19 @@ int main()
 	int h;
 	CQMLGUI::GetCQMLWindow(w,h);
 
-#ifdef USESDL
 	SDL_Event sdlEvent;
 	SDL_CreateWindowAndRenderer(w, h,SDL_WINDOW_OPENGL,&SDLWindow,&SDLRenderer);
 
-	//SDL_RenderFillRect(SDLRenderer,NULL);
 	if(SDLWindow==NULL || SDLRenderer==NULL)
 		return 0;
-#endif
 
-	GUIMainLoop();
-#ifdef USESDL
-	/*while(quit==0)
-	{
-		SDL_WaitEvent(&sdlEvent);
-		switch (sdlEvent.type)
-		{
-		case SDL_QUIT:
-			quit=1;
-			break;
-		case SDL_KEYDOWN:
-			printf("pressed %c\n",sdlEvent.key.keysym.sym);
-			break;
-		case SDL_MOUSEBUTTONDOWN:
-			root->MousePressed(sdlEvent.button.x,sdlEvent.button.y,1);
-			printf("mouse click %d %d\n",sdlEvent.button.x,sdlEvent.button.y);
-			break;
-		case SDL_MOUSEBUTTONUP:
-			root->MouseReleased(sdlEvent.button.x,sdlEvent.button.y,1);
-			printf("mouse click %d %d\n",sdlEvent.button.x,sdlEvent.button.y);
-			break;
-
-		}
-		SDL_SetRenderDrawColor(SDLRenderer,255,0,0,255);
-		SDL_RenderClear(SDLRenderer);
-		SDL_SetRenderDrawColor(SDLRenderer,0,0,0,255);
-		root->Draw();
-		//CQMLGUI::mGUI_Element_Draw((CQMLGUI::Element*)root);
-		SDL_RenderPresent(SDLRenderer);
-	}*/
-	//SDL_Delay(3000);
+	GUIMainLoop();;
 	
     SDL_DestroyRenderer(SDLRenderer);
     SDL_DestroyWindow(SDLWindow);
 
 	IMG_Quit();
     SDL_Quit();
-#endif
 
-#ifdef USECAIRO
-	CairoEnd();
-#endif
-
-	//_CrtDumpMemoryLeaks();
-	//getchar();
 	return 0;
 }

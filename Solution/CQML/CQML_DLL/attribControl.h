@@ -9,8 +9,8 @@
 struct ClassHashTable
 {
 	char ** keys; // m
-	int * T1; // m
-	int * T2; // m
+	int * T1; // maxT
+	int * T2; // maxT
 	int * g; // n
 	int m;
 	int n;

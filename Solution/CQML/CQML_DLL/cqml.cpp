@@ -6,19 +6,56 @@
 #include "draw_iface.h"
 #include "attribControl.h"
 
+namespace CQMLGUI
+{
+	void MainDraw();
+	void MainUpdate();
+}
+
 using namespace CQMLGUI;
 
-void InitGUI();
+
+/**
+ * Initializes CQML
+ * 
+ */
 void _CQML_Init()
 {
 	CQMLInitInput();
-	CQMLGUI::InitGUI();
-	//CQMLInitHashes();
+	InitGUI();
 }
 
  DrawIFace * drawer;
-
+ 
+/**
+ * Sets drawing interface
+ * 
+ *
+ * @param interface pointer
+ */
 void SetDrawIFace(DrawIFace * dr)
 {
 	drawer=dr;
+}
+
+/**
+ * Draws GUI
+ * 
+ */
+void _CQML_Draw()
+{
+	PreDraw();
+	MainDraw();
+	PostDraw();
+}
+
+/**
+ * Updates GUI
+ * 
+ */
+void _CQML_Update()
+{
+	PreUpdate();
+	MainUpdate();
+	PostUpdate();
 }

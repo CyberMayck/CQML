@@ -15,16 +15,29 @@
 HANDLE queueMutex;
 
 namespace CQMLGUI{
+
+/**
+ * Initializes threadsafe queue
+ * 
+ */
 void InitQueueThreadsafe()
 {
 	queueMutex=CreateMutex(NULL,FALSE,L"queueMutex");
 }
 
+/**
+ * locks queue
+ * 
+ */
 void lock()
 {
 	WaitForSingleObject(queueMutex, INFINITE);
 }
 
+/**
+ * unlocks queue
+ * 
+ */
 void unlock()
 {
 	ReleaseMutex(queueMutex);
@@ -56,12 +69,23 @@ namespace CQMLGUI
 {
 
 CQMLGUI::Element* root;
+
+/**
+ * Sets root element
+ * 
+ *
+ * @param root element pointer
+ */
 void SetRoot(void* p)
 {
 	root=(Element*)p;
 }
 CQMLEventQueue * eventQueue;
 
+/**
+ * initializes values of queue pointers to zeros.
+ * 
+ */
 CQMLEventQueue * MakeQueue()
 {
 	CQMLEventQueue * queue = (CQMLEventQueue*)malloc(sizeof(CQMLEventQueue));
@@ -71,6 +95,10 @@ CQMLEventQueue * MakeQueue()
 	return queue;
 }
 
+/**
+ * Swaps active and read queue
+ * 
+ */
 void SwapActiveQueue()
 {
 	lock();
@@ -81,6 +109,14 @@ void SwapActiveQueue()
 	unlock();
 }
 
+/**
+ * Pushes event to input event queue
+ * 
+ *
+ * @param input event
+ *
+ * @return 1
+ */
 int PushEvent(CQMLEvent inputEvent)
 {
 
@@ -103,6 +139,12 @@ int PushEvent(CQMLEvent inputEvent)
 	return 1;
 }
 
+/**
+ * Gets input evenet from front of queue
+ * 
+ *
+ * @return event fro queue
+ */
 CQMLEvent PopEvent()
 {
 	CQMLEventQueueNode * firstNode;
@@ -125,6 +167,15 @@ CQMLEvent PopEvent()
 }
 
 
+int xold=-1;
+int yold=-1;
+
+/**
+ * Processes mouse event
+ * 
+ *
+ * @param mouse event
+ */
 void ProcessMouseEvent(CQMLMouseEvent * mouseEvent)
 {
 //	int a;
@@ -141,13 +192,22 @@ void ProcessMouseEvent(CQMLMouseEvent * mouseEvent)
 		root->MouseScrolled(mouseEvent->x,mouseEvent->y,mouseEvent->relativeX,mouseEvent->relativeX);
 		break;
 	case MOUSE_MOVEMENT:
-		root->MouseMoved(mouseEvent->x,mouseEvent->y,mouseEvent->relativeX,mouseEvent->relativeX);
+		
+		root->MouseMoved(mouseEvent->x,mouseEvent->y,mouseEvent->x-xold,mouseEvent->y-yold);
+		xold=mouseEvent->x;
+		yold=mouseEvent->y;
 		break;
 	default:
 		break;
 	}
 }
 
+/**
+ * Processes key event
+ * 
+ *
+ * @param key event
+ */
 void ProcessKeyboardEvent(CQMLKeyboardEvent * keyEvent)
 {
 	switch(keyEvent->action)
@@ -161,6 +221,12 @@ void ProcessKeyboardEvent(CQMLKeyboardEvent * keyEvent)
 	}
 }
 
+/**
+ * Processes event
+ * 
+ *
+ * @param event
+ */
 void ProcessEvent(CQMLEvent * processedEvent)
 {
 	if(processedEvent->EventType==CQML_KEY_EVENT)
@@ -174,6 +240,10 @@ void ProcessEvent(CQMLEvent * processedEvent)
 }
 
 
+/**
+ * Processes queue of all events.
+ * 
+ */
 void processEvents()
 {
 	CQMLEvent node;
@@ -189,12 +259,22 @@ void processEvents()
 	}
 }
 
+/**
+ * Initializes input.
+ * 
+ */
 void CQMLInitInput()
 {
 	eventQueue=MakeQueue();
 	InitQueueThreadsafe();
 }
 
+/**
+ * Makes defautl event
+ * 
+ *
+ * @return default event
+ */
 CQMLEvent MakeEvent()
 {
 	CQMLEvent Event;
@@ -208,6 +288,12 @@ CQMLEvent MakeEvent()
 	return Event;
 }
 
+/**
+ * Sets root of gui hirearchy
+ * 
+ *
+ * @param gui root
+ */
 void SetRoot(CQMLGUI::Element* r)
 {
 	root=r;

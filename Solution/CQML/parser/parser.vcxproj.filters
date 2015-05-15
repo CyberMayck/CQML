@@ -33,13 +33,7 @@
     <ClCompile Include="parameter_handling.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="checker.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="hashing.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src_apendix.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src_processor.cpp">
@@ -48,23 +42,18 @@
     <ClCompile Include="elements.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="src.cqml">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="src4.cqml">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="src2.cqml">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="src3.cqml">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="basic_types.cfg">
-      <Filter>Resource Files</Filter>
-    </None>
+    <ClCompile Include="output_printing.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tree_processor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="import_processor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tarjan.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cqml_grammar.tab.h">
@@ -79,13 +68,7 @@
     <ClInclude Include="..\CQML\struct_definition_macros.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="checker.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="hashing.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src_apendix.h">
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="src_processor.h">
@@ -97,5 +80,43 @@
     <ClInclude Include="utils.h">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="output_printing.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="tree_processor.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="import_processor.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="tarjan.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="compare.cqml">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="button.cqml">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="calc_button.cqml">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="calculator.cqml">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="matching.cqml">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="normal_button.cqml">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="red_circle.cqml">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="text_button.cqml">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

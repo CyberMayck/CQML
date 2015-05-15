@@ -94,7 +94,6 @@
     <ClCompile Include="context.cpp" />
     <ClCompile Include="cqml.cpp" />
     <ClCompile Include="CQMLObject.cpp" />
-    <ClCompile Include="dependance.cpp" />
     <ClCompile Include="gui.cpp" />
     <ClCompile Include="input.cpp" />
     <ClCompile Include="preparser_source.cpp" />

@@ -5,7 +5,7 @@
 #include "utils.h"
 
 extern GUIElement * elements;
-//extern std::unordered_map<string, int>* idMaps;
+
 extern std::unordered_map<std::string, int> idMaps[100];
 
 
@@ -19,6 +19,13 @@ extern unordered_map<string, int> defaultClassMap;
 
 void ConstructRecursion(SourceTokenContainer * cont, SrcNode * node);
 
+/**
+ * Puts ids into arrays in form of strigns
+ * 
+ *
+ * @param source node
+ * @param token with id tokens
+ */
 void fillIds(SrcNode * node, SourceDotToken * container)
 {
 	if(node->text!=0)
@@ -40,40 +47,88 @@ void fillIds(SrcNode * node, SourceDotToken * container)
 }
 
 
+/**
+ * Constructor.
+ * Creates dot token from syntax tree node
+ *
+ * @param syntax tree node
+ */
 SourceDotToken::SourceDotToken(SrcNode * node)
 {
 	isVarReplaced=false;
 	fillIds(node, this);
 }
+/**
+ * Constructor.
+ * Creates string token from syntax tree node
+ *
+ * @param syntax tree node
+ */
 SourceStringToken::SourceStringToken(SrcNode * node)
 {
 	str=string(node->text);
 }
+/**
+ * Constructor.
+ * Creates ID token from syntax tree node
+ *
+ * @param syntax tree node
+ */
 SourceIdToken::SourceIdToken(SrcNode * node)
 {
 	str=string(node->text);
 	isElement=false;
 }
+/**
+ * Constructor.
+ * Creates expression token from syntax tree node
+ *
+ * @param syntax tree node
+ */
 SourceExprToken::SourceExprToken(SrcNode * node)
 {
 	ConstructRecursion(this,node);
 }
 
+/**
+ * Pushes source token into expression token
+ * 
+ *
+ * @param source token
+ */
 void SourceExprToken::PushToken(SourceToken * t)
 {
 	tokens.push_back(t);
 }
 
+/**
+ * Pushes new expression token created from syntax tree node into assignement token
+ * 
+ *
+ * @param syntax tree node
+ */
 void SourceAssignmentToken::PushSubNode(SrcNode * node)
 {
 	nodes.push_back(new SourceExprToken(node));
 }
+/**
+ * Pushes assingment operator to assignment token
+ * 
+ *
+ * @param operator
+ */
 void SourceAssignmentToken::PushOperator(AssignmentOperator op)
 {
 	ops.push_back(op);
 }
 
 
+/**
+ * Constructs assignment token from syntax tree node.
+ * 
+ *
+ * @param  syntax tree node.
+ */
 void SourceAssignmentToken::Construct(SrcNode* node)
 {
 	if(node->childrenCount==3)
@@ -91,29 +146,66 @@ void SourceAssignmentToken::Construct(SrcNode* node)
 
 }
 
+/**
+ * Constructor.
+ * Creates source assignment token from syntax tree node.
+ *
+ * @param syntax tree node.
+ */
 SourceAssignmentToken::SourceAssignmentToken(SrcNode * node)
 {
 	Construct(node);
 }
 
+/**
+ * Pushes source token to statement token
+ * 
+ *
+ * @param pushed token
+ */
 void SourceDotToken::PushToken(SourceToken * t)
 {
 	tokens.push_back(t);
 }
+/**
+ * Pushes ID token to dot token
+ * 
+ *
+ * @param pushed token
+ */
 void SourceDotToken::PushIdToken(SourceIdToken * t)
 {
 	identifiers.push_back(t);
 }
+/**
+ * Pushes source token to statement token
+ * 
+ *
+ * @param pushed token
+ */
 void SourceStatementToken::PushToken(SourceToken * t)
 {
 	tokens.push_back(t);
 }
+/**
+ * Pushes source token to handler
+ * 
+ *
+ * @param pushed token
+ */
 void SourceHandler::PushToken(SourceToken * t)
 {
 	tokens.push_back(t);
 }
 
 
+/**
+ * Constructs source representation with tokens from syntax tree node.
+ * 
+ *
+ * @param container for source tokens
+ * @param syntax tree node
+ */
 void ConstructRecursion(SourceTokenContainer * cont, SrcNode * node)
 {
 	bool processChildren=true;
@@ -150,6 +242,14 @@ void ConstructRecursion(SourceTokenContainer * cont, SrcNode * node)
 	}
 }
 
+/**
+ * Creates source handler from syntax tree node of expression.
+ * 
+ *
+ * @param syntax tree node
+ *
+ * @return source handler
+ */
 SourceHandler* ExprToHandler(SrcNode * node)
 {
 	SourceHandler * srcHandler= new SourceHandler();
@@ -159,6 +259,14 @@ SourceHandler* ExprToHandler(SrcNode * node)
 	return srcHandler;
 }
 
+/**
+ * Creates source handler from syntax tree node.
+ * 
+ *
+ * @param syntax tree node
+ *
+ * @return source handler
+ */
 SourceHandler* SourceToHandler(SrcNode * node)
 {
 	SourceHandler * srcHandler= new SourceHandler();
@@ -166,48 +274,71 @@ SourceHandler* SourceToHandler(SrcNode * node)
 	return srcHandler;
 }
 
+/**
+ * Prints source handler to string
+ * 
+ *
+ * @param output string
+ */
 void SourceHandler::Print(string& dest)
 {
 	for(unsigned int i=0;i<tokens.size();i++)
 		tokens[i]->Print(dest);
 	
 }
+/**
+ * Prints source token to string
+ * 
+ *
+ * @param output string
+ */
 void SourceStringToken::Print(string& dest)
 {
 	dest+=str;
 	if(str==";")
 		dest+="\n";
 }
+/**
+ * Prints statement token to string
+ * 
+ *
+ * @param output string
+ */
 void SourceStatementToken::Print(string& dest)
 {
 	string s;
-	/*for(int i=0;i<setGetters.size();i++)
-	{
-		setGetters[i]->Print(s);
-	}*/
+
 	dest+=s;
 	for(unsigned int i=0;i<tokens.size();i++)
 	{
 		this->tokens[i]->Print(dest);
 	}
 }
+/**
+ * Prints updaters of attributes inside ID token to string
+ * 
+ *
+ * @param output string
+ */
 void SourceIdToken::PrintZeroUpdaters(string& dest)
 {
 	if(this->isElement)
 	{
-		//dest+="(*((CQMLGUI::Rootoutput"+INTTOSTR(this->fileId)+"*)context->root)->"+
-		//"_CQML_element"+INTTOSTR(this->elementId)+")";
 	}
 	else if(this->isVar)
 	{
-		//dest+="_QVar"+INTTOSTR(this->variableId);
 		dest+="(*((CQMLGUI::Rootoutput"+INTTOSTR(this->fileId)+"*)context->root)->"+
 			"_CQML_element"+INTTOSTR(this->elementId)+")."+this->str+"_Update=0;\n";
 	}
 }
+/**
+ * Prints ID token to string
+ * 
+ *
+ * @param output string
+ */
 void SourceIdToken::Print(string& dest)
 {
-	//this->
 	if(this->isElement)
 	{
 		dest+="(((CQMLGUI::Rootoutput"+INTTOSTR(this->fileId)+"*)context->root)->"+
@@ -215,16 +346,20 @@ void SourceIdToken::Print(string& dest)
 	}
 	else if(this->isVar)
 	{
-		//dest+="_QVar"+INTTOSTR(this->variableId);
 		dest+="(*((CQMLGUI::Rootoutput"+INTTOSTR(this->fileId)+"*)context->root)->"+
 			"_CQML_element"+INTTOSTR(this->elementId)+")."+this->str;
 	}
 	else
 		dest+=str;
 }
+/**
+ * Prints updaters of attributes inside dot token to string
+ * 
+ *
+ * @param output string
+ */
 void SourceDotToken::PrintZeroUpdaters(string& dest)
 {
-	//this->
 	if(this->isVarReplaced)
 	{
 		dest+="(*((CQMLGUI::Rootoutput"+INTTOSTR(this->fileId)+"*)context->root)->"+
@@ -259,13 +394,17 @@ void SourceDotToken::PrintZeroUpdaters(string& dest)
 			}
 			wasStatic=this->isStatic[i];
 		}
-		//dest+="_QVar"+INTTOSTR(this->variableId);
 		
 	}
 }
+/**
+ * Prints dot token to string
+ * 
+ *
+ * @param output string
+ */
 void SourceDotToken::Print(string& dest)
 {
-	//this->
 	if(this->isVarReplaced)
 	{
 		dest+="(*((CQMLGUI::Rootoutput"+INTTOSTR(this->fileId)+"*)context->root)->"+
@@ -286,7 +425,6 @@ void SourceDotToken::Print(string& dest)
 			}
 			wasStatic=isStatic[i];
 		}
-		//dest+="_QVar"+INTTOSTR(this->variableId);
 		
 	}
 	else
@@ -297,6 +435,12 @@ void SourceDotToken::Print(string& dest)
 		}
 	}
 }
+/**
+ * Prints updaters of attributes inside expression token to string
+ * 
+ *
+ * @param output string
+ */
 void SourceExprToken::PrintZeroUpdaters(string& dest)
 {
 	for(unsigned int i=0;i<tokens.size();i++)
@@ -304,6 +448,12 @@ void SourceExprToken::PrintZeroUpdaters(string& dest)
 		this->tokens[i]->PrintZeroUpdaters(dest);
 	}
 }
+/**
+ * Prints expression token to string
+ * 
+ *
+ * @param output string
+ */
 void SourceExprToken::Print(string& dest)
 {
 	for(unsigned int i=0;i<tokens.size();i++)
@@ -311,9 +461,14 @@ void SourceExprToken::Print(string& dest)
 		this->tokens[i]->Print(dest);
 	}
 }
+/**
+ * Prints assignment token to string
+ * 
+ *
+ * @param output string
+ */
 void SourceAssignmentToken::Print(string& dest)
 {
-	//this->nodes[nodes.size()-1]->Print(dest);
 	this->nodes[0]->Print(dest);
 
 	for(unsigned int i=1;i<nodes.size();i++)
@@ -326,25 +481,34 @@ void SourceAssignmentToken::Print(string& dest)
 	{
 		this->nodes[i]->PrintZeroUpdaters(dest);
 	}
-	/*this->nodes[0]->Print(dest);
 
-	for(int i=1;i<nodes.size();i++)
-	{
-		dest+=this->ops[i-1].str;
-		this->nodes[i]->Print(dest);
-	}*/
 }
 
 void SourceToken::PrintZeroUpdaters(string&){}
 
 int varId=0;
 int lastRightVarId=0;
+/**
+ * Processes source of a handler.
+ * 
+ *
+ * @param handler pointer
+ * @param component index
+ * @param current element index
+ */
 void ProcessSource(SourceHandler * handler,int treeInd, int currentElementId)
 {
 	varId=0;
 	handler->Process(treeInd,currentElementId);
 }
 
+/**
+ * Processes source handler.
+ * 
+ *
+ * @param component index
+ * @param current element index
+ */
 void SourceHandler::Process(int treeInd, int currentElementId)
 {
 	for(unsigned int i=0;i<tokens.size();i++)
@@ -353,12 +517,30 @@ void SourceHandler::Process(int treeInd, int currentElementId)
 	}
 }
 
+/**
+ * Processes source token
+ * 
+ *
+ * @param component index
+ * @param current element index
+ * @param last statement token
+ * @param is r-value
+ */
 void SourceToken::Process(int treeInd, int currentElementId, SourceStatementToken* lastStatement, bool isRightVal)
 {
 
 }
 
 
+/**
+ * Processes ID token
+ * 
+ *
+ * @param component index
+ * @param current element index
+ * @param last statement token
+ * @param is r-value
+ */
 void SourceIdToken::Process(int treeInd, int currentElementId, SourceStatementToken* lastStatement, bool isRightVal)
 {
 	bool isOtherId=idMaps[treeInd].count(this->str)!=0;
@@ -371,7 +553,6 @@ void SourceIdToken::Process(int treeInd, int currentElementId, SourceStatementTo
 		fileId=treeInd;
 		elementId=idMaps[treeInd][this->str];
 		isElement=true;
-		//sprintf(str,"(*((GUI_Rootoutput%d *)context->root)->_CQML_element%d)",treeInd,curId);
 	}
 	else
 	{
@@ -380,39 +561,25 @@ void SourceIdToken::Process(int treeInd, int currentElementId, SourceStatementTo
 			PropertyAndType * prop=cont->CheckExistence(this->str);
 			if(prop!=0)
 			{
-		fileId=treeInd;
-		elementId=curId;
-				//this->variableId=curId;
-				//this->isVarReplaced=true;
+				fileId=treeInd;
+				elementId=curId;
+
 				isVar=true;
 			}
 			else
 				return;
-
-			/*if(prop!=0)
-			{
-				//fileId=treeInd;
-				//elementId=curId;
-				//isElement=true;
-				if(isRightVal)
-				{
-					isVar=true;
-			//		lastStatement->PushSetGetter(new GetterFromElement(treeInd,curId,this->str,varId));
-					variableId=varId;
-					varId++;
-				}
-				else
-				{
-					lastStatement->PushSetGetter(new SetterFromElement(treeInd,curId,this->str,lastRightVarId));
-				}
-			}
-			else
-			{
-				// leave alone. might be user's global
-			}*/
 	}
 }
 
+/**
+ * Processes dot token
+ * 
+ *
+ * @param component index
+ * @param current element index
+ * @param last statement token
+ * @param is r-value
+ */
 void SourceDotToken::Process(int treeInd, int currentElementId, SourceStatementToken* lastStatement, bool isRightVal)
 {
 	bool isOtherId=idMaps[treeInd].count(identifiers[0]->GetId())!=0;
@@ -465,7 +632,7 @@ void SourceDotToken::Process(int treeInd, int currentElementId, SourceStatementT
 				{
 					// error primitive type
 					printf("primitive type doesnt have members");
-					exit(-1);
+					exit(0);
 				}
 				//check existence
 				PropertyAndType * prop=cont->CheckExistence(identifiers[i]->GetId());
@@ -473,7 +640,7 @@ void SourceDotToken::Process(int treeInd, int currentElementId, SourceStatementT
 				if(prop==0)
 				{
 					printf("nonexistent attribute %d",identifiers[i]->GetId().c_str());
-					exit(-1);
+					exit(0);
 					//error does not exist
 				}
 				string typeName=prop->type;
@@ -533,7 +700,7 @@ void SourceDotToken::Process(int treeInd, int currentElementId, SourceStatementT
 				{
 					//error
 					printf("element has no parent\n");
-					exit(-1);
+					exit(0);
 				}
 			}
 			else
@@ -562,7 +729,7 @@ void SourceDotToken::Process(int treeInd, int currentElementId, SourceStatementT
 				{
 					// error primitive type
 					printf("primitive does doesnt have members");
-					exit(-1);
+					exit(0);
 				}
 				//check existence
 				PropertyAndType * prop=cont->CheckExistence(identifiers[i]->GetId());
@@ -571,7 +738,7 @@ void SourceDotToken::Process(int treeInd, int currentElementId, SourceStatementT
 				{
 					//error does not exist
 					printf("nonexistent attribute %d",identifiers[i]->GetId().c_str());
-					exit(-1);
+					exit(0);
 				}
 				string typeName=prop->type;
 
@@ -619,6 +786,15 @@ void SourceDotToken::Process(int treeInd, int currentElementId, SourceStatementT
 
 }
 
+/**
+ * Processes statement token
+ * 
+ *
+ * @param component index
+ * @param current element index
+ * @param last statement token
+ * @param is r-value
+ */
 void SourceStatementToken::Process(int treeInd, int currentElementId, SourceStatementToken* lastStatement, bool isRightVal)
 {
 	for(unsigned int i=0;i<this->tokens.size();i++)
@@ -627,6 +803,15 @@ void SourceStatementToken::Process(int treeInd, int currentElementId, SourceStat
 	}
 }
 
+/**
+ * Processes expression token
+ * 
+ *
+ * @param component index
+ * @param current element index
+ * @param last statement token
+ * @param is r-value
+ */
 void SourceExprToken::Process(int treeInd, int currentElementId, SourceStatementToken* lastStatement, bool isRightVal)
 {
 	for(unsigned int i=0;i<this->tokens.size();i++)
@@ -642,6 +827,15 @@ void SourceExprToken::Process(int treeInd, int currentElementId, SourceStatement
 	}*/
 }
 
+/**
+ * Processes assignment token
+ * 
+ *
+ * @param component index
+ * @param current element index
+ * @param last statement token
+ * @param is r-value
+ */
 void SourceAssignmentToken::Process(int treeInd, int currentElementId, SourceStatementToken* lastStatement, bool isRightVal)
 {
 	nodes[nodes.size()-1]->Process(treeInd, currentElementId,lastStatement, true);
@@ -659,109 +853,15 @@ void SourceAssignmentToken::Process(int treeInd, int currentElementId, SourceSta
 
 
 
-void SourceStatementToken::PushSetGetter(SetGetter* sg)
-{
-	setGetters.push_back(sg);
-}
 
-
-GetterFromElement::GetterFromElement(int fileId, int elementId, string propName, int getToId)
-{
-	this->fileId=fileId;
-	this->elementId=elementId;
-	this->propName=propName;
-	this->getToId=getToId;
-}
-
-GetterFromVar::GetterFromVar(int srcId, string propName, int getToId)
-{
-	this->srcId=srcId;
-	this->propName=propName;
-	this->getToId=getToId;
-}
-
-SetterFromElement::SetterFromElement(int fileId, int elementId, string propName, int setFromId)
-{
-	this->fileId=fileId;
-	this->elementId=elementId;
-	this->propName=propName;
-	this->setFromId=setFromId;
-}
-
-
-SetterFromVar::SetterFromVar(int srcId, string propName, int setFromId)
-{
-	this->srcId=srcId;
-	this->propName=propName;
-	this->setFromId=setFromId;
-}
-
+/**
+ * Gets identificator of token
+ * 
+ *
+ * @return identificator
+ */
 string SourceIdToken::GetId()
 {
 	return this->str;
-}
-
-void GetterFromElement::Print(string& dest)
-{
-	dest+=string("QEGET(")
-		+"(*((CQMLGUI::Rootoutput"+INTTOSTR(fileId)+"*)context->root)->"
-		+"_CQML_element"+INTTOSTR(elementId)+")"
-		+","
-		+"\""+propName+"\""
-		+","
-		+"_QVar"+INTTOSTR(getToId)
-		+")\n";
-}
-
-
-
-void GetterFromVar::Print(string& dest)
-{
-	dest+=string("QVGET(")
-		+"_QVar"+INTTOSTR(srcId)
-		+","
-		+"\""+propName+"\""
-		+","
-		+"_QVar"+INTTOSTR(getToId)
-		+")\n";
-}
-
-void SetterFromElement::Print(string& dest)
-{
-	dest+=string("QESET(")
-		+"(*((CQMLGUI::Rootoutput"+INTTOSTR(fileId)+"*)context->root)->"
-		+"_CQML_element"+INTTOSTR(elementId)+")"
-		+","
-		+"\""+propName+"\""
-		+","
-		+"_QVar"+INTTOSTR(this->setFromId)
-		+")\n";
-}
-
-void SetterFromVar::Print(string& dest)
-{
-	dest+=string("QVSET(")
-		+"_QVar"+INTTOSTR(srcId)
-		+","
-		+"\""+propName+"\""
-		+","
-		+"_QVar"+INTTOSTR(setFromId)
-		+")\n";
-}
-
-ExprSetter::ExprSetter(int v, SourceExprToken* t)
-{
-	variableId=v;
-	token=t;
-}
-
-void ExprSetter::Print(string& dest)
-{
-	string s("");
-
-	s+=string("_QVar") + INTTOSTR(variableId) + "=";
-	token->Print(s);
-	s+=";\n";
-	dest+=s;
 }
 

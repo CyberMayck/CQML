@@ -5,7 +5,6 @@
 class ClassContainer;
 class SourceHandler;
 struct SrcNode;
-class Checker;
 
 using namespace std;
 
@@ -94,6 +93,5 @@ public:
 	int graphInd;
 	bool isProperty;
 	SourceHandler * source;
-	vector<Checker> checkers;
 
 };

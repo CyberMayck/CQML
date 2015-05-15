@@ -13,44 +13,93 @@ CQMLGUI::Element * lastPressed;
 namespace CQMLGUI
 {
 	vector<Element*> pressedElements;
+	vector<Element*> drawnElements;
 	extern CQMLGUI::Element* root;
+	
+/**
+ * Allocates instance of Element
+ * 
+ *
+ * @return allocated instance.
+ */
 	Element* acElement()
 	{
-//		Element * a;
 		return new Element();
 	}
+/**
+ * Allocates instance of Text
+ * 
+ *
+ * @return allocated instance.
+ */
 	Text* acText()
 	{
 		Text * t=new Text();
 		return t;
 	}
+/**
+ * Allocates TextInput
+ * 
+ *
+ * @return allocated instance.
+ */
 	TextInput* acTextInput()
 	{
 		TextInput * t=new TextInput();
 		return t;
 	}
 	
+/**
+ * Allocates MouseArea
+ * 
+ *
+ * @return allocated instance.
+ */
 	MouseArea* acMouseArea()
 	{
 		MouseArea * t=new MouseArea();
 		return t;
 	}
+/**
+ * Allocates Image
+ * 
+ *
+ * @return allocated instance.
+ */
 	Image* acImage()
 	{
 		Image * t=new Image();
 		return t;
 	}
+/**
+ * Allocates scaled image.
+ * 
+ *
+ * @return allocated instance.
+ */
 	ScaledImage* acScaledImage()
 	{
 		ScaledImage * t=new ScaledImage();
 		return t;
 	}
-
+	
+/**
+ * Allocates Rectangle.
+ * 
+ *
+ * @return allocated instance.
+ */
 	Rectangle* acRectangle()
 	{
 		return new Rectangle();
 	}
-
+	
+/**
+ * Returns vertical coordinate of top border.
+ * 
+ *
+ * @return y coordinate
+ */
 	int Element::Top()
 	{
 		if(parent!=0)
@@ -59,7 +108,13 @@ namespace CQMLGUI
 		}
 		return y;
 	}
-
+	
+/**
+ * Returns horizontal coordinate of left border.
+ * 
+ *
+ * @return x coordinate.
+ */
 	int Element::Left()
 	{
 		if(parent!=0)
@@ -68,8 +123,35 @@ namespace CQMLGUI
 		}
 		return x;
 	}
+	
+/**
+ * Main drawing function.
+ * Puts all drawn elements to queue and draws them.
+ */
+	void MainDraw()
+	{
+		drawnElements.push_back(root);
+		for(unsigned int i=0;i<drawnElements.size();i++)
+		{
+			drawnElements[i]->Draw();
+		}
+		drawnElements.clear();
+	}
+	
+/**
+ * Updates the values in GUI.
+ * 
+ */
+	void MainUpdate()
+	{
+		root->Update();
+	}
 
-
+	
+/**
+ * Updates values of attributes.
+ * Updates values and its children.
+ */
 	void Element::Update()
 	{
 		if(!enabled)
@@ -88,13 +170,24 @@ namespace CQMLGUI
 		}
 		return;
 	}
-
+	
+/**
+ * Gets window size
+ * 
+ *
+ * @param width
+ * @param height
+ */
 	void GetCQMLWindow(int &w,int &h)
 	{
 		w=root->width;
 		h=root->height;
 	}
-
+	
+/**
+ * Draws children of element.
+ * 
+ */
 	void Element::Draw()
 	{
 		if(!visible)
@@ -103,11 +196,22 @@ namespace CQMLGUI
 
 		for(i=0;i<childrenCount;i++)
 		{
-			children[i]->Draw();
+			drawnElements.push_back(children[i]);
+			//children[i]->Draw();
 		}
 		return;
 	}
-
+	
+/**
+ * Mouse Pressed event
+ * 
+ *
+ * @param x coordinate
+ * @param y coordinate
+ * @param button code
+ *
+ * @return 1 if event was sucessfully processed and caught, 0 otherwise
+ */
 	int Element::MousePressed(int x, int y, int button)
 	{
 		if(!enabled)
@@ -121,7 +225,15 @@ namespace CQMLGUI
 		
 		return processed;
 	}
-
+	
+/**
+ * Key pressed event.
+ * 
+ *
+ * @param key code
+ *
+ * @return 1 if event was sucessfully processed and caught, 0 otherwise
+ */
 	int Element::KeyPressed(int key)
 	{
 		if(!enabled)
@@ -141,6 +253,14 @@ namespace CQMLGUI
 		}
 		return processed;
 	}
+/**
+ * Key Pressed event
+ * 
+ *
+ * @param key code
+ *
+ * @return 1 if event was sucessfully processed and caught, 0 otherwise
+ */
 	int TextInput::KeyPressed(int key)
 	{
 		if(!enabled)
@@ -156,12 +276,28 @@ namespace CQMLGUI
 		}
 		return 1;
 	}
+/**
+ * Key release event
+ * 
+ *
+ * @param key code
+ *
+ * @return 1 if event was sucessfully processed and caught, 0 otherwise
+ */
 	int TextInput::KeyReleased(int key)
 	{
 		if(!enabled)
 			return 0;
 		return 1;
 	}
+/**
+ * Key release event
+ * 
+ *
+ * @param key code
+ *
+ * @return 1 if event was sucessfully processed and caught, 0 otherwise
+ */
 	int Element::KeyReleased(int key)
 	{
 		if(!enabled)
@@ -181,7 +317,17 @@ namespace CQMLGUI
 		}
 		return processed;
 	}
-
+	
+/**
+ * Mouse released event
+ * 
+ *
+ * @param x coordinat
+ * @param y coordinate
+ * @param button code
+ *
+ * @return 1 if event was sucessfully processed and caught, 0 otherwise
+ */
 	int Element::MouseReleased(int x, int y, int button)
 	{
 		if(!enabled)
@@ -193,7 +339,18 @@ namespace CQMLGUI
 		pressedElements.clear();
 		return 0;
 	}
-
+	
+/**
+ * Mouse Moved event
+ * 
+ *
+ * @param x coordinate
+ * @param y coordinate
+ * @param relative x movement
+ * @param relative y movement
+ *
+ * @return 1 if event was sucessfully processed and caught, 0 otherwise
+ */
 	int Element::MouseMoved(int x, int y, int relx, int rely)
 	{
 		if(!enabled)
@@ -206,7 +363,18 @@ namespace CQMLGUI
 		}
 		return processed;
 	}
-
+	
+/**
+ * Mouse scrolled event
+ * 
+ *
+ * @param x coordinate
+ * @param y coordinate
+ * @param relative x scroll
+ * @param relative y scroll
+ *
+ * @return 1 if event was sucessfully processed and caught, 0 otherwise
+ */
 	int Element::MouseScrolled(int x, int y, int relx, int rely)
 	{
 		if(!enabled)
@@ -219,7 +387,17 @@ namespace CQMLGUI
 		}
 		return processed;
 	}
-
+	
+/**
+ * Mouse clicked event
+ * 
+ *
+ * @param x coordinat
+ * @param y coordinate
+ * @param button code
+ *
+ * @return 1 if event was sucessfully processed and caught, 0 otherwise
+ */
 	int Element::MouseClicked(int x, int y, int button)
 	{
 		if(!enabled)
@@ -232,14 +410,30 @@ namespace CQMLGUI
 		}
 		return processed;
 	}
-
+	
+/**
+ * Changes focus of element
+ * 
+ *
+ * @param element
+ */
 	void ChangeFocus(Element * e)
 	{
 		if(focused!=0) focused->focus=0;
 		focused=e;
 		focused->focus=1;
 	}
-
+	
+/**
+ * Mouse clicked event
+ * 
+ *
+ * @param x coordinat
+ * @param y coordinate
+ * @param button code
+ *
+ * @return 1 if event was sucessfully processed and caught, 0 otherwise
+ */
 	int TextInput::MouseClicked(int x, int y,int button)
 	{
 		if(!enabled)
@@ -263,7 +457,17 @@ namespace CQMLGUI
 
 		return 0;
 	}
-
+	
+/**
+ * Mouse clicked event
+ * 
+ *
+ * @param x coordinat
+ * @param y coordinate
+ * @param button code
+ *
+ * @return 1 if event was sucessfully processed and caught, 0 otherwise
+ */
 	int MouseArea::MouseClicked(int x, int y,int button)
 	{
 		if(!enabled)
@@ -297,13 +501,27 @@ namespace CQMLGUI
 		return 0;
 	}
 
-
+	
+/**
+ * Initializes GUI
+ * 
+ */
 	void InitGUI()
 	{
 		lastPressed=0;
 		focused=0;
 	}
-
+	
+/**
+ * Mouse pressed event
+ * 
+ *
+ * @param x coordinat
+ * @param y coordinate
+ * @param button code
+ *
+ * @return  1 if event was sucessfully processed and caught, 0 otherwise
+ */
 	int MouseArea::MousePressed(int x, int y, int button)
 	{
 		if(!enabled)
@@ -338,7 +556,17 @@ namespace CQMLGUI
 
 		return 0;
 	}
-
+	
+/**
+ * Mouse Released event
+ * 
+ *
+ * @param x coordinat
+ * @param y coordinate
+ * @param button code
+ *
+ * @return 1 if event was sucessfully processed and caught, 0 otherwise
+ */
 	int MouseArea::MouseReleased(int x, int y, int button)
 	{
 		if(!enabled)
@@ -382,6 +610,18 @@ namespace CQMLGUI
 		return 0;
 	}
 
+	
+/**
+ * Mouse Moved Event
+ * 
+ *
+ * @param x coordinate
+ * @param y coordinate
+ * @param relative x movement
+ * @param relative y movement
+ *
+ * @return 1 if event was sucessfully processed and caught, 0 otherwise
+ */
 	int MouseArea::MouseMoved(int x, int y, int relx, int rely)
 	{
 		if(!enabled)
@@ -406,7 +646,7 @@ namespace CQMLGUI
 		{
 			if(CustomMouseEntered!=0)
 			{
-				//if(!(x1<xold && xold<x1+w && y1<yold && yold<y1+h))
+				if(!(x1<xold && xold<x1+w && y1<yold && yold<y1+h))
 				{
 					CQMLMouseEvent e;
 					e.x=x;
@@ -431,7 +671,7 @@ namespace CQMLGUI
 		{
 			if(CustomMouseExited!=0)
 			{
-				//if(x1<xold && xold<x1+w && y1<yold && yold<y1+h)
+				if(x1<xold && xold<x1+w && y1<yold && yold<y1+h)
 				{
 					CQMLMouseEvent e;
 					e.x=x;
@@ -445,7 +685,18 @@ namespace CQMLGUI
 
 		return 0;
 	}
-
+	
+/**
+ * Mouse scrolled event
+ * 
+ *
+ * @param x coordinate
+ * @param y coordinate
+ * @param relative x scroll
+ * @param relative y scroll
+ *
+ * @return 1 if event was sucessfully processed and caught, 0 otherwise
+ */
 	int MouseArea::MouseScrolled(int x, int y, int relx, int rely)
 	{
 		if(!enabled)
@@ -477,14 +728,27 @@ namespace CQMLGUI
 
 		return 0;
 	}
+
+/**
+ * Empty init.
+ * 
+ */
 	void TextInput::Init()
 	{
 	}
+/**
+ * Default update
+ * tries to load font
+ */
 	void TextInput::DefaultUpdate()
 	{
 		resourceManager.TryLoadFont(font.family,font.size);
 	}
-
+	
+/**
+ * Draw text input
+ * 
+ */
 	void TextInput::Draw()
 	{
 		if(!visible)
@@ -501,30 +765,58 @@ namespace CQMLGUI
 		//draw kids
 		CQMLGUI::Element::Draw();
 	}
-
+	
+/**
+ * Empty init
+ * 
+ */
 	void Text::Init()
 	{
 	}
+/**
+ * Default update
+ * tries to load font
+ */
 	void Text::DefaultUpdate()
 	{
 		resourceManager.TryLoadFont(font.family,font.size);
 	}
 	
+/**
+ * Empty init
+ * 
+ */
 	void Image::Init()
 	{
 	}
+/**
+ * Empty init
+ * 
+ */
 	void ScaledImage::Init()
 	{
 	}
+/**
+ * Default update
+ * tries to load image data
+ */
 	void Image::DefaultUpdate()
 	{
 		resourceManager.TryLoadImage(img.src);
 	}
+/**
+ * Default update
+ * tries to load image data
+ */
 	void ScaledImage::DefaultUpdate()
 	{
 		resourceManager.TryLoadImage(img.src);
 	}
-
+	
+/**
+ * Draws image
+ * 
+ */
 	void Image::Draw()
 	{
 		if(!visible)
@@ -540,6 +832,10 @@ namespace CQMLGUI
 		//draw kids
 		CQMLGUI::Element::Draw();
 	}
+/**
+ * Draws ScaledImage
+ * 
+ */
 	void ScaledImage::Draw()
 	{
 		if(!visible)
@@ -572,7 +868,11 @@ namespace CQMLGUI
 
 		CQMLGUI::Element::Draw();
 	}
-
+	
+/**
+ * DrawsText
+ * 
+ */
 	void Text::Draw()
 	{
 		if(!visible)
@@ -590,7 +890,11 @@ namespace CQMLGUI
 		CQMLGUI::Element::Draw();
 	}
 
-
+	
+/**
+ * Draws Rectangle
+ * 
+ */
 	void Rectangle::Draw()
 	{
 		if(!visible)
@@ -609,31 +913,52 @@ namespace CQMLGUI
 		else
 			drawer->DrawFilledBorderedRectangle(x,y,w,h,me->color.red*255,me->color.green*255,me->color.blue*255,border,borderColor.red,borderColor.green,borderColor.blue);
 
-		//drawer->DrawRectangle(x,y,w,h,0,0,0);
-
-		//cairo draw
+		
 
 
 		//draw kids
 		CQMLGUI::Element::Draw();
 	}
-
+	
+/**
+ * Pre update function
+ * Processes input events
+ * 
+ */
 	void PreUpdate()
 	{
 		processEvents();
 	}
+/**
+ * Post update function
+ * loads font and image data
+ */
 	void PostUpdate()
 	{
 		resourceManager.LoadFonts();
 		resourceManager.LoadImages();
 	}
+/**
+ * Pre draw function
+ * does nothing
+ */
 	void PreDraw()
 	{
 	}
+/**
+ * Post draw function
+ * does nothing
+ */
 	void PostDraw()
 	{
 	}
-
+	
+/**
+ * 
+ * 
+ *
+ * @param 
+ */
 	void CopyChildren(Element *self,Element *src)
 	{
 		for(int i=0;i<(*src).childrenCount;i++)
@@ -643,7 +968,13 @@ namespace CQMLGUI
 		(*src).childrenCount=0;
 		delete src->children;
 	}
-
+	
+/**
+ * 
+ * 
+ *
+ * @param 
+ */
 	void mGUI_Element_InsertChild(Element *self,Element *child)
 	{
 		Element ** oldChildren;
@@ -666,7 +997,15 @@ namespace CQMLGUI
 		(*self).childrenCount++;
 	}
 
-
+	
+/**
+ * 
+ * 
+ *
+ * @param 
+ *
+ * @return 
+ */
 	CQML_Context * acCQML_Context(CQMLGUI::Component * g, CQMLGUI::Element * e)
 	{
 		CQML_Context * context;

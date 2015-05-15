@@ -9,7 +9,6 @@ using namespace std;
 
 
 class SourceStatementToken;
-class SetGetter;
 
 class SourceToken
 {
@@ -18,7 +17,7 @@ public:
 	virtual void PrintZeroUpdaters(string&);
 	virtual void Process(int , int , SourceStatementToken*, bool);
 };
-class SourceTokenContainer
+class SourceTokenContainer : public SourceToken
 {
 public:
 	virtual void PushToken(SourceToken *)=0;
@@ -41,15 +40,13 @@ public:
 	void Print(string&);
 };
 
-class SourceStatementToken : public SourceToken,public SourceTokenContainer
+class SourceStatementToken : public SourceTokenContainer
 {
 	vector<SourceToken *> tokens;
-	vector<SetGetter *> setGetters;
 public:
 	//SourceStatementToken();
 	void Print(string&);
 	void PushToken(SourceToken *);
-	void PushSetGetter(SetGetter*);
 	void Process(int , int , SourceStatementToken*, bool);
 };
 
@@ -85,7 +82,7 @@ public:
 	void Process(int , int , SourceStatementToken*, bool);
 	virtual void PrintZeroUpdaters(string& dest);
 };
-class SourceExprToken: public SourceToken, public SourceTokenContainer
+class SourceExprToken: public SourceTokenContainer
 {
 	vector<SourceToken *> tokens;
 	bool isVar;
@@ -112,65 +109,24 @@ public:
 	void Process(int , int , SourceStatementToken*, bool);
 };
 
+
+#include <string>
+using namespace std;
+
+struct AssignmentOperator
+{
+	string str;
+};
+
+struct AssignSentence
+{
+	vector<SrcNode *> nodes;
+	vector<AssignmentOperator> ops;
+};
+
+
 void ProcessSource(SourceHandler * handler);
 
 SourceHandler* ExprToHandler(SrcNode * node);
 SourceHandler* SourceToHandler(SrcNode * node);
-
-
-class SetGetter
-{
-public:
-	virtual void Print(string&)=0;
-};
-
-
-class GetterFromElement: public SetGetter
-{
-	int fileId;
-	int elementId;
-	string propName;
-	int getToId;
-public:
-	GetterFromElement(int fileId, int elementId, string propName, int getToId);
-	void Print(string&);
-};
-class GetterFromVar: public SetGetter
-{
-	int srcId;
-	string propName;
-	int getToId;
-public:
-	GetterFromVar(int srcId, string propName, int getToId);
-	void Print(string&);
-};
-
-class ExprSetter: public SetGetter
-{
-	int variableId;
-	SourceExprToken* token;
-public:
-	ExprSetter(int v, SourceExprToken* t);
-	void Print(string&);
-};
-
-class SetterFromElement: public SetGetter
-{
-	int fileId;
-	int elementId;
-	string propName;
-	int setFromId;
-public:
-	SetterFromElement(int fileId, int elementId, string propName, int setFromId);
-	void Print(string&);
-};
-class SetterFromVar: public SetGetter
-{
-	int srcId;
-	string propName;
-	int setFromId;
-public:
-	SetterFromVar(int srcId, string propName, int setFromId);
-	void Print(string&);
-};
 

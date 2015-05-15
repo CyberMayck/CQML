@@ -19,12 +19,9 @@ namespace CQMLGUI
 
 #define MakeNewThing(type, parent)	(mGUI_Element_InsertChild((CQMLGUI::Element*)&parent,(CQMLGUI::Element*)ac##type()))
 
-struct Component
-{
-	//CQMLGUI::Element * root;
-	//int memberCount;
-	//CQMLGUI::Element ** members;
-};
+	struct Component
+	{
+	};
 
 	CQML_API void PreUpdate();
 	CQML_API void PostUpdate();

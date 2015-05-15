@@ -62,35 +62,42 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="checker.cpp" />
     <ClCompile Include="cqml_grammar.tab.c" />
     <ClCompile Include="elements.cpp" />
     <ClCompile Include="hashing.cpp" />
+    <ClCompile Include="import_processor.cpp" />
     <ClCompile Include="lex.yy.c" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="output_printing.cpp" />
     <ClCompile Include="parameter_handling.cpp" />
     <ClCompile Include="parser_tree.cpp" />
-    <ClCompile Include="src_apendix.cpp" />
     <ClCompile Include="src_processor.cpp" />
+    <ClCompile Include="tarjan.cpp" />
+    <ClCompile Include="tree_processor.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\CQML\struct_definition_macros.h" />
-    <ClInclude Include="checker.h" />
     <ClInclude Include="cqml_grammar.tab.h" />
     <ClInclude Include="elements.h" />
     <ClInclude Include="hashing.h" />
+    <ClInclude Include="import_processor.h" />
+    <ClInclude Include="output_printing.h" />
     <ClInclude Include="parameter_handling.h" />
     <ClInclude Include="parser_tree.h" />
-    <ClInclude Include="src_apendix.h" />
     <ClInclude Include="src_processor.h" />
+    <ClInclude Include="tarjan.h" />
+    <ClInclude Include="tree_processor.h" />
     <ClInclude Include="utils.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="basic_types.cfg" />
-    <None Include="src.cqml" />
-    <None Include="src2.cqml" />
-    <None Include="src3.cqml" />
-    <None Include="src4.cqml" />
+    <None Include="button.cqml" />
+    <None Include="calculator.cqml" />
+    <None Include="calc_button.cqml" />
+    <None Include="compare.cqml" />
+    <None Include="matching.cqml" />
+    <None Include="normal_button.cqml" />
+    <None Include="red_circle.cqml" />
+    <None Include="text_button.cqml" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

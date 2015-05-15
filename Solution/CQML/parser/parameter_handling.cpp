@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unordered_map>
-//#include "string.h"
+
 
 static unsigned long crc32_tab[] = {
 	0x00000000, 0x77073096, 0xee0e612c, 0x990951ba, 0x076dc419, 0x706af48f,
@@ -52,6 +52,14 @@ static unsigned long crc32_tab[] = {
 	0xb40bbe37, 0xc30c8ea1, 0x5a05df1b, 0x2d02ef8d
 };
 
+/**
+ * Calculates CRC32 value for a string.
+ * 
+ *
+ * @param string
+ *
+ * @return CRC32 value
+ */
 unsigned long CRC32(const char * str)
 {
 	const char *p;
@@ -66,6 +74,14 @@ unsigned long CRC32(const char * str)
 	return crc ^ ~0U;
 }
 
+/**
+ * Constructor.
+ * Initializes class container
+ *
+ * @param name of class
+ * @param index of component file
+ * @param class identifier
+ */
 ClassContainer::ClassContainer(string str, int fileId, int classID)
 {
 	this->ancestor=0;
@@ -75,6 +91,12 @@ ClassContainer::ClassContainer(string str, int fileId, int classID)
 	this->classID=classID;
 }
 
+/**
+ * Adds attribute to class container.
+ * 
+ *
+ * @param property
+ */
 void ClassContainer::AddProp(PropertyAndType prop)
 {
 	prop.nameHash=CRC32(prop.name.c_str());
@@ -82,25 +104,57 @@ void ClassContainer::AddProp(PropertyAndType prop)
 	this->props.push_back(prop);
 }
 
+/**
+ * Adds handler to class container
+ * 
+ *
+ * @param handler
+ */
 void ClassContainer::AddHandler(HandlerAndType handler)
 {
 	this->handlers.push_back(handler);
 }
 
+/**
+ * Sets ancestor of a class stored in class container.
+ * 
+ *
+ * @param ancestor class container
+ */
 void ClassContainer::SetAncestor(ClassContainer * ancestor)
 {
 	this->ancestor=ancestor;
 }
 
+/**
+ * Checks if attribute/property is reference type
+ * 
+ *
+ * @return true if reference false otherwise
+ */
 bool PropertyAndType::IsReference()
 {
 	return '*'==type[type.length()-1];
 }
 
+/**
+ * Gets ancestor of a class.
+ * 
+ *
+ * @return ancestor class container
+ */
 ClassContainer * ClassContainer::GetAncestor()
 {
 	return this->ancestor;
 }
+/**
+ * Checks existence of an attribute within class.
+ * 
+ *
+ * @param attribute name
+ *
+ * @return pointer to attribute, 0 if not found
+ */
 PropertyAndType* ClassContainer::CheckExistence(string s)
 {
 	for(unsigned int i=0;i<props.size();i++)
@@ -115,6 +169,14 @@ PropertyAndType* ClassContainer::CheckExistence(string s)
 	return 0;
 }
 
+/**
+ * Checks existence of an handler within class.
+ * 
+ *
+ * @param handler name
+ *
+ * @return pointer to handler, 0 if not found
+ */
 HandlerAndType* ClassContainer::CheckHExistence(string s)
 {
 	for(unsigned int i=0;i<handlers.size();i++)
@@ -154,6 +216,12 @@ ClassContainer * curCont;
 
 
 
+/**
+ * Checks if attribute/property us primitive type.
+ * 
+ *
+ * @return true if is primitive type, false otherwise
+ */
 bool PropertyAndType::IsPrimitive()
 {
 	if(primitiveTypeMap.count(type)>0)
@@ -162,6 +230,15 @@ bool PropertyAndType::IsPrimitive()
 	}
 	return false;
 }
+/**
+ * Tries to get class container of named class in specific component.
+ * 
+ *
+ * @param class name.
+ * @param component index.
+ *
+ * @return pointer to class container, 0 if not found
+ */
 ClassContainer* GetClassContainer(string n, int treeInd)
 {
 	if(classMaps[treeInd].count(n)>0)
@@ -175,6 +252,14 @@ ClassContainer* GetClassContainer(string n, int treeInd)
 	return 0;
 }
 
+/**
+ * Tries to get class container of named default class type.
+ * 
+ *
+ * @param class name.
+ *
+ * @return pointer to class container, 0 if not found
+ */
 ClassContainer* GetDefaultClassContainer(string n)
 {
 	if(defaultClassMap.count(n)>0)
@@ -184,6 +269,12 @@ ClassContainer* GetDefaultClassContainer(string n)
 	return 0;
 }
 
+/**
+ * Registers primitive.
+ * 
+ *
+ * @param primitive name
+ */
 void registerPrimitive(const char* name)
 {
 	string s=string(name);
@@ -192,12 +283,25 @@ void registerPrimitive(const char* name)
 	primitiveTypes.push_back(cont);
 }
 
+/**
+ * Constructor.
+ * 
+ *
+ * @param name of primitive type
+ */
 PrimitiveType::PrimitiveType(string s)
 {
 	name=s;
 }
 
 
+/**
+ * Registers a structure as a class container.
+ * 
+ *
+ * @param name of structure
+ * @param name of parent structure, 0 if it has no parent
+ */
 void registerStruct(const char* name, const char* parent)
 {
 	string s=string(name);
@@ -224,6 +328,13 @@ void registerStruct(const char* name, const char* parent)
 	}
 }
 
+/**
+ * Registers a structure of reference type as a class container.
+ * 
+ *
+ * @param name of structure
+ * @param name of parent structure, 0 if it has no parent
+ */
 void registerStructRef(const char* name, const char* parent)
 {
 	string s=string(name);
@@ -242,9 +353,17 @@ void registerStructRef(const char* name, const char* parent)
 }
 
 
+/**
+ * Registers function pointer in class container.
+ * 
+ *
+ * @param return type name
+ * @param function name
+ * @param default function value
+ * @param arguments
+ */
 void parserDeclareFunc(const char* type, const char* name, const char* value, const char* args)
 {
-	//M(int, MousePressed, 0, GUI_Element*, int, int, int) 
 	string sType=string(type);
 	string sName=string(name);
 
@@ -270,13 +389,10 @@ void parserDeclareFunc(const char* type, const char* name, const char* value, co
 	}
 	arguments.push_back(sArgs.substr(prevInd,sArgs.length()-prevInd));
 
-	//va_list ap;
-    //va_start(ap, n_args);
 
     for(int i = 0; i < n_args; i++)
 	{
-		//const char* s = va_arg(ap, const char*);
-		string str=arguments[i];//string(s);
+		string str=arguments[i];
 		int spaceInd=-1;
 		bool nonSpaceFound=false;
 		for(int j=str.length()-1;j>=0;j--)
@@ -295,7 +411,7 @@ void parserDeclareFunc(const char* type, const char* name, const char* value, co
 		{
 			string s1 = str.substr(0,spaceInd);
 			string s2 = str.substr(spaceInd+1,str.length()-spaceInd-1);
-		//	string s2 = string.substr
+
 			temp.paramTypes.push_back(s1);
 			temp.paramNames.push_back(s2);
 		}
@@ -306,12 +422,19 @@ void parserDeclareFunc(const char* type, const char* name, const char* value, co
 		}
 
     }
-    //va_end(ap);
 
 	cont->AddHandler(temp);
 
 }
 
+/**
+ * Registers attribute (inacessible from CQML) into class container
+ * 
+ *
+ * @param type name
+ * @param attribute name
+ * @param default value
+ */
 void parserDeclareDefault(const char* type, const char* name, const char* value)
 {
 	string sType=string(type);
@@ -327,6 +450,14 @@ void parserDeclareDefault(const char* type, const char* name, const char* value)
 
 	cont->AddProp(temp);
 }
+/**
+ * Registers attribute into class container
+ * 
+ *
+ * @param type name
+ * @param attribute name
+ * @param default value
+ */
 void parserDeclare(const char* type, const char* name, const char* value)
 {
 	string sType=string(type);
@@ -343,6 +474,14 @@ void parserDeclare(const char* type, const char* name, const char* value)
 	cont->AddProp(temp);
 }
 
+/**
+ * Prints data of perfect hash function for specific class
+ * 
+ *
+ * @param output file
+ * @param class identifier
+ * @param hash function data
+ */
 void PrintHashTab(FILE * file, int classID, PerfectHashData * data)
 {
 	fprintf(file,"data=&hashTabs[%d];\n",classID);
@@ -372,6 +511,12 @@ void PrintHashTab(FILE * file, int classID, PerfectHashData * data)
 
 }
 
+/**
+ * Initializes class identifiers
+ * 
+ *
+ * @param number of classes registered.
+ */
 void InitClassIDs(int classCnt)
 {
 	int classID=0;
@@ -391,6 +536,13 @@ void InitClassIDs(int classCnt)
 }
 
 
+/**
+ * Prints hash functions' initialization function
+ * 
+ *
+ * @param output file
+ * @param number of classes
+ */
 void PrintClassHashTabs(FILE * file, int classCnt)
 {
 	int classID=0;
@@ -406,7 +558,7 @@ void PrintClassHashTabs(FILE * file, int classCnt)
 	}
 	fprintf(file,"InitClassesSize(hashTabs, %d);\n\n",size);
 	
-	//PrintClassTabs(file, classCnt);
+
 	classID=0;
 	int val=0;
 	int parentID=-1;
@@ -441,12 +593,6 @@ void PrintClassHashTabs(FILE * file, int classCnt)
 
 	classID=defaultClasses.size();
 
-	/*for(int i=0;i<defaultClasses.size();i++)
-	{
-		data=defaultClasses[i]->hashData;
-		PrintHashTab(file,classID,data);
-		classID++;
-	}*/
 	for(int j=0;j<classCnt;j++)
 	{
 		for(unsigned int i=0;i<classes[j].size();i++)
@@ -459,149 +605,17 @@ void PrintClassHashTabs(FILE * file, int classCnt)
 	fprintf(file,"}\n\n");
 }
 
-void PrintClassTabs(FILE * file, int classCnt)
-{
-	fprintf(file,"\n //PrintClassTabs()\n");
 
-	//return;
-	int ind=0;
-	int pInd=0;
-	ClassContainer * c;
-	for(unsigned int i=0;i<defaultClasses.size();i++)
-	{
-		c= defaultClasses[i]->GetAncestor();
-		if(c==0)
-			pInd=-1;
-		else
-			pInd=c->classID;
-		//fprintf(file,"InitAttribCnt(%d,%d,%d);\n",ind,defaultClasses[i]->props.size(),pInd);
-		ind++;
-	}
-	for(int j=0;j<classCnt;j++)
-	{
-		for(unsigned int i=0;i<classes[j].size();i++)
-		{
-			c= classes[j][i]->GetAncestor();
 
-			if(c==0)
-				pInd=-1;
-			else
-				pInd=c->classID;
-			//fprintf(file,"InitAttribCnt(%d,%d,%d);\n",ind,classes[j][i]->props.size(),pInd);
-			ind++;
-		}
-	}
-	ind=0;
-
-	
-
-	
-	for(unsigned int i=0;i<defaultClasses.size();i++)
-	{
-		for(unsigned int k=0;k<defaultClasses[i]->props.size();k++)
-		{
-			PropertyAndType& p=defaultClasses[i]->props[k];
-			
-			//fprintf(file,"AddAttribute(%d,%d,offsetof(%s,%s),\"%s\",member_size(%s,%s));\n",
-			//	ind,p.nameHash,p.cont->className.c_str(),p.name.c_str(),p.type.c_str(),p.cont->className.c_str(),p.name.c_str());
-		}
-		ind++;
-	}
-
-	for(int j=0;j<classCnt;j++)
-	{
-		for(unsigned int i=0;i<classes[j].size();i++)
-		{
-			for(unsigned int k=0;k<classes[j][i]->props.size();k++)
-			{
-				PropertyAndType& p=classes[j][i]->props[k];
-			
-				//fprintf(file,"AddAttribute(offsetof(%s,%s),\"%s\",member_size(%s,%s));\n",
-				//	ind,p.nameHash,p.cont->className.c_str(),p.name.c_str(),p.type.c_str(),p.cont->className.c_str(),p.name.c_str());
-			}
-			ind++;
-		}
-	}
-	fprintf(file,"\n");
-
-}
-
+/**
+ * Processes default types
+ * 
+ *
+ * @return 1
+ */
 int processBasicTypes()
 {
 	DefaultDeclaration();
-	return 1;
-	
-	FILE *file;
-	fopen_s(&file,"basic_types.cfg","r");
-	if (file == NULL)
-	{
-		perror ("Error opening file basic_types.cfg");
-		exit(-1);
-	}
-	char str [256];
-	
-	bool hasAncestor=false;
-	ClassContainer * cont=0;
-	while(fgets(str, 256, file)!=NULL)
-	{
-		if(str[0]=='@')
-		{
-			if(cont!=0)
-			{
-				//close prev class
-				hasAncestor=false;
-			}
-			string s=string(str);
-			s=s.substr(1,s.length()-2);
-			cont= new ClassContainer(s,-1, totalClassCnt++);
-			defaultClassMap[string(s)]=defaultClasses.size();
-			defaultClasses.push_back(cont);
-			//open class
-		}
-		else if(str[0]=='$')
-		{
-			//ancestor
-			if(hasAncestor)
-			{
-				perror("Multiple Ancestry");
-				exit(-1);
-			}
-			hasAncestor=true;
-			string s=string(str);
-			s=s.substr(1,s.length()-2);
-			cont->SetAncestor(defaultClasses[defaultClassMap[s]]);
-		}
-		else if(str[0]=='#')
-		{
-			string s=string(str);
-			string type;
-			string name;
-			bool splitFound=false;
-			for(unsigned int i=0;i<s.length();i++)
-			{
-				if(s[i]==' ')
-				{
-					type = s.substr(1,i-1);
-					name = s.substr(i+1,s.length()-i-2);
-					splitFound=true;
-					break;
-				}
-			}
-			if(splitFound==false)
-			{
-				perror("syntaxError in basic_type.cfg");
-				exit(-1);
-			}
-
-			PropertyAndType temp;
-			temp.name=name;
-			temp.type=type;
-
-			cont->AddProp(temp);
-			// calc hash?
-		}
-	}
-	fclose(file);
 	return 1;
 }
 

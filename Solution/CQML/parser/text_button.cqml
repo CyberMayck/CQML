@@ -54,7 +54,7 @@ MouseArea {
     Text{
         id: txt;
         text : thisButton.text;
-        font.family: "Tahoma";
+        font.family: "fonts/Tahoma.ttf";
         font.size: parent.height/4;
 		color.red : 1;
 		color.green : 1;

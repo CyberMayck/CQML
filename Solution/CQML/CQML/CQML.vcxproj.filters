@@ -18,60 +18,46 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="parser_output.c">
-      <Filter>Resource Files</Filter>
-    </ClCompile>
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="output0.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="parser_output.cpp">
-      <Filter>Resource Files</Filter>
-    </ClCompile>
     <ClCompile Include="printSomething.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="output1.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="output2.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="output3.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="output4.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="calc_logic.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="output5.cpp">
+    <ClCompile Include="cqml_output\parser_output.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="output6.cpp">
+    <ClCompile Include="cqml_output\output0.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cqml_output\output1.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cqml_output\output2.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cqml_output\output3.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cqml_output\output4.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cqml_output\output5.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cqml_output\output6.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="custombuild.bat">
-      <Filter>Custom Build</Filter>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="custom_classes.h">
-      <Filter>Resource Files</Filter>
-    </ClInclude>
     <ClInclude Include="qml_includes.h">
       <Filter>Resource Files</Filter>
     </ClInclude>
     <ClInclude Include="printSomething.h">
       <Filter>Resource Files</Filter>
-    </ClInclude>
-    <ClInclude Include="parser_output.h">
-      <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="calc_logic.h">
       <Filter>Resource Files</Filter>

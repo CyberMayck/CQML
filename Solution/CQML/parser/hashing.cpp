@@ -10,6 +10,16 @@ struct Edge
 	string str;
 };
 
+/**
+ * Function used for calculating index from table, for use in hash function.
+ * 
+ *
+ * @param key
+ * @param table of indices
+ * @param number of nodes
+ *
+ * @return 
+ */
 int f1(string s, int * T, int n)
 {
 	int sum=0;
@@ -21,6 +31,18 @@ int f1(string s, int * T, int n)
 	return sum;
 }
 
+/**
+ * Gets key representing an edge.
+ * 
+ *
+ * @param index of first node
+ * @param index of second node
+ * @param number of nodes
+ * @param number of edges
+ * @param array of edges
+ *
+ * @return key representing the edge, or "" if invalid.
+ */
 string getEdgeStr(int u, int v, int n, int m, Edge * edges)
 {
 	for(int i=0;i<n;i++)
@@ -31,6 +53,18 @@ string getEdgeStr(int u, int v, int n, int m, Edge * edges)
 	return "";
 }
 
+/**
+ * Gets index of an edge.
+ * 
+ *
+ * @param index of first node
+ * @param index of second node
+ * @param number of nodes
+ * @param number of edges
+ * @param array of edges
+ *
+ * @return edge index, or -1 if invalid.
+ */
 int getEdgeInd(int u, int v, int n, int m, Edge * edges)
 {
 	for(int i=0;i<n;i++)
@@ -41,6 +75,19 @@ int getEdgeInd(int u, int v, int n, int m, Edge * edges)
 	return -1;
 }
 
+/**
+ * Calculates hash value for a key.
+ * 
+ *
+ * @param key
+ * @param node count
+ * @param key count
+ * @param table T1
+ * @param table T2
+ * @param values of graph nodes
+ *
+ * @return hash value
+ */
 int h(string s, int n,int m, int * T1, int *T2, int*g)
 {
 	int u=f1(s,T1,n);
@@ -51,6 +98,17 @@ int h(string s, int n,int m, int * T1, int *T2, int*g)
 	return retVal;
 }
 
+/**
+ * Recurent function that assigns values to graph, used for calculating hash function.
+ * 
+ * @param current node index
+ * @param number of nodes
+ * @param number of keys
+ * @param pointer to array determing if node was visited
+ * @param arrays of neighbours of each node.
+ * @param array of graph edges.
+ * @param array of values of nodes.
+ */
 void traverse(int ind, int n, int m, bool * visited, vector<int>* &neighbours, Edge * edges, int*g)
 {
 	visited[ind]=true;
@@ -68,6 +126,18 @@ void traverse(int ind, int n, int m, bool * visited, vector<int>* &neighbours, E
 	}
 }
 
+/**
+ * Recurent function for depth-first search for checking acyclicity
+ * 
+ *
+ * @param index of node
+ * @param first node visited in depth search
+ * @param number of nodes
+ * @param pointer to array determing if node was visited
+ * @param arrays of neighbours of each node.
+ * 
+ * @return false if graph cannot be acyclic, true otherwise
+ */
 bool traverseAc(int ind, int origin, int n, bool * visited, vector<int>* &neighbours)
 {
 	if(visited[ind])
@@ -92,6 +162,16 @@ bool traverseAc(int ind, int origin, int n, bool * visited, vector<int>* &neighb
 	return true;
 }
 
+/**
+ * Checks acyclicity of graph used for generating hash function.
+ * 
+ *
+ * @param number of nodes
+ * @param pointer to array determing if node was visited
+ * @param arrays of neighbours of each node.
+ *
+ * @return true if acyclic, false otherwise
+ */
 bool checkAcyclicity(int n, bool * visited, vector<int>* &neighbours)
 {
 	for(int i=0;i<n;i++)
@@ -114,10 +194,16 @@ bool checkAcyclicity(int n, bool * visited, vector<int>* &neighbours)
 	return true;
 }
 
-//void PerfectHashData::Print()
-//{
-//}
 
+/**
+ * Calculates perfect hash function.
+ * 
+ *
+ * @param array of keys.
+ * @param number of keys.
+ *
+ * @return hash function data.
+ */
 PerfectHashData * makePerfectHash(vector<string> & strs, int cnt)
 {
 	int n=3*cnt; // or alphabet size
@@ -220,6 +306,14 @@ PerfectHashData * makePerfectHash(vector<string> & strs, int cnt)
 
 }
 
+/**
+ * Calculates hash function for class reprezented by class container.
+ * 
+ *
+ * @param class container
+ *
+ * @return hash function data
+ */
 PerfectHashData * makeHashFromClass(ClassContainer * cont)
 {
 	vector<string> names;
@@ -251,12 +345,10 @@ extern unordered_map<string, int> primitiveTypeMap;
 extern int totalClassCnt;
 extern int elementTreeCnt;
 
-
-// todo count params
-// remember types and props all of em for each class
-// calc hash and stuff
-// print hashes too
-// print getters and setters and their initialization
+/**
+ * 
+ * Calculates all hash function for all classes.
+ */
 void MakeAllHashes()
 {
 	for(unsigned int j=0;j<defaultClasses.size();j++)

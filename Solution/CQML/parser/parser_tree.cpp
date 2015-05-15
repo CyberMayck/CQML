@@ -1,5 +1,5 @@
 #include "parser_tree.h"
-
+#include <string.h>
 
 SrcNode* MakeNode0KW(char * text)
 {
@@ -69,7 +69,6 @@ SrcNode* MakeNode1A(SrcNode* child1)
 
 SrcNode* MakeNode1STATM(SrcNode* child1)
 {
-	//return child1;
 	SrcNode* pointer=(SrcNode*)malloc(sizeof(SrcNode));
 	
 	(*pointer).childrenCount=1;

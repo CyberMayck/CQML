@@ -33,10 +33,9 @@ typedef struct SrcNode SrcNode;
 
 
 extern ParserList* elementTree;
-extern int id;
 
 #ifdef __cplusplus
-#include "src_apendix.h"
+
 extern "C"
 {
 	SrcNode* MakeNode0(char * text);
@@ -154,8 +153,8 @@ struct SrcNode{
 	int type;
 	
 #ifdef __cplusplus
-	SrcApendix *apendix;
+
 #else
-	int* apendix;
+
 #endif
 };
