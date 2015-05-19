@@ -1,0 +1,24 @@
+﻿Build started 5. 5. 2015 15:01:26.
+     1>Project "C:\Users\Mayck\Desktop\aaa\CQML\CQML\Solution\CQML\bison_grammar\bison_grammar.vcxproj" on node 2 (Rebuild target(s)).
+     1>PreBuildEvent:
+         make_grammar.bat
+         :VCEnd
+     1>cqml_grammar.g : warning : 3 nonterminals useless in grammar
+     1>cqml_grammar.g : warning : 8 rules useless in grammar
+         cqml_grammar.g:663.1-11: warning: nonterminal useless in grammar: pure_c_code
+         cqml_grammar.g:664.11-30: warning: nonterminal useless in grammar: external_declaration
+         cqml_grammar.g:671.11-29: warning: nonterminal useless in grammar: function_definition
+         cqml_grammar.g:664.11-665.51: warning: rule useless in grammar: pure_c_code: external_declaration
+         cqml_grammar.g:666.11-667.65: warning: rule useless in grammar: pure_c_code: pure_c_code external_declaration
+         cqml_grammar.g:671.11-672.51: warning: rule useless in grammar: external_declaration: function_definition
+         cqml_grammar.g:673.11-674.51: warning: rule useless in grammar: external_declaration: declaration
+         cqml_grammar.g:678.11-679.93: warning: rule useless in grammar: function_definition: declaration_specifiers declarator declaration_list compound_statement
+         cqml_grammar.g:680.11-681.79: warning: rule useless in grammar: function_definition: declaration_specifiers declarator compound_statement
+         cqml_grammar.g:682.11-683.79: warning: rule useless in grammar: function_definition: declarator declaration_list compound_statement
+         cqml_grammar.g:684.11-685.65: warning: rule useless in grammar: function_definition: declarator compound_statement
+         cqml_grammar.g: conflicts: 1 shift/reduce
+     1>Done Building Project "C:\Users\Mayck\Desktop\aaa\CQML\CQML\Solution\CQML\bison_grammar\bison_grammar.vcxproj" (Rebuild target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:00.19

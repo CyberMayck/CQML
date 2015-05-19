@@ -1,0 +1,37 @@
+\select@language {english}
+\select@language {czech}
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {2.1}{\ignorespaces {}Po\IeC {\v c}\IeC {\'\i }ta\IeC {\v c} Xerox Alto \cite {bib:altoImage}.}}{4}{figure.2.1}
+\contentsline {figure}{\numberline {2.2}{\ignorespaces {}Po\IeC {\v c}\IeC {\'\i }ta\IeC {\v c} Xerox Alto, nekter\IeC {\'e}m b\IeC {\v e}\IeC {\v z}\IeC {\'\i } jedno z prvn\IeC {\'\i }ch GUI \cite {bib:altoImage}.}}{5}{figure.2.2}
+\contentsline {figure}{\numberline {2.3}{\ignorespaces {}Grafick\IeC {\'e} rozhran\IeC {\'\i } po\IeC {\v c}\IeC {\'\i }ta\IeC {\v c}e Macintosh \cite {bib:macImage}.}}{6}{figure.2.3}
+\contentsline {figure}{\numberline {2.4}{\ignorespaces {}Grafick\IeC {\'e} rozhran\IeC {\'\i } syst\IeC {\'e}mu Windows 1.0 \cite {bib:winImage}.}}{6}{figure.2.4}
+\contentsline {figure}{\numberline {2.5}{\ignorespaces {}Grafick\IeC {\'e} rozhran\IeC {\'\i } syst\IeC {\'e}mu Windows 2.0 \cite {bib:winImage}.}}{7}{figure.2.5}
+\contentsline {figure}{\numberline {2.6}{\ignorespaces {}Grafick\IeC {\'e} rozhran\IeC {\'\i } po\IeC {\v c}\IeC {\'\i }ta\IeC {\v c}e Amiga Workbench \cite {bib:amigaImage}.}}{7}{figure.2.6}
+\contentsline {figure}{\numberline {2.7}{\ignorespaces {}Grafick\IeC {\'e} rozhran\IeC {\'\i } Arthur spole\IeC {\v c}nosti Acorn Computers \cite {bib:arthurImage}.}}{8}{figure.2.7}
+\contentsline {figure}{\numberline {2.8}{\ignorespaces {}Diagram aplikace s~pou\IeC {\v z}\IeC {\'\i }vaj\IeC {\'\i }c\IeC {\'\i } popis GUI vygenerovan\IeC {\'y} z modelu.}}{9}{figure.2.8}
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {4.1}{\ignorespaces {}N\IeC {\'a}vrh struktury aplikace.}}{21}{figure.4.1}
+\contentsline {figure}{\numberline {4.2}{\ignorespaces {}N\IeC {\'a}vrh struktury aplikace roz\IeC {\v s}\IeC {\'\i }\IeC {\v r}en\IeC {\'y} o \IeC {\v c}\IeC {\'a}sti pro~p\IeC {\v r}edzpracov\IeC {\'a}n\IeC {\'\i } datov\IeC {\'y}ch typ\IeC {\r u}.}}{22}{figure.4.2}
+\contentsline {figure}{\numberline {4.3}{\ignorespaces {}N\IeC {\'a}vrh struktury p\IeC {\v r}eklada\IeC {\v c}e.}}{24}{figure.4.3}
+\contentsline {figure}{\numberline {4.4}{\ignorespaces {}Diagram t\IeC {\v r}\IeC {\'\i }d symbol\IeC {\r u}.}}{26}{figure.4.4}
+\contentsline {figure}{\numberline {4.5}{\ignorespaces {}N\IeC {\'a}vrh realizace fronty.}}{30}{figure.4.5}
+\contentsline {figure}{\numberline {4.6}{\ignorespaces {}N\IeC {\'a}vrh komunikace mezi knihovnou a~u\IeC {\v z}ivatelskou aplikac\IeC {\'\i }.}}{30}{figure.4.6}
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {6.1}{\ignorespaces {}Obr\IeC {\'a}zek jednoduch\IeC {\'e} nab\IeC {\'\i }dky realizovan\IeC {\'e} v~jazyce \textit {QML}.}}{50}{figure.6.1}
+\contentsline {figure}{\numberline {6.2}{\ignorespaces {}Obr\IeC {\'a}zek jednoduch\IeC {\'e} nab\IeC {\'\i }dky realizovan\IeC {\'e} v~jazyce \textit {CQML}.}}{51}{figure.6.2}
+\contentsline {figure}{\numberline {6.3}{\ignorespaces {}Obr\IeC {\'a}zek kalkula\IeC {\v c}ky realizovan\IeC {\'e} pomoc\IeC {\'\i } deklarace v~jazyce \textit {QML}.}}{52}{figure.6.3}
+\contentsline {figure}{\numberline {6.4}{\ignorespaces {}Obr\IeC {\'a}zek kalkula\IeC {\v c}ky realizovan\IeC {\'e} pomoc\IeC {\'\i } deklarace v~jazyce \textit {CQML}.}}{53}{figure.6.4}
+\contentsline {figure}{\numberline {6.5}{\ignorespaces {}Obr\IeC {\'a}zek jednoduch\IeC {\'e} hry realizovan\IeC {\'e} pomoc\IeC {\'\i } deklarace v~jazyce \textit {QML}.}}{54}{figure.6.5}
+\contentsline {figure}{\numberline {6.6}{\ignorespaces {}Obr\IeC {\'a}zek jednoduch\IeC {\'e} hry realizovan\IeC {\'e} pomoc\IeC {\'\i } deklarace v~jazyce \textit {CQML}.}}{55}{figure.6.6}
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {D.1}{\ignorespaces {}Diagram ilustruj\IeC {\'\i }c\IeC {\'\i } roz\IeC {\v r}ez\IeC {\'a}n\IeC {\'\i } obr\IeC {\'a}zku pomoc\IeC {\'\i } elementu \textit {ScaledImage} \cite {bib:borderedImage}.}}{75}{figure.D.1}
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\addvspace {10\p@ }

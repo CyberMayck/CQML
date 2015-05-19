@@ -1,0 +1,41 @@
+Instalace/Spuštìní
+--------------------
+1. Spuštìní aktuálního grafického rozhraní (to jenž bylo ukázáno v diplomové práci)
+a) První možností je spustit soubor CQML_run_app.exe ze složky exe/Excutable_test_app, která spustí
+	již pøedem zkompilovaný program, s daný uživatelským rozhraním.
+b) Druhou možností je spustit v adresáøi exe/Translator soubor runThis.bat. Což zpùsobí pøeložení GUI
+	hierarchie z CQML souboru (konkrétnì hierarchie ze souboru "compare.cqml") do zdrojových kódù C++ 
+	a následnì je zahrne do projektu ve složce exe/CQML_run_app.
+	Následnou kompilací a spuštìním tohoto projektu se zobrazí GUI ze zdrojových CQML souborù. 
+	Pro otevøení projektu je vyžadována verze MicroSoft Visual Studio 2012.
+
+----------------------------------------------------------------------
+	
+2. Použití pøekladaèe a uživatelské aplikace pro zobrazení jiného GUI
+a) V adresáøi exe/Translator se nachází spustitelná verze pøekladaèe, která jako první parametr
+	pøijímá soubor s koøenovou komponentou GUI definvaného v jazyce CQML. 
+	Pomocí souboru translate.bat lze spustit pøeklad uživatelského rozhraní,
+	jehož koøenová komponenta je definována v souboru compare.cqml - výstupní
+	C++ zdrojové kódy budou zapsány do souborù ve složce "cqml_output/"
+
+	editací souboru translate.bat lze zmìnit soubor, který se zpracuje
+	napøíklad zmìnou z:
+	parser.exe compare.cqml
+	na:
+	parser.exe calculator.cqml
+	se zmìní zpracováný soubor na "calculator.cqml"
+	
+b) V adresáøi exe/CQML_run_app se nachází soubory projektu, který slouží pro zobrazení vygenerovaného 
+	rozhraní. Pro zobrazení pøeloženého rozhraní je nutné výstupní soubory ze složky cqml_output
+	z pøedchozího kroku zahrnout do projektu a následnì projekt zkompilovat a spustit. 
+	
+c) Pro pohodlí byl vytvoøen krátký program ParserLoader.exe, který automatizuje pøidávání vygenerovaných souborù
+	do projektu. Program pøijímá dva parametry a tím je cesta k souboru projektu, a relativní cesta
+	od pracovní složky projektu k složce s potøebnými soubory (v tomto pøípadì složky cqml_output).
+	Tento program lze zavolat spuštìním souboru copyToProject.bat, který automaticky zadá parametry 
+	pro projekt zmínìný v pøedchozím bodì. Projekt je však nutné stále znovu zkompilovat.
+	
+d) spuštìní pøekladaèe a programu pro pøeklad CQML kódu a úpravu daného projektu lze použít 
+	soubor runThis.bat, který za sebou spustí translate.bat a copyToProject.bat
+
+e) v pøípadì použití stejného projektu jako v bodì 1. lze místo krokù 2.b, 2.c, 2.d použít jen krok 1.b

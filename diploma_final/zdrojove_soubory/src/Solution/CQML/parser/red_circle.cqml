@@ -1,0 +1,101 @@
+import "normal_button.cqml" as NormalButton
+NormalButton
+{
+    id:thisButton;
+    width: 100;
+    height: 100;
+    property int value : 0;
+    property Element matcher;
+
+    MouseClicked:{
+        if(matcher.status==0)
+        {
+            matcher.first=thisButton;
+            matcher.firstValue=value;
+            matcher.status=1;
+            thisButton.enabled=0;
+        }
+        else if(matcher.status==1)
+        {
+            matcher.status=0;
+            if(matcher.firstValue==value)
+            {
+                matcher.score=matcher.score+value+1;
+                matcher.first.enabled=0;
+                matcher.first.visible=0;
+				
+				thisButton.enabled=0;
+				thisButton.visible=0;
+				
+                if(matcher.score==17)
+                {
+                    matcher.winMsg.visible=1;
+                }
+            }
+            else
+            {
+                matcher.first.enabled=1;
+            }
+
+        }
+    };
+
+    pressedImg :
+    {
+        if(value==0)
+        {
+            return "pics/red_round_down.png";
+        }
+        else if(value==1)
+        {
+            return "pics/green_round_down.png";
+        }
+        else if(value==2)
+        {
+            return "pics/blue_round_down.png";
+        }
+        else
+        {
+            return "pics/yellow_round_down.png";
+        }
+
+    };
+    overImg:
+    {
+        if(value==0)
+        {
+            return "pics/red_round_over.png";
+        }
+        else if(value==1)
+        {
+            return "pics/green_round_over.png";
+        }
+        else if(value==2)
+        {
+            return "pics/blue_round_over.png";
+        }
+        else
+        {
+            return "pics/yellow_round_over.png";
+        }
+    };
+    defImg:
+    {
+        if(value==0)
+        {
+            return "pics/red_round.png";
+        }
+        else if(value==1)
+        {
+            return "pics/green_round.png";
+        }
+        else if(value==2)
+        {
+            return "pics/blue_round.png";
+        }
+        else
+        {
+            return "pics/yellow_round.png";
+        }
+    };
+}

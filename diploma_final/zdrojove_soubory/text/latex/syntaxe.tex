@@ -1,0 +1,252 @@
+%% History:
+% Pavel Tvrdik (26.12.2004)
+%  + initial version for PhD Report
+%
+% Daniel Sykora (27.01.2005)
+%
+% Michal Valenta (3.12.2008)
+% rada zmen ve~formatovani (diky M. Duškovi, J. Holubovi a~J. Žďárkovi)
+% sjednoceni zdrojoveho kodu pro~anglickou, ceskou, bakalarskou a~diplomovou praci
+
+% One-page layout: (proof-)reading on displa
+%%%% \documentclass[11pt,oneside,a4paper]{book}
+% Two-page layout: final printing
+%\documentclass[11pt,twoside,a4paper]{book}   
+\documentclass{article}
+\clubpenalty 10000
+\widowpenalty 10000
+\usepackage{graphicx}
+
+
+
+%=-=-=-=-=-=-=-=-=-=-=-=--=%
+% The user of this template may find useful to have an alternative to these 
+% officially suggested packages:
+\usepackage[czech, english]{babel}
+%\usepackage[T1]{fontenc} % pouzije EC fonty 
+% pripadne pisete-li cesky, pak lze zkusit take:
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+%\usepackage[cp1250]{inputenc}
+\usepackage[utf8x]{inputenc}
+
+\usepackage{listings}
+\lstset{
+  literate={ě}{{\v{e}}}1
+           {š}{{\v{s}}}1
+           {č}{{\v{c}}}1
+           {ř}{{\v{r}}}1
+           {ž}{{\v{z}}}1
+           {ý}{{\'y}}1
+           {á}{{\'a}}1
+           {í}{{\'i}}1
+           {é}{{\'e}}1
+           {ó}{{\'o}}1
+}
+
+
+% Pozicovani
+\usepackage{float}
+\restylefloat{table}
+
+%=-=-=-=-=-=-=-=-=-=-=-=--=%
+% In case of problems with PDF fonts, one may try to uncomment this line:
+%\usepackage{lmodern}
+%=-=-=-=-=-=-=-=-=-=-=-=--=%
+%=-=-=-=-=-=-=-=-=-=-=-=--=%
+% Depending on your particular TeX distribution and version of conversion tools 
+% (dvips/dvipdf/ps2pdf), some (advanced | desperate) users may prefer to use 
+% different settings.
+% Please uncomment the following style and use your CSLaTeX (cslatex/pdfcslatex) 
+% to process your work. Note however, this file is in UTF-8 and a~conversion to 
+% your native encoding may be required. Some settings below depend on babel 
+% macros and should also be modified. See \selectlanguage \iflanguage.
+%\usepackage{czech}  %%%%%\usepackage[T1]{czech} %%%%[IL2] [T1] [OT1]
+%=-=-=-=-=-=-=-=-=-=-=-=--=%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Styles required in your work follow %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{graphicx}
+%\usepackage{indentfirst} %1. odstavec jako v~cestine.
+
+\usepackage{k336_thesis_macros} % specialni makra pro~formatovani DP a~BP
+
+
+
+% Extension posted by Petr Dlouhy in order for better sources reference (\cite{} command) especially in Czech.
+% April 2010
+% See comment over \thebibliography command for details.
+
+\usepackage[square, numbers]{natbib}             % sazba pouzite literatury
+%\DeclareUrlCommandDostupné z \url{\def\UrlLeft{<}\def\UrlRight{>}\urlstyle{tt}}  %rm/sf/tt
+%\renewcommand{\emph}[1]{\textsl{#1}}    % melo by byt kurziva nebo sklonene,
+%\let\oldUrl\url
+%\renewcommand\url[1]{<\texttt{\oldUrl{#1}}>}
+
+
+\usepackage{fancyhdr}
+
+\begin{document}
+\selectlanguage{czech} 
+\title{Použití CQML knihovny}
+\date{}
+\maketitle
+
+
+Uživatel musí definovat uživatelské rozhraní v jazyce \textit{CQML} a uložit jej do souboru. Následně musí daný soubor předat překladači, který z něj vygeneruje zdrojové kódy pro~použití v uživatelské aplikaci, která pro obsluhu \textit{GUI} používá runtime knihovnu pro \textit{CQML}.
+\section{Použití překladače}
+\subsection{Spuštění překladu}
+Překladač v příkazové řádce přijímá jeden parametr, kterým je jméno souboru, v němž je definována vrchní komponenta \textit{GUI} hierarchie. Ukázka kódu \ref{lst:help1} ilustruje spuštění překladače pro překlad souboru \uv{src.cqml} prostřednictvím příkazové řádky. V~případě, že jsou v rámci daného souboru využívány komponenty z jiných souborů, tyto soubory se načtou automaticky.
+\begin{lstlisting}[frame=single,caption=Spuštění překladače pomocí příkazové řádky.,label=lst:help1]
+parser.exe "src.cqml"
+\end{lstlisting}
+\subsection{Výstupní soubory}
+Výstupem překladče je několik souborů ($X$ je pořadové číslo zpracovaného souboru):
+\begin{description}
+\item[parser\_output.cpp] - zdrojový soubor s vygenerovanými funkcemi pro inicializaci a obsluhu rozhraní.
+\item[parser\_output.h] - hlavičkový soubor, v němž jsou deklarovány hlavičky funkcí pro inicializaci a obsluhu rozhraní.
+\item[outputX.cpp] - zdrojový soubor komponenty.
+\item[outputX.h] - hlavičkový soubor komponenty.
+\end{description}
+\section[Použití knihovny]{Použití knihovny v uživatelské aplikaci}
+\subsection{Kompilace uživatelské aplikace}
+Pro překlad uživatelské aplikace používající zdrojové kódy vygenerované překladačem je nutné použít dynamickou knihovnu, která byla zkompilována do souborů \uv{CQML\_DLL.dll} a \uv{CQML\_DLL.dll}. Do~projektu pro uživatelskou aplikaci je potřeba zahrnout soubory vygenerované překladačem a také hlavičkové soubory pro použití knihovny ze složky \uv{cqml\_include}.
+\subsection{Inicializace rozhraní}
+Před spuštěním hlavní programové smyčky, která komunikuje s \textit{GUI}, musí být provedena inicializace. Nejprve program musí zavolat funkci \textit{\_CQML\_Init}. Následně je nutné přiřadit instance rozhraní pro vykreslování a správu externích zdrojů pomocí funkcí \textit{SetDrawIFace} (viz. sekce \ref{SEC:drawI}) a \textit{SetResourceManager}(viz. sekce \ref{SEC:resI}). Na závěr je potřeba inicializaci ukončit zavoláním funkce \textit{\_CQML\_Start}, která spustí logiku pro obsluhu \textit{GUI}. Pro volání všech funkcí pro obsluhu \textit{GUI} musí být do zdrojového souboru zahrnut soubor \uv{qml\_includes.h} ze složky \uv{cqml\_include} a také soubor \uv{parser\_output.h} vygenerovaný překladačem.
+\subsection{Zpracování vstupu}
+Vstup se zpracovává prostřednictvím událostí, které musí být ve specifickém formátu předány knihovně prostřednictvím funkce \textit{PushEvent}. Tato funkce přijímá jeden parametr typu \textit{CQMLEvent}, ve kterém jsou uložena specifika dané vstupní události. Struktura datového typu \textit{CQMLEvent} je uvedena v kódu \ref{lst:help2}.
+\begin{lstlisting}[frame=single,caption=Struktura datového typu \textit{CQMLEvent}.,label=lst:help2]
+int EventType; //hodnota CQML_KEY_EVENT nebo CQML_MOUSE_EVENT
+// následující hodnoty platí jen pro CQML_KEY_EVENT
+	int keyEvent.action;	// KEY_RELEASED nebo KEY_PRESSED
+	int keyEvent.key;	// kód stisknuté klávesy
+// následující hodnoty platí jen pro CQML_MOUSE_EVENT
+	int mouseEvent.action; // MOUSE_WHEEL_SCROLLED, 
+		// MOUSE_MOVEMENT, MOUSE_BUTTON_RELEASED 
+		// nebo MOUSE_BUTTON_PRESSED
+	int mouseEvent.button; // kód stisknutého tlačítka
+	int mouseEvent.x;	// souřadnice x ukazatele myši
+	int mouseEvent.y;	// souřadnice y ukazatele myši
+	int mouseEvent.relativeX; // relativní pohyb v ose x
+	int mouseEvent.relativeY; // relativní pohyb v ose y
+\end{lstlisting}
+Kód \ref{lst:help3} ilustruje předání události stisknutí klávesy knihovně.
+\begin{lstlisting}[float,frame=single,caption=Předání vstupu z klávesnice knihovně.,label=lst:help3]
+CQMLEvent e;
+e.EventType =  CQML_KEY_EVENT;
+e.keyEvent.action = KEY_PRESSED;
+e.keyEvent.key = c; // c je hodnota označující klávesu
+PushEvent(e);
+\end{lstlisting}
+
+\subsection{\label{SEC:resI}Rozhraní pro zpracování externích zdrojů}
+Pomocí funkce \textit{SetResourceManager} se nastaví rozhraní pro správu externích zdrojů, to je jí předáno prostřednictvím ukazatele na instanci daného rozhraní. Rozhraní musí dědit z~abstraktní třídy \textit{ResourceManagerIFace} a implementovat metody ukázané v kódu \ref{lst:help5}.
+\begin{lstlisting}[frame=single,caption=Metody rozhraní pro správu externích zdrojů.,label=lst:help5]
+void* LoadFont(const char * fontStr, int fontSize);
+// načte data písma a vrátí na ně ukazatel
+// fontStr je název písma
+// fontSize je velikost písma
+
+ImageData LoadImage(const char *  path);
+// načte data obrázku a vrátí je ve formě struktury popsané níže
+// path je cesta k souboru s obrázkem
+
+struct ImageData
+{
+	void * img; // ukazatel na načtená data
+	int w; // šířka načteného obrázku
+	int h; // výška načteného obrázku
+};
+\end{lstlisting}
+
+\subsection{\label{SEC:drawI}Vykreslovací rozhraní}
+Pomocí funkce \textit{SetDrawIFace} se nastaví rozhraní pro vykreslování, to je jí předáno prostřednictvím ukazatele na instanci daného rozhraní. Rozhraní musí dědit z abstraktní třídy \textit{DrawIFace} a implementovat metody ukázané v kódu \ref{lst:help4}.
+\begin{lstlisting}[float,frame=single,caption=Metody vykreslovacího rozhraní.,label=lst:help4]
+void DrawFilledRectangle(int x,int y, int w, int h,
+	float r, float g, float b);
+// vykreslí jednobarevný obdélník
+// x, y jsou souřadnice obdélníku
+// w, h jsou rozměry obdélníku
+// r, g, b určují barevné složky barvy výplně obdélníku
+
+void DrawFilledBorderedRectangle(int x, int y, int w, int h, 
+	float r, float g, float b, float border, 
+	float br, float bg, float bb);
+// vykreslí obdélník s okrajem
+// x, y jsou souřadnice obdélníku
+// w, h jsou rozměry obdélníku
+// r, g, b určují barevné složky barvy výplně obdélníku
+// border určuje šířku okraje
+// br, bg, bb určují barevné složky barvy okraje obdélníku
+
+void DrawText(int x, int y, int w, int h, 
+	const char* text, void* font, float r, float g, float b);
+// vykreslí text
+// x, y jsou souřadnice textu
+// text je textový řetězec, který se má vykreslit
+// font je ukazatel na data písma
+// r, g, b určují barevné složky barvy písma
+
+void DrawImage(int x, int y, int w, int h, void* image);
+// vykreslí obrázek
+// x, y jsou souřadnice obrázku
+// w, h jsou rozměry, do kterých se obrázek roztáhne
+// image je ukazatel na data obrázku
+
+void DrawImageSegment(int x, int y, int w, int h,
+	void* image, int iX, int iY, int iW, int iH);
+// vykreslí určitý výřez obrázku
+// x, y jsou souřadnice obrázku
+// w, h jsou rozměry, do kterých se obrázek roztáhne
+// image je ukazatel na data obrázku
+// iX, iY jsou souřadnice výřezu ve zdrojovém obrázku
+// iW, iH jsou rozměry výřezu ve zdrojovém obrázku
+\end{lstlisting}
+
+\subsection{\label{SEC:updateDraw}Funkce volané z hlavní programové smyčky}
+Pro vykreslování \textit{GUI} uživatelská aplikace musí zavolat funkci \textit{\_CQML\_Draw}. Pro přepočítání hodnot jednotlivých elementů v hierarchii uživatelská aplikace musí zavolat funkci \textit{\_CQML\_Update}.
+
+
+\section[Rozšiřování \textit{CQML}]{\label{CH:APD}Rošiřování jazyka \textit{CQML} o nové vestavěné typy a elementy.}
+Jazyk \textit{CQML} lze rozšířit o další vestavěné typy a to pomocí speciálních maker v souboru \uv{struct\_definition\_macros.h}, toto však vyžaduje zásah do zdrojový kódů knihovny. Nejprve programátor vytvoří makro pro definici struktury daného typu a následně dané makro zaregistruje. Toto je ilustrováno v kódu \ref{lst:help5}, kde je přidán nový element jménem \textit{EnhancedElement}, který je odvozen z typu \textit{Element}. Veškerou funkčnost, která není poskytována již u ostatních elementů, musí však programátor implementovat v rámci zdrojového kódu knihovny.\\
+\begin{lstlisting}[float, frame=single,caption=Registrace nového vestavěného datového typu.,label=lst:help5]
+// makro STRUCT_ENHANCED vytvoří strukturu s následujicími členy:
+// 1. atribut typu int jménem Attribute s výchozí hodnotou 0
+// 2. atribut typu float jménem HiddenAttribute, který není 
+	přístupný z CQML, s výchozí hodnotou 0
+// 3. virtuální metoda jménem VirtualMethod s návratovým 
+//	typem void a žádnými a parametry
+// 4. metoda jménem Method s návratovým typem int 
+//	a dvěma parametry typu int
+// 5. ukazatel na funkci pro obsluhu nějaké události, který je
+//	z CQML přístupný pod jménem EventHandler
+//	a je inicializován na nulovou hodnotu. 
+//	v tomto případě přijímá parametr typu QMLMouseEvent, 
+//	který je v CQML dostupný pod názvem EVENT
+#define STRUCT_ENHANCED(MF, F, M, ME, MEV) \
+	F(int, Attribute, 0) \
+	MF(float, HiddenAttribute, 0) \
+	MEV(void, VirtualMethod) \
+	ME(int, Method, int, int) \
+	M(void, CustomEventHandler, 0, QMLMouseEvent EVENT) \
+
+// následně se dané makro zaregistruje přidáním nového řádku 
+// 	do makra REGISTRATION (viz. jeho poslední řádek).
+// první argument na posledním řádku určuje název registrovaného
+//	makra
+// druhý argument na posledním řádku určuje jméno elementu
+// poslední argument na posledním řádku určuje, z jaké struktury
+//	nový prvek dědí - pro případ, že chceme vytvořit
+//	hodnotový datový typ, který z ničeho nedědí, odstraní se 
+//	poslední argument a makro MACRO3 se změní na MACRO2
+#define REGISTRATION(MACRO2, MACRO2REF, MACRO3) \
+	REGPRIMITIVE(int)\
+	MACRO2(STRUCT_COLOR, Color) \
+	MACRO2REF(STRUCT_ELEMENT, Element) \
+	MACRO3(STRUCT_RECTANGLE, Rectangle, Element) \
+	MACRO3(STRUCT_ENHANCED, EnhancedElement, Element) \ 
+\end{lstlisting}
+Upravený soubor \uv{struct\_definition\_macros.h} musí programátor vložit do projektů všech částí knihovny \textit{CQML}, tj. překladače, preprocesoru datových typů i runtime knihovny a také do projektu uživatelské aplikace. Následně musí zkompilovat a spustit preprocesor datových typů, který vygeneruje zdrojový soubor \uv{preparser\_output.cpp}, který musí být zahrnut do~zdrojových kódů knihovny, resp. je jím nutno přepsat ten již existující. Po té je nutné znovu zkompilovat překladač a runtime knihovnu. Poté už je možné nový datový typ použít.
+
+\end{document}

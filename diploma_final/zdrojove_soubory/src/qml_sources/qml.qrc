@@ -1,0 +1,32 @@
+<RCC>
+    <qresource prefix="/">
+        <file>main.qml</file>
+        <file>TextButton.qml</file>
+        <file>button_long.png</file>
+        <file>SameLogic.js</file>
+        <file>pics/blue_round.png</file>
+        <file>pics/blue_round_down.png</file>
+        <file>pics/blue_round_over.png</file>
+        <file>pics/button_long.png</file>
+        <file>pics/button_long_down.png</file>
+        <file>pics/button_long_over.png</file>
+        <file>pics/button_square.png</file>
+        <file>pics/button_square_blue.png</file>
+        <file>pics/button_square_blue_down.png</file>
+        <file>pics/button_square_blue_over.png</file>
+        <file>pics/green_round.png</file>
+        <file>pics/green_round_down.png</file>
+        <file>pics/green_round_over.png</file>
+        <file>pics/red_round.png</file>
+        <file>pics/red_round_down.png</file>
+        <file>pics/red_round_over.png</file>
+        <file>pics/yellow_round.png</file>
+        <file>pics/yellow_round_down.png</file>
+        <file>pics/yellow_round_over.png</file>
+        <file>Calculator.qml</file>
+        <file>Matching.qml</file>
+        <file>CalculatorButton.qml</file>
+        <file>NormalButton.qml</file>
+        <file>RedCircle.qml</file>
+    </qresource>
+</RCC>

@@ -1,0 +1,71 @@
+import "text_button.cqml" as TextButton
+import "matching.cqml" as Matching
+import "calculator.cqml" as Calculator
+Rectangle
+{
+    width : 1024;
+    height : 768;
+    color.red : 1;
+    color.green : 1;
+    color.blue : 1;
+	
+	TextButton{
+        id : but1;
+        text : "Calculator";
+        x: parent.width/2 - width/2;
+        y: 1*parent.height/4 - height/2;
+        MouseClicked:
+        {
+            but1.visible=0;
+            but1.enabled=0;
+            but2.visible=0;
+            but2.enabled=0;
+            but3.visible=0;
+            but3.enabled=0;
+            calc.visible=1;
+            calc.enabled=1;
+        };
+    };
+    TextButton{
+        id : but2;
+        text : "Match 2";
+        x: parent.width/2 - width/2;
+        y: 2*parent.height/4 - height/2;
+        MouseClicked:
+        {
+            but1.visible=0;
+            but1.enabled=0;
+            but2.visible=0;
+            but2.enabled=0;
+            but3.visible=0;
+            but3.enabled=0;
+			match.enabled=1;
+			match.visible=1;
+        };
+    };
+    TextButton{
+        id : but3;
+        text : "Quit";
+        x: parent.width/2 - width/2;
+        y: 3*parent.height/4 - height/2;
+        MouseClicked:
+        {
+            exit(0);
+        };
+    };
+    Matching{
+        id: match;
+        x:0;
+        y:0;
+        visible: 0;
+        enabled: 0;
+    };
+	
+    Calculator{
+        id: calc;
+        x:0;
+        y:0;
+        visible: 0;
+        enabled: 0;
+    };
+}
